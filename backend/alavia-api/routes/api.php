@@ -4,9 +4,9 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\Auth\AuthController;
 use App\Http\Controllers\Auth\PasswordResetController;
 use App\Http\Controllers\User\ProfileController;
-use App\Http\Controllers\HospitalController;
-use App\Http\Controllers\ConsultationController;
-use App\Http\Controllers\SpeechController;
+// use App\Http\Controllers\HospitalController;
+// use App\Http\Controllers\ConsultationController;
+// use App\Http\Controllers\SpeechController;
 
 Route::get('/health', function () {
     return response()->json(['status' => 'ok']);
@@ -44,4 +44,4 @@ Route::prefix('speech')->group(function () {
     Route::post('/tts', [SpeechController::class, 'tts']);
 });
 
-Route::prefix('admin')->group(base_path('routes/admin.php'));
+//Route::prefix('admin')->group(base_path('routes/admin.php'));
