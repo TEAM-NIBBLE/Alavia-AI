@@ -95,6 +95,17 @@ export interface HospitalListItem {
   lat: number
   lng: number
   distance_km?: number
+  address?: string
+  phone?: string
+  is_public?: boolean
+  isEmergencyReady?: boolean
+  emergency_ready?: boolean
+  specialties?: string[] | string
+  facilities?: string[] | string
+  openHours?: string
+  open_hours?: string
+  city?: string
+  area?: string
 }
 
 export interface HospitalListResponse {
@@ -271,19 +282,19 @@ export const hospitalsApi = {
 }
 
 export const consultationsApi = {
-  start(initial_message?: string) {
+  start(initial_message?: string, language?: string) {
     return apiRequest<ConsultationStartResponse>(API.consultations.start, {
       method: 'POST',
       token: getToken(),
-      body: initial_message ? { initial_message } : {},
+      body: { initial_message: initial_message ?? '', language: language ?? 'en' },
     })
   },
 
-  message(id: string | number, content: string) {
+  message(id: string | number, content: string, language?: string) {
     return apiRequest<ConsultationMessageResponse>(API.consultations.message(id), {
       method: 'POST',
       token: getToken(),
-      body: { content },
+      body: { content, language: language ?? 'en' },
     })
   },
 
@@ -389,4 +400,3 @@ export const adminApi = {
     })
   },
 }
-
