@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import alaviaLogo from './assets/alavia-ai_logo.png'
 import SignUpPage from './components/SignUpPage'
 import SignInPage from './components/SignInPage'
+import VoiceInteractionScreen from './components/VoiceInteractionScreen'
 import './App.css'
 
 type OnboardingStep = 'splash' | 'language' | 'signup' | 'signin' | 'app'
@@ -12,11 +13,14 @@ const languageCodes: LanguageCode[] = ['en', 'pcm', 'yo', 'ha', 'ig']
 
 function App() {
   const { t, i18n } = useTranslation()
-  const [step, setStep] = useState<OnboardingStep>('splash')
+  const [step, setStep] = useState<OnboardingStep>(() => {
+    const user = localStorage.getItem('alavia.user')
+    return user ? 'app' : 'splash'
+  })
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(
     (localStorage.getItem('alavia.selectedLanguage') as LanguageCode) ||
-      (i18n.language as LanguageCode) ||
-      'en'
+    (i18n.language as LanguageCode) ||
+    'en'
   )
   const [isContinuing, setIsContinuing] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
@@ -30,11 +34,13 @@ function App() {
   })
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setStep('language')
-    }, 2500)
-    return () => clearTimeout(timer)
-  }, [])
+    if (step === 'splash') {
+      const timer = setTimeout(() => {
+        setStep('language')
+      }, 2500)
+      return () => clearTimeout(timer)
+    }
+  }, [step])
 
   // IMPORTANT: This effect ensures that as soon as selectedLanguage state changes,
   // i18next updates the global language, causing the whole UI to re-translate instantly.
@@ -70,6 +76,17 @@ function App() {
     setStep('app')
   }
 
+  const handleLogout = () => {
+    localStorage.removeItem('alavia.user')
+    setUserName('')
+    setStep('language')
+  }
+
+  const handleLanguageChange = (code: LanguageCode) => {
+    setSelectedLanguage(code)
+    localStorage.setItem('alavia.selectedLanguage', code)
+  }
+
   // Auth pages render as full-page replacements
   if (step === 'signup') {
     return (
@@ -93,42 +110,11 @@ function App() {
 
   if (step === 'app') {
     return (
-      <div className="relative min-h-screen overflow-hidden bg-white">
-        <div className="absolute top-0 left-0 right-0 h-1.5 bg-emerald-600" />
-        <div className="absolute left-0 top-0 h-full w-1.5 bg-emerald-600/30" />
-        <div className="absolute right-0 top-0 h-full w-1.5 bg-emerald-600/30" />
-        <div
-          aria-hidden="true"
-          className="pointer-events-none absolute inset-0"
-          style={{
-            background:
-              'radial-gradient(circle at top right, rgba(16,185,129,0.1) 0%, transparent 50%)'
-          }}
-        />
-        <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center px-6 text-center">
-          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-emerald-600 shadow-xl shadow-emerald-200">
-            <img src={alaviaLogo} alt="Alavia AI" className="h-14 w-14 rounded-2xl object-contain" />
-          </div>
-          <div className="mb-2 rounded-full bg-emerald-100 px-4 py-1 text-xs font-bold uppercase tracking-wider text-emerald-700">
-            Welcome
-          </div>
-          <h1 className="mt-2 text-3xl font-extrabold text-slate-900">
-            Hello, {userName || 'there'}! 👋
-          </h1>
-          <p className="mt-3 text-slate-500">
-            You're now signed in to Alavia AI. Your health journey in your language starts here.
-          </p>
-          <button
-            onClick={() => {
-              localStorage.removeItem('alavia.user')
-              setStep('signin')
-            }}
-            className="mt-10 rounded-xl border border-slate-200 px-6 py-2.5 text-sm font-medium text-slate-500 transition hover:border-emerald-300 hover:text-emerald-600"
-          >
-            Sign out
-          </button>
-        </div>
-      </div>
+      <VoiceInteractionScreen
+        userName={userName}
+        onLogout={handleLogout}
+        onLanguageChange={handleLanguageChange}
+      />
     )
   }
 
@@ -147,8 +133,8 @@ function App() {
         {/* Brand Container - Settles at the top with reduced size */}
         <div
           className={`flex flex-col items-center transition-all duration-1000 ease-in-out ${step === 'splash'
-              ? 'scale-110 mb-0'
-              : 'scale-90 mb-8 sm:mb-12'
+            ? 'scale-110 mb-0'
+            : 'scale-90 mb-8 sm:mb-12'
             }`}
         >
           <div className="relative">
@@ -181,8 +167,8 @@ function App() {
         {/* Language Selection Card */}
         <div
           className={`w-full max-w-xl transition-all duration-1000 ease-out ${step === 'language'
-              ? 'translate-y-0 opacity-100'
-              : 'translate-y-16 opacity-0 pointer-events-none'
+            ? 'translate-y-0 opacity-100'
+            : 'translate-y-16 opacity-0 pointer-events-none'
             }`}
         >
           <div className="rounded-3xl border border-white/40 bg-white/70 p-6 shadow-2xl backdrop-blur-xl sm:p-9 ring-1 ring-slate-900/5">
@@ -213,8 +199,8 @@ function App() {
                     <div className="flex items-center gap-4">
                       <div
                         className={`flex h-10 w-10 items-center justify-center rounded-xl transition-all duration-300 ${active
-                            ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200'
-                            : 'bg-slate-100 text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-500'
+                          ? 'bg-emerald-600 text-white shadow-md shadow-emerald-200'
+                          : 'bg-slate-100 text-slate-400 group-hover:bg-emerald-50 group-hover:text-emerald-500'
                           }`}
                       >
                         <span className="text-xs font-black uppercase">NG</span>
@@ -271,7 +257,7 @@ function App() {
 
         {/* Footer Text */}
         <div
-          className={`absolute bottom-8 text-center px-4 transition-all duration-1000 ${step === 'language' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          className={`absolute bottom-6 text-center px-4 transition-all duration-1000 ${step === 'language' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
             }`}
         >
           <p className="text-xs font-bold uppercase tracking-widest text-slate-400">{t('onboarding.footer')}</p>

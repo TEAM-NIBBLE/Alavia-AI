@@ -95,7 +95,7 @@ export default function SignInPage({ onSuccess, onSwitchToSignUp, onBack }: Sign
         {/* Forgot-password toast */}
         {forgotSent && (
           <div className="mb-4 w-full rounded-xl border border-emerald-200 bg-emerald-50 px-4 py-3 text-sm font-medium text-emerald-700 shadow-sm animate-in fade-in slide-in-from-top-2">
-            ✓ A reset link has been sent if your account exists.
+            {t('auth.forgotPasswordSuccess')}
           </div>
         )}
 
@@ -119,11 +119,10 @@ export default function SignInPage({ onSuccess, onSwitchToSignUp, onBack }: Sign
                   value={form.emailOrPhone}
                   onChange={handleChange('emailOrPhone')}
                   placeholder={t('auth.emailOrPhonePlaceholder')}
-                  className={`w-full rounded-xl border py-3 pl-10 pr-4 text-sm text-slate-800 outline-none transition-all placeholder:text-slate-300 focus:ring-2 focus:ring-emerald-500/30 ${
-                    errors.emailOrPhone
-                      ? 'border-red-400 bg-red-50 focus:border-red-400'
-                      : 'border-slate-200 bg-slate-50 focus:border-emerald-500 focus:bg-white'
-                  }`}
+                  className={`w-full rounded-xl border py-3 pl-10 pr-4 text-sm text-slate-800 outline-none transition-all placeholder:text-slate-300 focus:ring-2 focus:ring-emerald-500/30 ${errors.emailOrPhone
+                    ? 'border-red-400 bg-red-50 focus:border-red-400'
+                    : 'border-slate-200 bg-slate-50 focus:border-emerald-500 focus:bg-white'
+                    }`}
                 />
               </div>
               {errors.emailOrPhone && (
@@ -157,11 +156,10 @@ export default function SignInPage({ onSuccess, onSwitchToSignUp, onBack }: Sign
                   value={form.password}
                   onChange={handleChange('password')}
                   placeholder={t('auth.signinPasswordPlaceholder')}
-                  className={`w-full rounded-xl border py-3 pl-10 pr-12 text-sm text-slate-800 outline-none transition-all placeholder:text-slate-300 focus:ring-2 focus:ring-emerald-500/30 ${
-                    errors.password
-                      ? 'border-red-400 bg-red-50 focus:border-red-400'
-                      : 'border-slate-200 bg-slate-50 focus:border-emerald-500 focus:bg-white'
-                  }`}
+                  className={`w-full rounded-xl border py-3 pl-10 pr-12 text-sm text-slate-800 outline-none transition-all placeholder:text-slate-300 focus:ring-2 focus:ring-emerald-500/30 ${errors.password
+                    ? 'border-red-400 bg-red-50 focus:border-red-400'
+                    : 'border-slate-200 bg-slate-50 focus:border-emerald-500 focus:bg-white'
+                    }`}
                 />
                 <button
                   type="button"
@@ -214,9 +212,27 @@ export default function SignInPage({ onSuccess, onSwitchToSignUp, onBack }: Sign
           {/* Divider */}
           <div className="my-6 flex items-center gap-3">
             <div className="h-px flex-1 bg-slate-100" />
-            <span className="text-xs font-medium text-slate-300">or</span>
+            <span className="text-xs font-medium text-slate-300 uppercase tracking-widest text-[10px]">{t('auth.orDivider')}</span>
             <div className="h-px flex-1 bg-slate-100" />
           </div>
+
+          <button
+            type="button"
+            onClick={() => {
+              setIsLoading(true)
+              setTimeout(() => {
+                localStorage.setItem('alavia.user', JSON.stringify({ name: 'Demo User', email: 'demo@alavia.ai' }))
+                setIsLoading(false)
+                onSuccess()
+              }, 1000)
+            }}
+            className="mb-6 flex w-full items-center justify-center gap-2 rounded-xl border-2 border-emerald-100 bg-white py-3 text-sm font-bold text-emerald-700 transition-all hover:border-emerald-500 hover:bg-emerald-50 hover:shadow-md active:scale-[0.98]"
+          >
+            <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+              <path strokeLinecap="round" strokeLinejoin="round" d="M5.121 17.804A13.937 13.937 0 0112 16c2.5 0 4.847.655 6.879 1.804M15 10a3 3 0 11-6 0 3 3 0 016 0zm6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            {t('auth.signInDemo')}
+          </button>
 
           {/* Switch to Sign Up */}
           <p className="text-center text-sm text-slate-500">
