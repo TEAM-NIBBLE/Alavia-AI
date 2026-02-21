@@ -167,11 +167,15 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     ? { id: String(currentAIMessageSeq), question: currentAIMessage }
     : null
 
-  const speakText = (text: string) => {
-    if (!('speechSynthesis' in window)) return
+  const speakText = (text: string, onEnd?: () => void) => {
+    if (!('speechSynthesis' in window)) {
+      onEnd?.()
+      return
+    }
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.lang = selectedLanguage === 'pcm' ? 'en-NG' : `${selectedLanguage}-NG`
     utterance.rate = 1.0
+    if (onEnd) utterance.onend = onEnd
     window.speechSynthesis.cancel()
     window.speechSynthesis.speak(utterance)
   }
@@ -360,10 +364,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     if (isListening) stopListening()
   }
 
-  const answerQuestion = (value: boolean) => {
-    void sendConsultationMessage(value ? t('voice.yes') : t('voice.no'))
-  }
-
   useEffect(() => {
     transcriptRef.current = transcript
   }, [transcript])
@@ -481,7 +481,12 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   useEffect(() => {
     if (aiResponse && activeQuestion && lastSpokenQuestionRef.current !== activeQuestion.id) {
       lastSpokenQuestionRef.current = activeQuestion.id
-      setTimeout(() => speakText(activeQuestion.question), 1000)
+      setTimeout(() => {
+        speakText(activeQuestion.question, () => {
+          // auto-start mic after the question is spoken so user can reply naturally
+          void startListening()
+        })
+      }, 800)
     }
   }, [activeQuestion, aiResponse])
 
@@ -812,32 +817,54 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                     <h4 className="text-2xl font-black leading-tight mb-8 tracking-tight text-emerald-400">
                       {activeQuestion.question}
                     </h4>
-                    <div className="flex gap-4">
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => answerQuestion(true)}
-                        className="flex-1 rounded-2xl bg-emerald-500 py-4 text-lg font-black text-white shadow-2xl shadow-emerald-500/30 transition-all hover:bg-emerald-400"
+
+                    {/* Auto-mic listening indicator */}
+                    <div className={`flex items-center gap-3 rounded-2xl px-5 py-4 transition-all ${
+                      isListening
+                        ? 'bg-emerald-500/20 border border-emerald-500/40'
+                        : sessionStatus === 'processing'
+                          ? 'bg-white/5 border border-white/10'
+                          : 'bg-white/10 border border-white/20'
+                    }`}>
+                      <motion.div
+                        animate={isListening ? { scale: [1, 1.25, 1] } : {}}
+                        transition={{ repeat: Infinity, duration: 1.2 }}
                       >
-                        {t('voice.yes')}
-                      </motion.button>
-                      <motion.button
-                        whileHover={{ scale: 1.02 }}
-                        whileTap={{ scale: 0.98 }}
-                        onClick={() => answerQuestion(false)}
-                        className="flex-1 rounded-2xl bg-white/20 py-4 text-lg font-black text-black border border-white/40 shadow-xl hover:bg-white/30 transition-all"
-                      >
-                        {t('voice.no')}
-                      </motion.button>
+                        {sessionStatus === 'processing'
+                          ? <Loader2 size={18} className="animate-spin text-white/40" />
+                          : isListening
+                            ? <Mic size={18} className="text-emerald-400" />
+                            : <MicOff size={18} className="text-white/30" />
+                        }
+                      </motion.div>
+                      <span className={`flex-1 text-sm font-bold ${
+                        isListening ? 'text-emerald-300' : 'text-white/40'
+                      }`}>
+                        {sessionStatus === 'processing'
+                          ? t('voice.status.processing')
+                          : isListening
+                            ? t('voice.status.listening')
+                            : t('voice.listeningHint')
+                        }
+                      </span>
+                      {isListening && (
+                        <div className="flex items-end gap-0.5">
+                          {[0, 1, 2, 3].map(i => (
+                            <motion.span
+                              key={i}
+                              className="w-1 rounded-full bg-emerald-400"
+                              animate={{ height: ['5px', '16px', '5px'] }}
+                              transition={{ repeat: Infinity, duration: 0.7, delay: i * 0.15 }}
+                              style={{ display: 'inline-block' }}
+                            />
+                          ))}
+                        </div>
+                      )}
                     </div>
 
-                    <button
-                      onClick={handleSpeakTap}
-                      className="mt-6 flex items-center gap-2 text-[10px] font-black uppercase tracking-widest text-white/40 hover:text-emerald-400 transition-colors"
-                    >
-                      <Mic size={14} />
-                      {t('voice.speakAnswer')}
-                    </button>
+                    <p className="mt-4 text-center text-[10px] font-black uppercase tracking-widest text-white/20">
+                      {t('voice.typeSymptoms')}
+                    </p>
                   </div>
                 </motion.div>
               )}
