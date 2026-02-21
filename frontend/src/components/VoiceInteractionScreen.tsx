@@ -132,6 +132,10 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const transcriptRef = useRef('')
   const interimRef = useRef('')
   const lastSpokenQuestionRef = useRef<string | null>(null)
+  const shouldKeepListeningRef = useRef(false)
+  const inputModeRef = useRef<InputMode>('tap')
+  const silenceTimeoutRef = useRef<number | null>(null)
+  const restartTimeoutRef = useRef<number | null>(null)
 
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('ready')
   const [inputMode, setInputMode] = useState<InputMode>('tap')
@@ -232,8 +236,45 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     }, 600)
   }
 
+  const clearSpeechTimers = () => {
+    if (silenceTimeoutRef.current !== null) {
+      window.clearTimeout(silenceTimeoutRef.current)
+      silenceTimeoutRef.current = null
+    }
+    if (restartTimeoutRef.current !== null) {
+      window.clearTimeout(restartTimeoutRef.current)
+      restartTimeoutRef.current = null
+    }
+  }
+
+  const queueInactivityStop = () => {
+    if (inputModeRef.current !== 'tap') return
+    if (!shouldKeepListeningRef.current) return
+
+    // Keep tap-to-speak stable for slower speakers; avoid abrupt stop mid-sentence.
+    if (silenceTimeoutRef.current !== null) {
+      window.clearTimeout(silenceTimeoutRef.current)
+    }
+
+    silenceTimeoutRef.current = window.setTimeout(() => {
+      if (shouldKeepListeningRef.current && inputModeRef.current === 'tap') {
+        stopListening()
+      }
+    }, 9000)
+  }
+
+  const finalizeCurrentTranscript = () => {
+    const finalText = `${transcriptRef.current} ${interimRef.current}`.trim()
+    if (!finalText) return
+    submitInputIntoFlow(finalText)
+  }
+
   const stopListening = () => {
+    shouldKeepListeningRef.current = false
+    clearSpeechTimers()
     recognitionRef.current?.stop()
+    setIsListening(false)
+    setSessionStatus('ready')
     triggerHaptics([10, 20, 10])
   }
 
@@ -249,8 +290,13 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       return
     }
 
+    shouldKeepListeningRef.current = true
+    clearSpeechTimers()
+    setTranscript('')
     setSessionStatus('listening')
     setInterimTranscript('')
+    transcriptRef.current = ''
+    interimRef.current = ''
 
     try {
       recognitionRef.current?.start()
@@ -311,6 +357,10 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   }, [interimTranscript])
 
   useEffect(() => {
+    inputModeRef.current = inputMode
+  }, [inputMode])
+
+  useEffect(() => {
     if (!supportsSpeech) return
 
     const speechWindow = window as any
@@ -318,7 +368,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     if (!SpeechRecognitionImpl) return
 
     const recognition = new SpeechRecognitionImpl()
-    recognition.continuous = false
+    recognition.continuous = true
     recognition.interimResults = true
     recognition.lang = selectedLanguage === 'pcm' ? 'en-NG' : `${selectedLanguage}-NG`
 
@@ -338,26 +388,61 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
       if (interim) setInterimTranscript(interim.trim())
       if (finalChunk.trim()) setTranscript((prev) => `${prev} ${finalChunk}`.trim())
+      queueInactivityStop()
     }
 
-    recognition.onerror = () => {
+    recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
+      const shouldContinue = shouldKeepListeningRef.current && inputModeRef.current === 'tap'
+      const transientError = event.error === 'no-speech' || event.error === 'aborted'
+
+      if (shouldContinue && transientError) {
+        restartTimeoutRef.current = window.setTimeout(() => {
+          if (!shouldKeepListeningRef.current || inputModeRef.current !== 'tap') return
+          try {
+            recognitionRef.current?.start()
+            setIsListening(true)
+            setSessionStatus('listening')
+          } catch {
+            // Browser can throw if recognition is already active.
+          }
+        }, 150)
+        return
+      }
+
+      shouldKeepListeningRef.current = false
+      clearSpeechTimers()
       setIsListening(false)
       setSessionStatus('ready')
     }
 
     recognition.onend = () => {
+      const shouldContinue = shouldKeepListeningRef.current && inputModeRef.current === 'tap'
       setIsListening(false)
-      setSessionStatus('ready')
 
-      const finalText = `${transcriptRef.current} ${interimRef.current}`.trim()
-      if (finalText) {
-        submitInputIntoFlow(finalText)
+      if (shouldContinue) {
+        restartTimeoutRef.current = window.setTimeout(() => {
+          if (!shouldKeepListeningRef.current || inputModeRef.current !== 'tap') return
+          try {
+            recognitionRef.current?.start()
+            setIsListening(true)
+            setSessionStatus('listening')
+          } catch {
+            // Safe no-op: browser can throw if restart collides with lifecycle.
+          }
+        }, 120)
+        return
       }
+
+      clearSpeechTimers()
+      setSessionStatus('ready')
+      finalizeCurrentTranscript()
     }
 
     recognitionRef.current = recognition
 
     return () => {
+      shouldKeepListeningRef.current = false
+      clearSpeechTimers()
       recognition.stop()
       recognitionRef.current = null
     }

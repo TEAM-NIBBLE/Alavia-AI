@@ -1,5 +1,6 @@
 import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
+import { Eye, EyeOff } from 'lucide-react'
 import alaviaLogo from '../assets/alavia-ai_logo.png'
 import { authApi } from '../api/services'
 
@@ -182,7 +183,7 @@ export default function SignInPage({ onSuccess, onSwitchToSignUp, onBack }: Sign
                   className="absolute inset-y-0 right-3.5 flex items-center text-slate-400 transition-colors hover:text-emerald-600"
                   aria-label={showPassword ? 'Hide password' : 'Show password'}
                 >
-                  {showPassword ? '??' : '???'}
+                  {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
                 </button>
               </div>
               {errors.password && (
