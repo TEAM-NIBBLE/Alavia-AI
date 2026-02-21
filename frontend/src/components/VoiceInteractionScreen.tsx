@@ -1071,7 +1071,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed inset-0 z-[150]"
+            className="fixed inset-0 z-[150] overflow-y-auto"
           >
             <ProfilePage
               onBack={() => setShowProfile(false)}
