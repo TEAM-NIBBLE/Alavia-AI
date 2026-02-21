@@ -173,27 +173,50 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       onEnd?.()
       return
     }
-    const utterance = new SpeechSynthesisUtterance(text)
-    const lang = selectedLanguage === 'pcm' ? 'en-NG' : `${selectedLanguage}-NG`
-    utterance.lang = lang
-    utterance.rate = 1.0
 
-    // Pick the best female voice available
-    const voices = voicesRef.current
-    const FEMALE_NAMES = ['zira', 'samantha', 'victoria', 'karen', 'fiona', 'susan', 'moira',
-      'veena', 'tessa', 'female', 'woman', 'girl', 'serena', 'siri', 'ava', 'allison',
-      'joanna', 'ivy', 'kimberly', 'kendra', 'salli', 'olivia', 'aria']
+    // Map app language codes → BCP47 tags (priority order per language)
+    const LANG_BCP47: Record<string, string[]> = {
+      en:  ['en-NG', 'en-GB', 'en-US', 'en'],
+      pcm: ['en-NG', 'en-GB', 'en-US', 'en'],   // Nigerian Pidgin – closest TTS is NG English
+      yo:  ['yo', 'yo-NG', 'en-NG', 'en'],        // Yoruba (rare – falls back to NG English)
+      ha:  ['ha', 'ha-NE', 'en-NG', 'en'],        // Hausa
+      ig:  ['ig', 'ig-NG', 'en-NG', 'en'],        // Igbo
+    }
+    const bcp47List = LANG_BCP47[selectedLanguage] ?? ['en-NG', 'en']
+
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.lang = bcp47List[0]   // primary preference
+    utterance.rate = 0.95
+    utterance.pitch = 1.1           // warmer female pitch
+
+    // Female voice name fragments
+    const FEMALE_NAMES = [
+      'zira', 'samantha', 'victoria', 'karen', 'fiona', 'susan', 'moira',
+      'veena', 'tessa', 'female', 'woman', 'serena', 'siri', 'ava', 'allison',
+      'joanna', 'ivy', 'kimberly', 'kendra', 'salli', 'olivia', 'aria', 'hazel',
+    ]
     const isFemale = (v: SpeechSynthesisVoice) =>
       FEMALE_NAMES.some(n => v.name.toLowerCase().includes(n))
-    // 1. Female voice matching app language locale
-    const langPrefix = lang.split('-')[0]
-    let chosen = voices.find(v => isFemale(v) && v.lang.startsWith(langPrefix))
-    // 2. Female English voice
+
+    const voices = voicesRef.current
+    let chosen: SpeechSynthesisVoice | undefined
+
+    // 1. Female voice matching any of the preferred BCP47 tags (in priority order)
+    for (const tag of bcp47List) {
+      chosen = voices.find(v => isFemale(v) && v.lang.startsWith(tag.split('-')[0]))
+      if (chosen) break
+    }
+    // 2. Any voice (not necessarily female) matching the language
+    if (!chosen) {
+      for (const tag of bcp47List) {
+        chosen = voices.find(v => v.lang.startsWith(tag.split('-')[0]))
+        if (chosen) break
+      }
+    }
+    // 3. Any female English voice as last resort
     if (!chosen) chosen = voices.find(v => isFemale(v) && v.lang.startsWith('en'))
-    // 3. Any female voice
-    if (!chosen) chosen = voices.find(v => isFemale(v))
+
     if (chosen) utterance.voice = chosen
-    utterance.pitch = 1.1   // slightly warmer pitch
 
     if (onEnd) utterance.onend = onEnd
     window.speechSynthesis.cancel()
@@ -215,12 +238,30 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     setConsultationComplete(v)
   }
 
+  // Language name sent to backend so the AI replies in the correct language
+  const LANG_NAMES: Record<string, string> = {
+    en:  'English',
+    pcm: 'Nigerian Pidgin English',
+    yo:  'Yoruba',
+    ha:  'Hausa',
+    ig:  'Igbo',
+  }
+
+  // Instruction prepended to every message so the AI model always responds
+  // in the correct language, regardless of backend language field support.
+  const langInstruction = (langName: string) =>
+    selectedLanguage === 'en'
+      ? ''  // no prefix needed for English
+      : `[SYSTEM: You MUST respond ONLY in ${langName}. Do NOT use English in your response. The user speaks ${langName}.] `
+
   const startConsultation = (message: string) => {
     setSessionStatus('processing')
     setApiError(null)
+    const langName = LANG_NAMES[selectedLanguage] ?? 'English'
+    const prefixed = langInstruction(langName) + message
     void (async () => {
       try {
-        const res = await consultationsApi.start(message)
+        const res = await consultationsApi.start(prefixed, langName)
         const id = res.consultation_id
         updateConsultationId(id)
         setCurrentAIMessage(res.message.content)
@@ -240,8 +281,11 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     if (!id) return
     setSessionStatus('processing')
     setApiError(null)
+    const langName = LANG_NAMES[selectedLanguage] ?? 'English'
+    // Keep reminding the AI of the language on every turn
+    const prefixed = langInstruction(langName) + content
     try {
-      const res = await consultationsApi.message(id, content)
+      const res = await consultationsApi.message(id, prefixed, langName)
       setCurrentAIMessage(res.message.content)
       setCurrentAIMessageSeq(prev => prev + 1)
       if (res.severity) {

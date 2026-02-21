@@ -1,6 +1,3 @@
-Here is the clean **Markdown instruction document** you can give directly to the AI as its system behavior.
-
----
 
 # 🩺 ALAVIA AI – System Instruction
 
