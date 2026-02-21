@@ -17,7 +17,20 @@ import {
   LogOut,
   Loader2,
   MicOff,
-  UserCircle
+  UserCircle,
+  MapPin,
+  Clock,
+  ArrowRight,
+  Navigation,
+  ExternalLink,
+  Map as MapIcon,
+  Stethoscope,
+  BriefcaseMedical,
+  Users,
+  Building2,
+  HeartPulse,
+  Syringe,
+  Info
 } from 'lucide-react'
 import alaviaLogo from '../assets/alavia-ai_logo.png'
 
@@ -80,6 +93,31 @@ const severityStyle: Record<Severity, { bg: string, text: string, border: string
   high: { bg: 'bg-orange-50', text: 'text-orange-700', border: 'border-orange-200', icon: AlertTriangle },
   critical: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200', icon: AlertTriangle },
 }
+
+const DUMMY_HOSPITALS = [
+  {
+    id: 1,
+    name: 'Lagoon Hospital',
+    distance: '1.2km',
+    type: 'Private',
+    level: 'Specialist Hospital',
+    emergency: 'Emergency Ready 24 hours',
+    specialties: ['General Medicine', 'Emergency Medicine', 'Surgery', 'Cardiology'],
+    tags: ['Has ICU', 'Has Pharmacy', 'Open 24 Hours', 'Has Ambulance'],
+    coordinates: { x: 65, y: 40 }
+  },
+  {
+    id: 2,
+    name: 'Island Maternity Hospital',
+    distance: '2.5km',
+    type: 'Public',
+    level: 'General Hospital',
+    emergency: 'Emergency Ready 24 hours',
+    specialties: ['Obstetrics and Gynecology', 'Pediatrics'],
+    tags: ['Affordable', 'Open 24 Hours', 'Has Laboratory'],
+    coordinates: { x: 35, y: 55 }
+  }
+]
 
 interface VoiceInteractionScreenProps {
   userName?: string
@@ -671,7 +709,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
                         onClick={() => answerQuestion(false)}
-                        className="flex-1 rounded-2xl bg-white/10 py-4 text-lg font-black text-white border border-white/20 backdrop-blur-md hover:bg-white/20 transition-all"
+                        className="flex-1 rounded-2xl bg-white/20 py-4 text-lg font-black text-black border border-white/40 shadow-xl hover:bg-white/30 transition-all"
                       >
                         {t('voice.no')}
                       </motion.button>
@@ -684,6 +722,152 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                       <Mic size={14} />
                       {t('voice.speakAnswer')}
                     </button>
+                  </div>
+                </motion.div>
+              )}
+
+              {aiResponse && questionIndex === TRIAGE_QUESTIONS.length && (
+                <motion.div
+                  initial={{ opacity: 0, y: 40 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  className="space-y-6"
+                >
+                  {/* First Aid Section */}
+                  <div className="rounded-[32px] bg-white p-6 sm:p-8 shadow-2xl shadow-slate-200/50 border border-slate-50">
+                    <div className="flex items-center gap-3 mb-6">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-200">
+                        <Activity size={20} />
+                      </div>
+                      <h3 className="text-xl font-black text-slate-800 tracking-tight">{t('voice.firstAidTitle')}</h3>
+                    </div>
+                    <div className="space-y-4">
+                      {(t(`voice.firstAid.${aiResponse.severity}`, { returnObjects: true }) as string[]).map((step, idx) => (
+                        <motion.div
+                          key={idx}
+                          initial={{ opacity: 0, x: -20 }}
+                          animate={{ opacity: 1, x: 0 }}
+                          transition={{ delay: idx * 0.1 }}
+                          className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100/50"
+                        >
+                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-black text-white">
+                            {idx + 1}
+                          </span>
+                          <p className="text-sm font-bold text-slate-600 leading-relaxed">{step}</p>
+                        </motion.div>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Hospital Routing Section */}
+                  <div className="rounded-[32px] bg-slate-900 p-8 shadow-2xl shadow-slate-900/20 text-white overflow-hidden relative">
+                    <motion.div
+                      animate={{
+                        scale: [1, 1.2, 1],
+                        opacity: [0.1, 0.2, 0.1]
+                      }}
+                      transition={{ duration: 5, repeat: Infinity }}
+                      className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-emerald-500 blur-[80px]"
+                    />
+
+                    <div className="relative z-10">
+                      <div className="flex items-center justify-between mb-4">
+                        <div>
+                          <h3 className="text-2xl font-black mb-1 tracking-tight">{t('voice.routingTitle')}</h3>
+                          <p className="text-sm font-bold text-white/50">{t('voice.routingDesc')}</p>
+                        </div>
+                        <div className="h-12 w-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
+                          <MapIcon size={24} className="text-emerald-400" />
+                        </div>
+                      </div>
+
+                      {/* Map Preview Interface */}
+                      <div className="relative mb-8 h-48 w-full overflow-hidden rounded-[28px] bg-slate-800 border border-white/5">
+                        {/* Stylized Map SVG/Background */}
+                        <div className="absolute inset-0 opacity-20">
+                          <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
+                            <path d="M0,20 L100,20 M0,50 L100,50 M0,80 L100,80 M30,0 L30,100 M70,0 L70,100" stroke="white" strokeWidth="0.5" fill="none" />
+                            <circle cx="50" cy="50" r="40" stroke="white" strokeWidth="0.2" fill="none" />
+                          </svg>
+                        </div>
+
+                        {/* Pulsing User Location */}
+                        <motion.div
+                          animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
+                          transition={{ duration: 2, repeat: Infinity }}
+                          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.8)] border-2 border-white z-10"
+                        />
+
+                        {/* Hospital Markers */}
+                        {DUMMY_HOSPITALS.map((h) => (
+                          <motion.div
+                            key={h.id}
+                            initial={{ scale: 0 }}
+                            animate={{ scale: 1 }}
+                            style={{ left: `${h.coordinates.x}%`, top: `${h.coordinates.y}%` }}
+                            className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
+                          >
+                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg border-2 border-slate-900">
+                              <HeartPulse size={14} />
+                            </div>
+                            <div className="mt-1 rounded-md bg-slate-900/80 px-1.5 py-0.5 backdrop-blur-sm border border-white/10">
+                              <span className="text-[7px] font-black uppercase whitespace-nowrap">{h.name.split(' ')[0]}</span>
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+
+                      <div className="space-y-4">
+                        {DUMMY_HOSPITALS.map((hospital, idx) => (
+                          <motion.div
+                            key={idx}
+                            whileHover={{ y: -4 }}
+                            className="group flex flex-col p-5 rounded-[28px] bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer"
+                          >
+                            <div className="flex items-start justify-between mb-4">
+                              <div className="flex items-center gap-4">
+                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
+                                  <Navigation size={20} />
+                                </div>
+                                <div>
+                                  <h5 className="font-black text-base text-white tracking-tight leading-tight">{hospital.name}</h5>
+                                  <div className="flex items-center gap-3 text-[10px] font-bold text-emerald-400 mt-1">
+                                    <span className="flex items-center gap-1 uppercase tracking-wider">{hospital.type}</span>
+                                    <span className="h-1 w-1 rounded-full bg-white/20" />
+                                    <span className="flex items-center gap-1">{hospital.distance} away</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <div className="rounded-full bg-emerald-500/10 px-3 py-1 text-[8px] font-black text-emerald-400 border border-emerald-500/20 uppercase">
+                                {hospital.level}
+                              </div>
+                            </div>
+
+                            <div className="flex flex-wrap gap-2 mb-4">
+                              {hospital.specialties.slice(0, 3).map((s, i) => (
+                                <span key={i} className="text-[9px] font-bold text-white/60 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">{s}</span>
+                              ))}
+                              {hospital.specialties.length > 3 && (
+                                <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-lg">+{hospital.specialties.length - 3} more</span>
+                              )}
+                            </div>
+
+                            <div className="grid grid-cols-2 gap-2 mt-auto">
+                              {hospital.tags.map((tag, i) => (
+                                <div key={i} className="flex items-center gap-2 text-[9px] font-bold text-white/40">
+                                  <div className="h-1 w-1 rounded-full bg-emerald-500" />
+                                  {tag}
+                                </div>
+                              ))}
+                            </div>
+                          </motion.div>
+                        ))}
+                      </div>
+
+                      <button className="w-full mt-8 flex items-center justify-center gap-3 rounded-2xl bg-emerald-500 py-5 text-xs font-black text-white shadow-2xl shadow-emerald-500/40 transition-all hover:bg-emerald-400 uppercase tracking-widest border border-emerald-400/20">
+                        <MapIcon size={18} />
+                        <span>Navigate in Full Maps</span>
+                      </button>
+                    </div>
                   </div>
                 </motion.div>
               )}

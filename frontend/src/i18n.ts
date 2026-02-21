@@ -104,7 +104,32 @@ const resources = {
           high: 'You should visit a hospital today for assessment.',
           medium: 'Monitor closely and plan a same-day clinic visit if symptoms continue.',
           low: 'Current signs look mild. Keep monitoring and rest.'
-        }
+        },
+        firstAidTitle: 'First Aid Instructions',
+        firstAid: {
+          critical: [
+            'Call emergency services immediately',
+            'Stay calm and try to slow your breathing',
+            'Do not drive yourself to the hospital'
+          ],
+          high: [
+            'Prepare to travel to the nearest hospital',
+            'Pack your current medications',
+            'Have someone accompany you'
+          ],
+          medium: [
+            'Rest and monitor your temperature',
+            'Hydrate well',
+            'Book an appointment if symptoms persist'
+          ],
+          low: [
+            'Rest and keep warm',
+            'Continue with regular fluids',
+            'Monitor for any new symptoms'
+          ]
+        },
+        routingTitle: 'Hospitals Near You',
+        routingDesc: 'We found the following facilities based on your location.'
       }
     }
   },
@@ -209,8 +234,33 @@ const resources = {
           critical: 'Your symptoms fit need urgent help. Abeg go emergency care now now.',
           high: 'You suppose go hospital today for checkup.',
           medium: 'Monitor am well and plan same-day clinic visit if e continue.',
-          low: 'Signs look mild for now. Keep monitoring and rest.'
-        }
+          low: 'Normal signs wey mild. Just dey monitor and rest.'
+        },
+        firstAidTitle: 'First Aid Wetin You Go Do',
+        firstAid: {
+          critical: [
+            'Call emergency now now',
+            'Stay calm, try slow your breathing',
+            'No drive yourself go hospital'
+          ],
+          high: [
+            'Prepare go hospital wey near you',
+            'Carry your medicine follow body',
+            'Make person follow you go'
+          ],
+          medium: [
+            'Rest and check your body hotness',
+            'Drink plenty water',
+            'Book appointment if e no stop'
+          ],
+          low: [
+            'Rest and stay warm',
+            'Dey drink plenty water',
+            'Monitor if anything new happen'
+          ]
+        },
+        routingTitle: 'Hospital Wey Near You',
+        routingDesc: 'We find these places follow where you dey.'
       }
     }
   },
@@ -315,8 +365,33 @@ const resources = {
           critical: 'Ami aisan yi le nilo iranlowo pajawiri. Lo si ile iwosan pajawiri bayii.',
           high: 'O ye ki o lo si ile iwosan loni fun ayewo.',
           medium: 'Tele e peki ki o si gbero ibewo ile iwosan loni bi o ba tesiwaju.',
-          low: 'Ami yi rorun fun bayii. Maa tele e ki o sinmi.'
-        }
+          low: 'Awon ami aisan re ko po pupo. Tesiwaju lati mojuto ki o si sinmi.'
+        },
+        firstAidTitle: 'Awọn Igbese Akọkọ',
+        firstAid: {
+          critical: [
+            'Pe iranlowo pajawiri lẹsẹkẹsẹ',
+            'Sinmi, gbiyanju lati dinku mimi rẹ',
+            'Ma ṣe wakọ funrararẹ lọ si ile-iwosan'
+          ],
+          high: [
+            'Murasilẹ lati lọ si ile-iwosan ti o sunmọ',
+            'Di awọn oogun rẹ ti o nlo lọwọlọwọ',
+            'Jẹ ki ẹnikan tẹle ọ lọ'
+          ],
+          medium: [
+            'Sinmi ki o si bojuto iwọn otutu ara rẹ',
+            'Mu omi daradara',
+            'Ṣeto eto lati rí dokita ti o ba tẹsiwaju'
+          ],
+          low: [
+            'Sinmi ki o si pa ara rẹ mọ́',
+            'Tesiwaju lati mu omi to pọọ',
+            'Mojuto ti o ba ri ohunkohun titun'
+          ]
+        },
+        routingTitle: 'Awọn Ile-Iwosan Nitosi Rẹ',
+        routingDesc: 'A ri awọn ile-iwosan wọnyi gẹgẹbi ibi ti o wa.'
       }
     }
   },
@@ -421,8 +496,33 @@ const resources = {
           critical: 'Alamun ka na iya bukatar kulawar gaggawa. Je asibitin gaggawa yanzu.',
           high: 'Ya kamata ka je asibiti yau domin dubawa.',
           medium: 'Ci gaba da lura sosai kuma ka shirya zuwa asibiti yau idan ya ci gaba.',
-          low: 'Alamun sun yi sauki a yanzu. Ci gaba da lura kuma ka huta.'
-        }
+          low: 'Alamun da kake nuna ba su dade ba. Ci gaba da lura da hutu.'
+        },
+        firstAidTitle: 'Matakan Tallafin Gaggawa',
+        firstAid: {
+          critical: [
+            'Tuntubi agajin gaggawa nan take',
+            'Kwantar da hankali, yi kokarin rage numfashi',
+            'Kada ka tuka kanka zuwa asibiti'
+          ],
+          high: [
+            'Shirya tafiya zuwa asibiti mafi kusa',
+            'Dauki magungunan da kake amfani da su',
+            'Samu wani ya raka ka'
+          ],
+          medium: [
+            'Huta sannan ka rika duba zafin jikinka',
+            'Sha ruwa sosai',
+            'Nemi ganin likita idan abin ya ci gaba'
+          ],
+          low: [
+            'Huta ka kiyaye zafin jikinka',
+            'Ci gaba da shan ruwa',
+            'Lura idan aka samu canji'
+          ]
+        },
+        routingTitle: 'Asibitoci Kusa Da Kai',
+        routingDesc: 'Mun sami wadannan wuraren dangane da inda kake.'
       }
     }
   },
@@ -527,8 +627,33 @@ const resources = {
           critical: 'Mgbaama gi nwere ike choro enyemaka ozugbo. Gaa ulo ogwu mberede ugbu a.',
           high: 'I kwesiri iga ulo ogwu taa ka ha nyochaa gi.',
           medium: 'Nyochaa nke oma ma mee atumatu ileta ulo ogwu taa ma oburu na o gara nihu.',
-          low: 'Mgbaama di mfe ugbu a. Nogide na-ele anya ma zuru ike.'
-        }
+          low: 'Ihe nrịba ama dị ugbu a dị nwayọ. Nọgide na-ekiri na izu ike.'
+        },
+        firstAidTitle: 'Ihe Enyemaka Mbụ',
+        firstAid: {
+          critical: [
+            'Kpọọ ndị enyemaka mberede ozugbo',
+            'Wetuo obi, gbalịa ka iku ume gị nwayọ',
+            'Anwala ịkwọ ụgbọ ala gị gaa ụlọ ọgwụ'
+          ],
+          high: [
+            'Kwado ịga n’ụlọ ọgwụ kacha nso',
+            'Buru ọgwụ gị niile ị na-aụ ugbu a',
+            'Ka mmadụ soro gị gaa'
+          ],
+          medium: [
+            'Zuo ike ma na-elele iku ume gị',
+            'Ṅụọ mmiri nke ọma',
+            'Gaa hụ dọkịta ma ọ bụrụ na ọ gaa n’ihu'
+          ],
+          low: [
+            'Zuo ike ma na-ekpo ọkụ',
+            'Nọgide na-aụ mmiri nke ọma',
+            'Lekwa ma ọ bụrụ na ihe ọhụrụ emee'
+          ]
+        },
+        routingTitle: 'Ụlọ Ọgwụ Dị Gị Nso',
+        routingDesc: 'Anyị hụrụ ebe ndị a dabere n’ebe ị nọ.'
       }
     }
   }
