@@ -128,7 +128,9 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const silenceTimeoutRef = useRef<number | null>(null)
   const restartTimeoutRef = useRef<number | null>(null)
   const voicesRef = useRef<SpeechSynthesisVoice[]>([])
+  const conversationModeRef = useRef<'voice' | 'keyboard' | null>(null)
 
+  const [conversationMode, setConversationMode] = useState<'voice' | 'keyboard' | null>(null)
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('ready')
   const [inputMode, setInputMode] = useState<InputMode>('tap')
   const [isListening, setIsListening] = useState(false)
@@ -302,6 +304,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       : `[SYSTEM: You MUST respond ONLY in ${langName}. Do NOT use English in your response. The user speaks ${langName}.] `
 
   const startConsultation = (message: string) => {
+    console.debug('[VoiceInteraction] startConsultation called', { message, mode: conversationModeRef.current })
     setSessionStatus('processing')
     setApiError(null)
     const langName = LANG_NAMES[selectedLanguage] ?? 'English'
@@ -309,6 +312,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     void (async () => {
       try {
         const res = await consultationsApi.start(prefixed, langName)
+        console.debug('[VoiceInteraction] consultationsApi.start response', res)
         const id = res.consultation_id
         updateConsultationId(id)
         setCurrentAIMessage(res.message.content)
@@ -325,7 +329,11 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
   const sendConsultationMessage = async (content: string) => {
     const id = consultationIdRef.current
-    if (!id) return
+    console.debug('[VoiceInteraction] sendConsultationMessage called', { content, id, mode: conversationModeRef.current })
+    if (!id) {
+      console.warn('[VoiceInteraction] sendConsultationMessage aborted — no consultation id')
+      return
+    }
     setSessionStatus('processing')
     setApiError(null)
     const langName = LANG_NAMES[selectedLanguage] ?? 'English'
@@ -333,6 +341,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     const prefixed = langInstruction(langName) + content
     try {
       const res = await consultationsApi.message(id, prefixed, langName)
+      console.debug('[VoiceInteraction] consultationsApi.message response', res)
       setCurrentAIMessage(res.message.content)
       setCurrentAIMessageSeq(prev => prev + 1)
       if (res.severity) {
@@ -360,10 +369,14 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     }
   }
 
-  const submitInputIntoFlow = (value: string) => {
+  const submitInputIntoFlow = (value: string, source: 'voice' | 'keyboard' = 'voice') => {
     const cleaned = value.trim()
     if (!cleaned) return
-    setTranscript(cleaned)
+    if (source === 'voice') {
+      setTranscript(cleaned)
+    } else {
+      setTranscript('')
+    }
     setInterimTranscript('')
     const currentId = consultationIdRef.current
     const isComplete = consultationCompleteRef.current
@@ -379,6 +392,8 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
         setAIResponse(null)
         setApiError(null)
       }
+      conversationModeRef.current = source
+      setConversationMode(source)
       startConsultation(cleaned)
     }
   }
@@ -413,7 +428,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const finalizeCurrentTranscript = () => {
     const finalText = `${transcriptRef.current} ${interimRef.current}`.trim()
     if (!finalText) return
-    submitInputIntoFlow(finalText)
+    submitInputIntoFlow(finalText, 'voice')
   }
 
   const stopListening = () => {
@@ -603,12 +618,20 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   useEffect(() => {
     if (aiResponse && activeQuestion && lastSpokenQuestionRef.current !== activeQuestion.id) {
       lastSpokenQuestionRef.current = activeQuestion.id
-      setTimeout(() => {
-        speakText(activeQuestion.question, () => {
-          // auto-start mic after the question is spoken so user can reply naturally
-          void startListening()
-        })
-      }, 800)
+      if (conversationModeRef.current === 'keyboard') {
+        // keyboard mode: speak question then reopen keyboard panel
+        setTimeout(() => {
+          speakText(activeQuestion.question)
+          setShowKeyboardPanel(true)
+        }, 800)
+      } else {
+        // voice mode: speak question then auto-start mic
+        setTimeout(() => {
+          speakText(activeQuestion.question, () => {
+            void startListening()
+          })
+        }, 800)
+      }
     }
   }, [activeQuestion, aiResponse])
 
@@ -997,7 +1020,54 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                       {activeQuestion.question}
                     </h4>
 
-                    {/* Auto-mic listening indicator */}
+                    {/* Response indicator — keyboard or mic depending on conversation mode */}
+                    {conversationMode === 'keyboard' ? (
+                      <div
+                        onClick={() => setShowKeyboardPanel(true)}
+                        className={`flex items-center gap-3 rounded-2xl px-5 py-4 transition-all cursor-pointer ${
+                          showKeyboardPanel
+                            ? 'bg-emerald-500/20 border border-emerald-500/40'
+                            : sessionStatus === 'processing'
+                              ? 'bg-white/5 border border-white/10'
+                              : 'bg-white/10 border border-white/20 hover:bg-white/15'
+                        }`}
+                      >
+                        <motion.div
+                          animate={showKeyboardPanel ? { scale: [1, 1.15, 1] } : {}}
+                          transition={{ repeat: Infinity, duration: 1.4 }}
+                        >
+                          {sessionStatus === 'processing'
+                            ? <Loader2 size={18} className="animate-spin text-white/40" />
+                            : <Keyboard size={18} className={showKeyboardPanel ? 'text-emerald-400' : 'text-white/30'} />
+                          }
+                        </motion.div>
+                        <span className={`flex-1 text-sm font-bold truncate ${
+                          showKeyboardPanel && textInput ? 'text-white' : showKeyboardPanel ? 'text-emerald-300' : 'text-white/40'
+                        }`}>
+                          {sessionStatus === 'processing'
+                            ? t('voice.status.processing')
+                            : showKeyboardPanel && textInput
+                              ? textInput
+                              : showKeyboardPanel
+                                ? t('voice.inputPlaceholder')
+                                : t('voice.typeSymptoms')
+                          }
+                        </span>
+                        {showKeyboardPanel && textInput && (
+                          <div className="flex items-end gap-0.5">
+                            {[0, 1, 2].map(i => (
+                              <motion.span
+                                key={i}
+                                className="w-1 rounded-full bg-emerald-400"
+                                animate={{ height: ['4px', '14px', '4px'] }}
+                                transition={{ repeat: Infinity, duration: 0.6, delay: i * 0.18 }}
+                                style={{ display: 'inline-block' }}
+                              />
+                            ))}
+                          </div>
+                        )}
+                      </div>
+                    ) : (
                     <div className={`flex items-center gap-3 rounded-2xl px-5 py-4 transition-all ${
                       isListening
                         ? 'bg-emerald-500/20 border border-emerald-500/40'
@@ -1040,6 +1110,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                         </div>
                       )}
                     </div>
+                    )}
 
                     <p className="mt-4 text-center text-[10px] font-black uppercase tracking-widest text-white/20">
                       {t('voice.typeSymptoms')}
@@ -1350,7 +1421,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                     onChange={(e) => setTextInput(e.target.value)}
                     onKeyDown={(e) => {
                       if (e.key === 'Enter') {
-                        submitInputIntoFlow(textInput)
+                        submitInputIntoFlow(textInput, 'keyboard')
                         setTextInput('')
                         setShowKeyboardPanel(false)
                       }
@@ -1361,7 +1432,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                   whileTap={{ scale: 0.95 }}
                   disabled={!textInput.trim()}
                   onClick={() => {
-                    submitInputIntoFlow(textInput)
+                    submitInputIntoFlow(textInput, 'keyboard')
                     setTextInput('')
                     setShowKeyboardPanel(false)
                   }}
