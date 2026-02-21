@@ -1,5 +1,6 @@
-import { useEffect, useRef, useState } from 'react'
+import { useEffect, useRef, useState, type ReactNode } from 'react'
 import { useTranslation } from 'react-i18next'
+import { userApi } from '../api/services'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowLeft, User, Globe, Heart, MapPin, ShieldCheck, AlertTriangle,
@@ -77,8 +78,8 @@ function Toggle({ checked, onChange }: { checked: boolean; onChange: (v: boolean
 
 // ── Section Card ───────────────────────────────────────────────────────
 function SectionCard({ icon, title, hint, accent = 'emerald', dark = false, children }: {
-  icon: React.ReactNode; title: string; hint?: string
-  accent?: 'emerald' | 'red'; dark?: boolean; children: React.ReactNode
+  icon: ReactNode; title: string; hint?: string
+  accent?: 'emerald' | 'red'; dark?: boolean; children: ReactNode
 }) {
   const iconBg = accent === 'red' ? 'bg-red-500/10 text-red-500' : 'bg-emerald-100 text-emerald-700'
   return (
@@ -96,7 +97,7 @@ function SectionCard({ icon, title, hint, accent = 'emerald', dark = false, chil
 }
 
 // ── Row ────────────────────────────────────────────────────────────────
-function Row({ label, hint, dark = false, children }: { label: string; hint?: string; dark?: boolean; children: React.ReactNode }) {
+function Row({ label, hint, dark = false, children }: { label: string; hint?: string; dark?: boolean; children: ReactNode }) {
   return (
     <div className="flex items-center justify-between gap-4 px-5 py-4">
       <div className="min-w-0">
@@ -184,6 +185,21 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
         r.addEventListener('change', () => setLocPermission(r.state as 'granted' | 'denied' | 'unknown'))
       })
       .catch(() => setLocPermission('unknown'))
+
+    // Attempt profile hydration from API; fallback remains local storage settings.
+    userApi.getProfile()
+      .then((profile) => {
+        setUser((value) => ({ ...value, name: profile.name || value.name, email: profile.email || value.email }))
+        setSettings((value) => ({
+          ...value,
+          appLanguage: (profile.language?.toLowerCase() as LanguageCode) || value.appLanguage,
+          emergencyName: profile.emergency_contact_name || value.emergencyName,
+          emergencyPhone: profile.emergency_contact_phone || value.emergencyPhone,
+        }))
+      })
+      .catch(() => {
+        // offline/local mode
+      })
   }, [])
 
   const set = <K extends keyof Settings>(key: K, val: Settings[K]) =>
@@ -195,7 +211,7 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
     toastTimer.current = setTimeout(() => setToast(false), 3000)
   }
 
-  const handleSave = () => {
+  const handleSave = async () => {
     // Persist user name change
     try {
       const stored = localStorage.getItem('alavia.user')
@@ -203,6 +219,18 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
       localStorage.setItem('alavia.user', JSON.stringify({ ...u, name: user.name }))
     } catch { /* ignore */ }
     localStorage.setItem('alavia.profileSettings', JSON.stringify(settings))
+
+    try {
+      await userApi.updateProfile({
+        name: user.name,
+        language: settings.appLanguage.toUpperCase(),
+        emergency_contact_name: settings.emergencyName,
+        emergency_contact_phone: settings.emergencyPhone,
+      })
+    } catch {
+      // keep local save flow when backend is unavailable
+    }
+
     if (settings.appLanguage !== i18n.language) {
       onLanguageChange(settings.appLanguage)
       void i18n.changeLanguage(settings.appLanguage)
@@ -638,3 +666,4 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
     </div>
   )
 }
+

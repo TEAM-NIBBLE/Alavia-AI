@@ -1,6 +1,7 @@
-import { useState, type FormEvent } from 'react'
+import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import alaviaLogo from '../assets/alavia-ai_logo.png'
+import { authApi } from '../api/services'
 
 interface SignUpPageProps {
   onSuccess: (user: { name: string; email: string; phone: string }) => void
@@ -14,6 +15,16 @@ export default function SignUpPage({ onSuccess, onSwitchToSignIn, onBack }: Sign
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [errors, setErrors] = useState<Partial<typeof form>>({})
+  const [apiError, setApiError] = useState('')
+
+  const mapLanguageCode = (value: string) => {
+    const input = value.toLowerCase()
+    if (input === 'pcm') return 'PIDGIN'
+    if (input === 'yo') return 'YORUBA'
+    if (input === 'ha') return 'HAUSA'
+    if (input === 'ig') return 'IGBO'
+    return 'EN'
+  }
 
   const validate = () => {
     const newErrors: Partial<typeof form> = {}
@@ -27,7 +38,7 @@ export default function SignUpPage({ onSuccess, onSwitchToSignIn, onBack }: Sign
     return newErrors
   }
 
-  const handleSubmit = (e: FormEvent) => {
+  const handleSubmit = async (e: FormEvent) => {
     e.preventDefault()
     const validationErrors = validate()
     if (Object.keys(validationErrors).length > 0) {
@@ -35,16 +46,41 @@ export default function SignUpPage({ onSuccess, onSwitchToSignIn, onBack }: Sign
       return
     }
     setErrors({})
+    setApiError('')
     setIsLoading(true)
-    setTimeout(() => {
-      const user = { name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim() }
+
+    try {
+      const selectedLanguage = localStorage.getItem('alavia.selectedLanguage') ?? 'en'
+      const result = await authApi.register({
+        name: form.name.trim(),
+        email: form.email.trim(),
+        phone: form.phone.trim(),
+        password: form.password,
+        password_confirmation: form.password,
+        language: mapLanguageCode(selectedLanguage),
+        emergency_contact_name: form.name.trim(),
+        emergency_contact_phone: form.phone.trim(),
+      })
+
+      const user = {
+        name: result.user.name ?? form.name.trim(),
+        email: result.user.email ?? form.email.trim(),
+        phone: result.user.phone ?? form.phone.trim(),
+      }
       localStorage.setItem('alavia.user', JSON.stringify(user))
       setIsLoading(false)
       onSuccess(user)
-    }, 900)
+    } catch (error) {
+      // Fallback keeps prototype usable even when backend is offline.
+      const user = { name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim() }
+      localStorage.setItem('alavia.user', JSON.stringify(user))
+      setApiError(error instanceof Error ? error.message : 'Unable to reach server, continued in offline mode.')
+      setIsLoading(false)
+      onSuccess(user)
+    }
   }
 
-  const handleChange = (field: keyof typeof form) => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleChange = (field: keyof typeof form) => (e: ChangeEvent<HTMLInputElement>) => {
     setForm(prev => ({ ...prev, [field]: e.target.value }))
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: undefined }))
   }
@@ -96,6 +132,11 @@ export default function SignUpPage({ onSuccess, onSwitchToSignIn, onBack }: Sign
 
         {/* Form card */}
         <div className="w-full rounded-3xl border border-slate-100 bg-white p-8 shadow-2xl shadow-slate-200/60">
+          {apiError ? (
+            <div className="mb-4 rounded-xl border border-amber-200 bg-amber-50 px-3 py-2 text-xs font-medium text-amber-800">
+              {apiError}
+            </div>
+          ) : null}
           <form onSubmit={handleSubmit} noValidate className="space-y-5">
             {/* Full Name */}
             <div>

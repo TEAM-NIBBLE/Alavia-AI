@@ -4,6 +4,7 @@ import alaviaLogo from './assets/alavia-ai_logo.png'
 import SignUpPage from './components/SignUpPage'
 import SignInPage from './components/SignInPage'
 import VoiceInteractionScreen from './components/VoiceInteractionScreen'
+import { authApi } from './api/services'
 import './App.css'
 
 type OnboardingStep = 'splash' | 'language' | 'signup' | 'signin' | 'app'
@@ -77,6 +78,9 @@ function App() {
   }
 
   const handleLogout = () => {
+    void authApi.logout().catch(() => {
+      // Ignore API logout failures in offline/demo mode.
+    })
     localStorage.removeItem('alavia.user')
     setUserName('')
     setStep('language')
