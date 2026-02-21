@@ -54,6 +54,7 @@ const resources = {
         forgotPasswordSuccess: '✓ A reset link has been sent if your account exists.',
         orDivider: 'or',
         logout: 'Log Out',
+        profile: 'View Profile',
         step2Label: 'Step 2 of 2',
         back: 'Back'
       },
@@ -159,6 +160,7 @@ const resources = {
         forgotPasswordSuccess: '✓ Reset link don send if your account dey.',
         orDivider: 'abi',
         logout: 'Log Out',
+        profile: 'Ma Profile',
         step2Label: 'Step 2 of 2',
         back: 'Go back'
       },
@@ -264,6 +266,7 @@ const resources = {
         forgotPasswordSuccess: '✓ A ti fi link ntunse ranse ti o ba ni account.',
         orDivider: 'tabi',
         logout: 'Jade',
+        profile: 'Ìró mi',
         step2Label: 'Igbese 2 ninu 2',
         back: 'Pada'
       },
@@ -369,6 +372,7 @@ const resources = {
         forgotPasswordSuccess: '✓ An aika link na sake saiti idan kana da asusu.',
         orDivider: 'ko',
         logout: 'Fita',
+        profile: 'Bayanin Nawa',
         step2Label: 'Mataki na 2 cikin 2',
         back: 'Koma baya'
       },
@@ -474,6 +478,7 @@ const resources = {
         forgotPasswordSuccess: '✓ Ezitela link nt?ghar? ma ? b?r? na i nwere aka?nt?.',
         orDivider: 'ma ? b?r?',
         logout: 'Puputa',
+        profile: 'Profaịlụ m',
         step2Label: 'Nzo 2 nime 2',
         back: 'Laghachi'
       },

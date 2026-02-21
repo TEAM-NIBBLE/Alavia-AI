@@ -16,7 +16,8 @@ import {
   ChevronDown,
   LogOut,
   Loader2,
-  MicOff
+  MicOff,
+  UserCircle
 } from 'lucide-react'
 import alaviaLogo from '../assets/alavia-ai_logo.png'
 
@@ -428,43 +429,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
               >
                 <User size={18} />
               </motion.button>
-
-              <AnimatePresence>
-                {showUserDropdown && (
-                  <>
-                    <motion.div
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                      className="fixed inset-0 z-40 bg-transparent"
-                      onClick={() => setShowUserDropdown(false)}
-                    />
-                    <motion.div
-                      initial={{ opacity: 0, scale: 0.95, y: 10 }}
-                      animate={{ opacity: 1, scale: 1, y: 0 }}
-                      exit={{ opacity: 0, scale: 0.95, y: 10 }}
-                      className="absolute right-0 mt-3 w-48 overflow-hidden rounded-2xl border border-slate-100 bg-white shadow-2xl z-50 p-1.5"
-                    >
-                      <div className="px-4 py-3 border-b border-slate-50 mb-1">
-                        <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-0.5">Logged in as</p>
-                        <p className="text-sm font-bold text-slate-900 truncate">{userName || 'User'}</p>
-                      </div>
-                      <button
-                        onClick={() => {
-                          setShowUserDropdown(false)
-                          onLogout()
-                        }}
-                        className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-bold text-red-600 transition-all hover:bg-red-50 active:bg-red-100"
-                      >
-                        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-red-500/10 text-red-600">
-                          <LogOut size={16} />
-                        </div>
-                        {t('auth.logout')}
-                      </button>
-                    </motion.div>
-                  </>
-                )}
-              </AnimatePresence>
             </div>
           </div>
         </div>
@@ -787,6 +751,58 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                 ))}
               </div>
             </motion.section>
+          </div>
+        )}
+      </AnimatePresence>
+
+      <AnimatePresence>
+        {showUserDropdown && (
+          <div className="fixed inset-0 z-[110]">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="absolute inset-0 bg-slate-900/10 backdrop-blur-[2px]"
+              onClick={() => setShowUserDropdown(false)}
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95, y: -10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: -10 }}
+              className="absolute right-4 top-20 w-56 overflow-hidden rounded-[24px] bg-white p-2 shadow-2xl border border-slate-100"
+            >
+              <div className="px-4 py-4 border-b border-slate-50 mb-1">
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Logged in as</p>
+                <p className="text-sm font-black text-slate-900 truncate">{userName || 'User'}</p>
+              </div>
+
+              <button
+                onClick={() => {
+                  setShowUserDropdown(false)
+                  // Navigate to profile or show profile modal
+                  console.log('Open profile')
+                }}
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-4 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 active:bg-slate-100"
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-slate-100 text-slate-600">
+                  <UserCircle size={18} />
+                </div>
+                {t('auth.profile')}
+              </button>
+
+              <button
+                onClick={() => {
+                  setShowUserDropdown(false)
+                  onLogout()
+                }}
+                className="flex w-full items-center gap-3 rounded-xl px-4 py-4 text-sm font-bold text-red-600 transition-all hover:bg-red-50 active:bg-red-100"
+              >
+                <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-500/10 text-red-600">
+                  <LogOut size={18} />
+                </div>
+                {t('auth.logout')}
+              </button>
+            </motion.div>
           </div>
         )}
       </AnimatePresence>
