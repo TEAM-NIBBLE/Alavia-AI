@@ -26,7 +26,7 @@ import {
 } from 'lucide-react'
 import alaviaLogo from '../assets/alavia-ai_logo.png'
 import ProfilePage from './ProfilePage'
-import { consultationsApi } from '../api/services'
+import { consultationsApi, speechApi } from '../api/services'
 import type { ConsultationDetailResponse } from '../api/services'
 
 type InputMode = 'tap' | 'hold'
@@ -128,6 +128,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const silenceTimeoutRef = useRef<number | null>(null)
   const restartTimeoutRef = useRef<number | null>(null)
   const voicesRef = useRef<SpeechSynthesisVoice[]>([])
+  const audioRef = useRef<HTMLAudioElement | null>(null)
 
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('ready')
   const [inputMode, setInputMode] = useState<InputMode>('tap')
@@ -163,6 +164,14 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   ]
 
   const currentLanguageName = t(`language.${selectedLanguage}.name`)
+  const LANGUAGE_CONFIG: Record<string, { displayName: string; speechLocale: string; apiLanguage: string }> = {
+    en: { displayName: 'English', speechLocale: 'en-NG', apiLanguage: 'ENGLISH' },
+    pcm: { displayName: 'Nigerian Pidgin English', speechLocale: 'en-NG', apiLanguage: 'PIDGIN' },
+    yo: { displayName: 'Yoruba', speechLocale: 'yo-NG', apiLanguage: 'YORUBA' },
+    ha: { displayName: 'Hausa', speechLocale: 'ha-NG', apiLanguage: 'HAUSA' },
+    ig: { displayName: 'Igbo', speechLocale: 'ig-NG', apiLanguage: 'IGBO' },
+  }
+  const selectedLangConfig = LANGUAGE_CONFIG[selectedLanguage] ?? LANGUAGE_CONFIG.en
 
   const supportsSpeech = useMemo(() => {
     return typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
@@ -172,7 +181,29 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     ? { id: String(currentAIMessageSeq), question: currentAIMessage }
     : null
 
-  const speakText = (text: string, onEnd?: () => void) => {
+  const speakText = async (text: string, onEnd?: () => void) => {
+    if (!text.trim()) {
+      onEnd?.()
+      return
+    }
+
+    try {
+      const tts = await speechApi.tts({
+        text,
+        language: selectedLangConfig.apiLanguage,
+      })
+      if (tts.audio_url) {
+        audioRef.current?.pause()
+        const audio = new Audio(tts.audio_url)
+        audioRef.current = audio
+        if (onEnd) audio.onended = onEnd
+        await audio.play()
+        return
+      }
+    } catch {
+      // fallback to browser synthesis
+    }
+
     if (!('speechSynthesis' in window)) {
       onEnd?.()
       return
@@ -186,7 +217,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       ha:  ['ha', 'ha-NE', 'en-NG', 'en'],        // Hausa
       ig:  ['ig', 'ig-NG', 'en-NG', 'en'],        // Igbo
     }
-    const bcp47List = LANG_BCP47[selectedLanguage] ?? ['en-NG', 'en']
+    const bcp47List = [selectedLangConfig.speechLocale, ...(LANG_BCP47[selectedLanguage] ?? ['en-NG', 'en'])]
 
     const utterance = new SpeechSynthesisUtterance(text)
     utterance.lang = bcp47List[0]   // primary preference
@@ -262,7 +293,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     setIsEmergencyMode(true)
     setShowEmergencyPanel(true)
     stopListening()
-    speakText('Emergency mode activated. Call or send SMS to your emergency contact now.')
+    void speakText('Emergency mode activated. Call or send SMS to your emergency contact now.')
   }
 
   const handleEmergencyCall = () => {
@@ -285,15 +316,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     setConsultationComplete(v)
   }
 
-  // Language name sent to backend so the AI replies in the correct language
-  const LANG_NAMES: Record<string, string> = {
-    en:  'English',
-    pcm: 'Nigerian Pidgin English',
-    yo:  'Yoruba',
-    ha:  'Hausa',
-    ig:  'Igbo',
-  }
-
   // Instruction prepended to every message so the AI model always responds
   // in the correct language, regardless of backend language field support.
   const langInstruction = (langName: string) =>
@@ -304,17 +326,17 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const startConsultation = (message: string) => {
     setSessionStatus('processing')
     setApiError(null)
-    const langName = LANG_NAMES[selectedLanguage] ?? 'English'
+    const langName = selectedLangConfig.displayName
     const prefixed = langInstruction(langName) + message
     void (async () => {
       try {
-        const res = await consultationsApi.start(prefixed, langName)
+        const res = await consultationsApi.start(prefixed, selectedLangConfig.apiLanguage)
         const id = res.consultation_id
         updateConsultationId(id)
         setCurrentAIMessage(res.message.content)
         setCurrentAIMessageSeq(1)
         setAIResponse({ heading: t('voice.responseHeading'), summary: message })
-        speakText(res.message.content)
+        void speakText(res.message.content)
       } catch (err) {
         setApiError(err instanceof Error ? err.message : 'Request failed')
       } finally {
@@ -328,11 +350,11 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     if (!id) return
     setSessionStatus('processing')
     setApiError(null)
-    const langName = LANG_NAMES[selectedLanguage] ?? 'English'
+    const langName = selectedLangConfig.displayName
     // Keep reminding the AI of the language on every turn
     const prefixed = langInstruction(langName) + content
     try {
-      const res = await consultationsApi.message(id, prefixed, langName)
+      const res = await consultationsApi.message(id, prefixed, selectedLangConfig.apiLanguage)
       setCurrentAIMessage(res.message.content)
       setCurrentAIMessageSeq(prev => prev + 1)
       if (res.severity) {
@@ -351,7 +373,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
           // detail fetch failed — first aid will be empty
         }
       } else {
-        speakText(res.message.content)
+        void speakText(res.message.content)
       }
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'Request failed')
@@ -497,7 +519,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     const recognition = new SpeechRecognitionImpl()
     recognition.continuous = true
     recognition.interimResults = true
-    recognition.lang = selectedLanguage === 'pcm' ? 'en-NG' : `${selectedLanguage}-NG`
+    recognition.lang = selectedLangConfig.speechLocale
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let finalChunk = ''
@@ -521,6 +543,10 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
       const shouldContinue = shouldKeepListeningRef.current && inputModeRef.current === 'tap'
       const transientError = event.error === 'no-speech' || event.error === 'aborted'
+
+      if (event.error === 'language-not-supported') {
+        recognition.lang = 'en-NG'
+      }
 
       if (shouldContinue && transientError) {
         restartTimeoutRef.current = window.setTimeout(() => {
@@ -604,7 +630,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     if (aiResponse && activeQuestion && lastSpokenQuestionRef.current !== activeQuestion.id) {
       lastSpokenQuestionRef.current = activeQuestion.id
       setTimeout(() => {
-        speakText(activeQuestion.question, () => {
+        void speakText(activeQuestion.question, () => {
           // auto-start mic after the question is spoken so user can reply naturally
           void startListening()
         })
@@ -961,7 +987,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                   <motion.button
                     whileHover={{ scale: 1.02, translateY: -2 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => speakText(currentAIMessage ?? `${aiResponse.heading}. ${aiResponse.summary}`)}
+                    onClick={() => { void speakText(currentAIMessage ?? `${aiResponse.heading}. ${aiResponse.summary}`) }}
                     className="flex items-center gap-3 rounded-2xl bg-slate-900 px-6 py-4 text-xs font-black text-white shadow-2xl shadow-slate-900/20 transition-all active:scale-100 uppercase tracking-widest"
                   >
                     <Volume2 size={20} />
