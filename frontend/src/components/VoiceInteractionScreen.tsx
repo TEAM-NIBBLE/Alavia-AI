@@ -125,6 +125,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const inputModeRef = useRef<InputMode>('tap')
   const silenceTimeoutRef = useRef<number | null>(null)
   const restartTimeoutRef = useRef<number | null>(null)
+  const voicesRef = useRef<SpeechSynthesisVoice[]>([])
 
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('ready')
   const [inputMode, setInputMode] = useState<InputMode>('tap')
@@ -173,8 +174,27 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       return
     }
     const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = selectedLanguage === 'pcm' ? 'en-NG' : `${selectedLanguage}-NG`
+    const lang = selectedLanguage === 'pcm' ? 'en-NG' : `${selectedLanguage}-NG`
+    utterance.lang = lang
     utterance.rate = 1.0
+
+    // Pick the best female voice available
+    const voices = voicesRef.current
+    const FEMALE_NAMES = ['zira', 'samantha', 'victoria', 'karen', 'fiona', 'susan', 'moira',
+      'veena', 'tessa', 'female', 'woman', 'girl', 'serena', 'siri', 'ava', 'allison',
+      'joanna', 'ivy', 'kimberly', 'kendra', 'salli', 'olivia', 'aria']
+    const isFemale = (v: SpeechSynthesisVoice) =>
+      FEMALE_NAMES.some(n => v.name.toLowerCase().includes(n))
+    // 1. Female voice matching app language locale
+    const langPrefix = lang.split('-')[0]
+    let chosen = voices.find(v => isFemale(v) && v.lang.startsWith(langPrefix))
+    // 2. Female English voice
+    if (!chosen) chosen = voices.find(v => isFemale(v) && v.lang.startsWith('en'))
+    // 3. Any female voice
+    if (!chosen) chosen = voices.find(v => isFemale(v))
+    if (chosen) utterance.voice = chosen
+    utterance.pitch = 1.1   // slightly warmer pitch
+
     if (onEnd) utterance.onend = onEnd
     window.speechSynthesis.cancel()
     window.speechSynthesis.speak(utterance)
@@ -476,6 +496,17 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       }
     }
     void queryPermission()
+  }, [])
+
+  // Load TTS voices (browsers fire voiceschanged when the list is ready)
+  useEffect(() => {
+    if (!('speechSynthesis' in window)) return
+    const loadVoices = () => {
+      voicesRef.current = window.speechSynthesis.getVoices()
+    }
+    loadVoices()
+    window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', loadVoices)
   }, [])
 
   useEffect(() => {
