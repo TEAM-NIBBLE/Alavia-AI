@@ -18,22 +18,14 @@ import {
   Loader2,
   MicOff,
   UserCircle,
-  MapPin,
-  Clock,
-  ArrowRight,
   Navigation,
-  ExternalLink,
   Map as MapIcon,
-  Stethoscope,
-  BriefcaseMedical,
-  Users,
-  Building2,
   HeartPulse,
-  Syringe,
-  Info
 } from 'lucide-react'
 import alaviaLogo from '../assets/alavia-ai_logo.png'
 import ProfilePage from './ProfilePage'
+import { consultationsApi } from '../api/services'
+import type { ConsultationDetailResponse } from '../api/services'
 
 type InputMode = 'tap' | 'hold'
 type SessionStatus = 'ready' | 'listening' | 'processing'
@@ -83,9 +75,6 @@ interface SpeechRecognition extends EventTarget {
   onend: (() => void) | null
   start: () => void
   stop: () => void
-}
-interface SpeechRecognitionConstructor {
-  new(): SpeechRecognition
 }
 
 const severityStyle: Record<Severity, { bg: string, text: string, border: string, icon: any }> = {
@@ -144,8 +133,13 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const [transcript, setTranscript] = useState('')
   const [interimTranscript, setInterimTranscript] = useState('')
   const [aiResponse, setAIResponse] = useState<AIResponse | null>(null)
-  const [answers, setAnswers] = useState<Record<string, boolean>>({})
-  const [questionIndex, setQuestionIndex] = useState(0)
+  const consultationIdRef = useRef<number | null>(null)
+  const [currentAIMessage, setCurrentAIMessage] = useState<string | null>(null)
+  const [currentAIMessageSeq, setCurrentAIMessageSeq] = useState(0)
+  const [consultationDetail, setConsultationDetail] = useState<ConsultationDetailResponse['consultation'] | null>(null)
+  const [consultationComplete, setConsultationComplete] = useState(false)
+  const consultationCompleteRef = useRef(false)
+  const [apiError, setApiError] = useState<string | null>(null)
   const [showKeyboardPanel, setShowKeyboardPanel] = useState(false)
   const [showLanguagePanel, setShowLanguagePanel] = useState(false)
   const [showUserDropdown, setShowUserDropdown] = useState(false)
@@ -165,45 +159,13 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
   const currentLanguageName = t(`language.${selectedLanguage}.name`)
 
-  const TRIAGE_QUESTIONS: TriageQuestion[] = useMemo(() => [
-    { id: 'breathing', question: t('voice.questions.breathing') },
-    { id: 'fainting', question: t('voice.questions.fainting') },
-    { id: 'worse', question: t('voice.questions.worse') },
-    { id: 'weakness', question: t('voice.questions.weakness') },
-  ], [t])
-
   const supportsSpeech = useMemo(() => {
     return typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
   }, [])
 
-  const activeQuestion = questionIndex < TRIAGE_QUESTIONS.length ? TRIAGE_QUESTIONS[questionIndex] : null
-
-  const createAIResponse = (text: string, currentAnswers: Record<string, boolean>): AIResponse => {
-    const transcriptText = text.toLowerCase()
-    const redFlag =
-      currentAnswers.breathing === true ||
-      currentAnswers.fainting === true ||
-      currentAnswers.weakness === true ||
-      transcriptText.includes('cannot breathe') ||
-      transcriptText.includes('chest pain')
-
-    const worsening = currentAnswers.worse === true
-    let severity: Severity = 'low'
-
-    if (redFlag) {
-      severity = 'critical'
-    } else if (worsening) {
-      severity = 'high'
-    } else if (transcriptText.includes('pain') || transcriptText.includes('fever')) {
-      severity = 'medium'
-    }
-
-    return {
-      heading: t('voice.responseHeading'),
-      summary: t(`voice.summaries.${severity}`),
-      severity,
-    }
-  }
+  const activeQuestion: TriageQuestion | null = currentAIMessage && !consultationComplete
+    ? { id: String(currentAIMessageSeq), question: currentAIMessage }
+    : null
 
   const speakText = (text: string) => {
     if (!('speechSynthesis' in window)) return
@@ -220,20 +182,90 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     }
   }
 
-  const submitInputIntoFlow = (value: string, answersOverride?: Record<string, boolean>) => {
+  const updateConsultationId = (id: number | null) => {
+    consultationIdRef.current = id
+  }
+
+  const updateConsultationComplete = (v: boolean) => {
+    consultationCompleteRef.current = v
+    setConsultationComplete(v)
+  }
+
+  const startConsultation = (message: string) => {
+    setSessionStatus('processing')
+    setApiError(null)
+    void (async () => {
+      try {
+        const res = await consultationsApi.start(message)
+        const id = res.consultation_id
+        updateConsultationId(id)
+        setCurrentAIMessage(res.message.content)
+        setCurrentAIMessageSeq(1)
+        setAIResponse({ heading: t('voice.responseHeading'), summary: message })
+        speakText(res.message.content)
+      } catch (err) {
+        setApiError(err instanceof Error ? err.message : 'Request failed')
+      } finally {
+        setSessionStatus('ready')
+      }
+    })()
+  }
+
+  const sendConsultationMessage = async (content: string) => {
+    const id = consultationIdRef.current
+    if (!id) return
+    setSessionStatus('processing')
+    setApiError(null)
+    try {
+      const res = await consultationsApi.message(id, content)
+      setCurrentAIMessage(res.message.content)
+      setCurrentAIMessageSeq(prev => prev + 1)
+      if (res.severity) {
+        setAIResponse(prev => prev ? { ...prev, severity: res.severity as Severity } : prev)
+      }
+      if (res.status === 'complete' || res.status === 'closed' || res.status === 'ended') {
+        updateConsultationComplete(true)
+        try {
+          const detail = await consultationsApi.detail(id)
+          setConsultationDetail(detail.consultation)
+          if (detail.consultation.severity) {
+            const sev = detail.consultation.severity as Severity
+            setAIResponse(prev => prev ? { ...prev, severity: sev } : prev)
+          }
+        } catch {
+          // detail fetch failed — first aid will be empty
+        }
+      } else {
+        speakText(res.message.content)
+      }
+    } catch (err) {
+      setApiError(err instanceof Error ? err.message : 'Request failed')
+    } finally {
+      setSessionStatus('ready')
+    }
+  }
+
+  const submitInputIntoFlow = (value: string) => {
     const cleaned = value.trim()
     if (!cleaned) return
-
     setTranscript(cleaned)
     setInterimTranscript('')
-    setSessionStatus('processing')
-
-    setTimeout(() => {
-      const nextResponse = createAIResponse(cleaned, answersOverride ?? answers)
-      setAIResponse(nextResponse)
-      setSessionStatus('ready')
-      speakText(`${nextResponse.heading}. ${nextResponse.summary}`)
-    }, 600)
+    const currentId = consultationIdRef.current
+    const isComplete = consultationCompleteRef.current
+    if (currentId && !isComplete) {
+      void sendConsultationMessage(cleaned)
+    } else {
+      if (isComplete) {
+        updateConsultationId(null)
+        setCurrentAIMessage(null)
+        setCurrentAIMessageSeq(0)
+        setConsultationDetail(null)
+        updateConsultationComplete(false)
+        setAIResponse(null)
+        setApiError(null)
+      }
+      startConsultation(cleaned)
+    }
   }
 
   const clearSpeechTimers = () => {
@@ -329,23 +361,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   }
 
   const answerQuestion = (value: boolean) => {
-    if (!activeQuestion) return
-
-    const nextAnswers = { ...answers, [activeQuestion.id]: value }
-    setAnswers(nextAnswers)
-
-    const nextIndex = questionIndex + 1
-    setQuestionIndex(nextIndex)
-
-    if (nextIndex < TRIAGE_QUESTIONS.length) {
-      const nextUpdate = createAIResponse(transcript || interimTranscript || 'symptoms', nextAnswers)
-      setAIResponse(nextUpdate)
-      return
-    }
-
-    const finalResponse = createAIResponse(transcript || interimTranscript || 'symptoms', nextAnswers)
-    setAIResponse(finalResponse)
-    speakText(`${finalResponse.heading}. ${finalResponse.summary}`)
+    void sendConsultationMessage(value ? t('voice.yes') : t('voice.no'))
   }
 
   useEffect(() => {
@@ -721,6 +737,19 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                 </motion.div>
               )}
 
+              {apiError && (
+                <motion.div
+                  key="api-error"
+                  initial={{ opacity: 0, y: 20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  exit={{ opacity: 0, y: 20 }}
+                  className="triage-card p-5 border border-red-200 bg-red-50 text-sm font-bold text-red-600 relative overflow-hidden"
+                >
+                  <div className="absolute top-0 left-0 w-2 h-full bg-red-400" />
+                  <p className="pl-2">{apiError}</p>
+                </motion.div>
+              )}
+
               {aiResponse && (
                 <motion.div
                   key="ai-response"
@@ -748,7 +777,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                   <motion.button
                     whileHover={{ scale: 1.02, translateY: -2 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={() => speakText(`${aiResponse.heading}. ${aiResponse.summary}`)}
+                    onClick={() => speakText(currentAIMessage ?? `${aiResponse.heading}. ${aiResponse.summary}`)}
                     className="flex items-center gap-3 rounded-2xl bg-slate-900 px-6 py-4 text-xs font-black text-white shadow-2xl shadow-slate-900/20 transition-all active:scale-100 uppercase tracking-widest"
                   >
                     <Volume2 size={20} />
@@ -777,7 +806,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                     <div className="mb-4 flex items-center justify-between">
                       <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400">{t('voice.triageQuestion')}</span>
                       <span className="rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-bold text-white/80 backdrop-blur-sm border border-white/10">
-                        {questionIndex + 1} of {TRIAGE_QUESTIONS.length}
+                        {t('voice.triageQuestion')}
                       </span>
                     </div>
                     <h4 className="text-2xl font-black leading-tight mb-8 tracking-tight text-emerald-400">
@@ -813,7 +842,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                 </motion.div>
               )}
 
-              {aiResponse && questionIndex === TRIAGE_QUESTIONS.length && (
+              {consultationComplete && (
                 <motion.div
                   initial={{ opacity: 0, y: 40 }}
                   animate={{ opacity: 1, y: 0 }}
@@ -828,7 +857,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                       <h3 className="text-xl font-black text-slate-800 tracking-tight">{t('voice.firstAidTitle')}</h3>
                     </div>
                     <div className="space-y-4">
-                      {(t(`voice.firstAid.${aiResponse.severity}`, { returnObjects: true }) as string[]).map((step, idx) => (
+                      {(consultationDetail?.first_aid ?? []).map((step, idx) => (
                         <motion.div
                           key={idx}
                           initial={{ opacity: 0, x: -20 }}
@@ -1164,7 +1193,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                 setShowProfile(false)
                 onLogout()
               }}
-              onLanguageChange={(code) => {
+              onLanguageChange={(code: string) => {
                 onLanguageChange(code)
               }}
             />
