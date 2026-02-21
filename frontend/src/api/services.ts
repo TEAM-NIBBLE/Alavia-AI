@@ -95,6 +95,17 @@ export interface HospitalListItem {
   lat: number
   lng: number
   distance_km?: number
+  address?: string
+  phone?: string
+  is_public?: boolean
+  isEmergencyReady?: boolean
+  emergency_ready?: boolean
+  specialties?: string[] | string
+  facilities?: string[] | string
+  openHours?: string
+  open_hours?: string
+  city?: string
+  area?: string
 }
 
 export interface HospitalListResponse {
@@ -389,4 +400,3 @@ export const adminApi = {
     })
   },
 }
-

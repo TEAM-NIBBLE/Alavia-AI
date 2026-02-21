@@ -55,7 +55,7 @@ const resources = {
         forgotPasswordSuccess: '✓ A reset link has been sent if your account exists.',
         orDivider: 'or',
         logout: 'Log Out',
-        profile: 'View Profile',
+        profile: 'Profile & Settings',
         step2Label: 'Step 2 of 2',
         back: 'Back'
       },

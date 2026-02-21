@@ -1,16 +1,53 @@
 import { useEffect, useMemo, useState } from 'react'
+import { hospitalsApi, type HospitalListItem } from '../api/services'
 import { mockHospitals, type ComplaintCategory } from '../data/hospitals'
 import { FilterPills } from './postTriage/FilterPills'
 import { HospitalCard } from './postTriage/HospitalCard'
 import { HospitalDetailsSheet } from './postTriage/HospitalDetailsSheet'
 import { ListMapToggle } from './postTriage/ListMapToggle'
 import { SeverityBadge } from './postTriage/SeverityBadge'
-import { rankHospitals, type RankedHospital } from '../utils/hospitalRouting'
+import { distanceKm, rankHospitals, type RankedHospital } from '../utils/hospitalRouting'
 
 interface RoutingScreenProps {
   severity: 'low' | 'medium' | 'high' | 'critical'
   complaintCategory: ComplaintCategory
   onBack: () => void
+}
+
+function toStringArray(value: unknown): string[] {
+  if (Array.isArray(value)) return value.map((item) => String(item).toLowerCase())
+  if (typeof value === 'string') return value.split(',').map((item) => item.trim().toLowerCase()).filter(Boolean)
+  return []
+}
+
+function toRankedHospital(item: HospitalListItem, category: ComplaintCategory, location: { lat: number; lng: number } | null, index: number): RankedHospital {
+  const specialtyList = toStringArray(item.specialties)
+  const facilityList = toStringArray(item.facilities)
+  const isEmergencyReady = Boolean(item.isEmergencyReady ?? item.emergency_ready)
+  const isPublic = item.is_public ?? true
+  const computedDistance = location ? distanceKm(location.lat, location.lng, item.lat, item.lng) : Number((index + 1.2).toFixed(1))
+  const resolvedDistance = Number((item.distance_km ?? computedDistance).toFixed(1))
+  const travelMinutes = Math.max(8, Math.round((resolvedDistance / 25) * 60))
+
+  return {
+    id: String(item.id),
+    name: item.name,
+    lat: item.lat,
+    lng: item.lng,
+    address: item.address ?? 'Address unavailable',
+    phone: item.phone ?? '112',
+    isPublic,
+    isEmergencyReady,
+    specialties: specialtyList.length > 0 ? specialtyList : ['general'],
+    facilities: facilityList,
+    openHours: item.openHours ?? item.open_hours,
+    city: item.city ?? 'Unknown',
+    area: item.area ?? 'Unknown',
+    distanceKm: resolvedDistance,
+    travelMinutes,
+    matchScore: Math.max(1, 100 - Math.round(resolvedDistance * 2)),
+    matchReason: specialtyList.includes(category) ? `Best for ${category}` : isEmergencyReady ? 'Has emergency unit' : 'General care available',
+  }
 }
 
 export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingScreenProps) {
@@ -22,6 +59,9 @@ export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingSc
   const [selectedHospital, setSelectedHospital] = useState<RankedHospital | null>(null)
   const [largeTextMode, setLargeTextMode] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
+  const [apiHospitals, setApiHospitals] = useState<RankedHospital[]>([])
+  const [hospitalsLoading, setHospitalsLoading] = useState(false)
+  const [hospitalsError, setHospitalsError] = useState('')
 
   useEffect(() => {
     if (!navigator.geolocation) {
@@ -38,11 +78,44 @@ export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingSc
         setLocationStatus('granted')
       },
       () => setLocationStatus('denied'),
-      { timeout: 5000 }
+      { timeout: 10000, enableHighAccuracy: true }
     )
   }, [])
 
-  const allRanked = useMemo(() => {
+  useEffect(() => {
+    let cancelled = false
+
+    const loadHospitals = async () => {
+      setHospitalsLoading(true)
+      setHospitalsError('')
+      try {
+        const response = await hospitalsApi.list({
+          lat: location?.lat,
+          lng: location?.lng,
+          specialty: complaintCategory === 'general' ? undefined : complaintCategory,
+          severity,
+          emergency_ready: severity === 'high' || severity === 'critical' ? true : undefined,
+          is_public: sortMode === 'public' ? true : sortMode === 'private' ? false : undefined,
+        })
+        if (cancelled) return
+        const mapped = response.data.map((item, index) => toRankedHospital(item, complaintCategory, location, index))
+        setApiHospitals(mapped)
+      } catch (error) {
+        if (cancelled) return
+        setHospitalsError(error instanceof Error ? error.message : 'Could not load hospitals from API.')
+        setApiHospitals([])
+      } finally {
+        if (!cancelled) setHospitalsLoading(false)
+      }
+    }
+
+    void loadHospitals()
+    return () => {
+      cancelled = true
+    }
+  }, [complaintCategory, location?.lat, location?.lng, severity, sortMode])
+
+  const fallbackRanked = useMemo(() => {
     return rankHospitals({
       hospitals: mockHospitals,
       complaintCategory,
@@ -53,13 +126,25 @@ export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingSc
   }, [complaintCategory, location, query, severity])
 
   const visibleHospitals = useMemo(() => {
-    let rows = [...allRanked]
+    const source = apiHospitals.length > 0 ? apiHospitals : fallbackRanked
+    let rows = [...source]
+    const loweredQuery = query.trim().toLowerCase()
+
+    if (loweredQuery) {
+      rows = rows.filter((item) =>
+        item.name.toLowerCase().includes(loweredQuery) ||
+        item.address.toLowerCase().includes(loweredQuery) ||
+        item.city.toLowerCase().includes(loweredQuery) ||
+        item.area.toLowerCase().includes(loweredQuery)
+      )
+    }
+
     if (sortMode === 'nearest') rows = rows.sort((left, right) => left.distanceKm - right.distanceKm)
     if (sortMode === 'public') rows = rows.filter((item) => item.isPublic)
     if (sortMode === 'private') rows = rows.filter((item) => !item.isPublic)
     if (sortMode === 'emergency') rows = rows.filter((item) => item.isEmergencyReady)
-    return rows
-  }, [allRanked, sortMode])
+    return rows.slice(0, 10)
+  }, [apiHospitals, fallbackRanked, query, sortMode])
 
   const openDirections = (hospital: RankedHospital) => {
     const url = `https://www.google.com/maps/search/?api=1&query=${hospital.lat},${hospital.lng}`
@@ -77,7 +162,7 @@ export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingSc
           <div className="mb-2 h-1.5 rounded-full bg-[linear-gradient(90deg,#0f9f62_0%,#ffffff_50%,#0f9f62_100%)]" />
           <div className="flex items-center justify-between gap-3">
             <button type="button" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm font-semibold" onClick={onBack}>
-              ← Back
+              Back
             </button>
             <h1 className="text-xl font-bold">Hospital Routing</h1>
             <div className="flex items-center gap-2">
@@ -85,7 +170,7 @@ export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingSc
                 {complaintCategory.toUpperCase()}
               </span>
               <button type="button" className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-full border border-red-200 bg-red-50 text-red-700">
-                🚨
+                SOS
               </button>
             </div>
           </div>
@@ -100,10 +185,10 @@ export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingSc
               {locationStatus === 'granted' ? 'Using your location' : locationStatus === 'loading' ? 'Checking location...' : 'Enter your area'}
             </span>
             <button type="button" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm font-semibold" onClick={() => setLargeTextMode((value) => !value)}>
-              🔠 {largeTextMode ? 'Standard Text' : 'Large Text'}
+              {largeTextMode ? 'Standard Text' : 'Large Text'}
             </button>
             <button type="button" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm font-semibold" onClick={() => setDarkMode((value) => !value)}>
-              🌙 {darkMode ? 'Light' : 'Dark'}
+              {darkMode ? 'Light' : 'Dark'}
             </button>
           </div>
 
@@ -139,13 +224,25 @@ export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingSc
           We ranked hospitals by specialty and urgency, then distance.
         </section>
 
+        {hospitalsLoading ? (
+          <section className="rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-700 shadow-sm">
+            Loading hospitals from API...
+          </section>
+        ) : null}
+
+        {hospitalsError ? (
+          <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 shadow-sm">
+            {hospitalsError} Showing fallback list.
+          </section>
+        ) : null}
+
         {locationStatus === 'denied' ? (
           <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 shadow-sm">
             Location access is denied. Enable location in browser settings or search by your area manually.
           </section>
         ) : null}
 
-        {visibleHospitals.length === 0 ? (
+        {visibleHospitals.length === 0 && !hospitalsLoading ? (
           <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:bg-slate-900">
             <h3 className="text-lg font-bold">No exact matches found</h3>
             <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
@@ -199,4 +296,3 @@ export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingSc
     </div>
   )
 }
-

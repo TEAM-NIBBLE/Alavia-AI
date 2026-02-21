@@ -7,6 +7,8 @@ import {
   Send,
   X,
   AlertTriangle,
+  PhoneCall,
+  MessageCircle,
   Activity,
   CheckCircle2,
   Volume2,
@@ -145,6 +147,8 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const [showLanguagePanel, setShowLanguagePanel] = useState(false)
   const [showUserDropdown, setShowUserDropdown] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
+  const [isEmergencyMode, setIsEmergencyMode] = useState(false)
+  const [showEmergencyPanel, setShowEmergencyPanel] = useState(false)
   const [isChangingLanguage, setIsChangingLanguage] = useState(false)
   const [textInput, setTextInput] = useState('')
 
@@ -204,6 +208,49 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     if ('vibrate' in navigator) {
       navigator.vibrate(pattern)
     }
+  }
+
+  const getEmergencyContactPhone = () => {
+    try {
+      const profileRaw = localStorage.getItem('alavia.profileSettings')
+      if (profileRaw) {
+        const profile = JSON.parse(profileRaw) as { emergencyPhone?: string }
+        if (profile.emergencyPhone?.trim()) return profile.emergencyPhone.trim()
+      }
+    } catch {
+      // ignore malformed local storage
+    }
+
+    try {
+      const userRaw = localStorage.getItem('alavia.user')
+      if (userRaw) {
+        const user = JSON.parse(userRaw) as { emergency_contact_phone?: string; phone?: string }
+        if (user.emergency_contact_phone?.trim()) return user.emergency_contact_phone.trim()
+        if (user.phone?.trim()) return user.phone.trim()
+      }
+    } catch {
+      // ignore malformed local storage
+    }
+
+    return '112'
+  }
+
+  const activateEmergencyMode = () => {
+    setIsEmergencyMode(true)
+    setShowEmergencyPanel(true)
+    stopListening()
+    speakText('Emergency mode activated. Call or send SMS to your emergency contact now.')
+  }
+
+  const handleEmergencyCall = () => {
+    const phone = getEmergencyContactPhone()
+    window.location.href = `tel:${phone}`
+  }
+
+  const handleEmergencySms = () => {
+    const phone = getEmergencyContactPhone()
+    const emergencyMessage = encodeURIComponent('ALAVIA AI emergency request. Please assist immediately.')
+    window.location.href = `sms:${phone}?body=${emergencyMessage}`
   }
 
   const updateConsultationId = (id: number | null) => {
@@ -524,7 +571,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const currentTranscript = (interimTranscript || transcript).trim()
 
   return (
-    <div className="min-h-screen bg-[#fdfdfd] text-slate-900 transition-all duration-500 text-base">
+    <div className={`min-h-screen text-slate-900 transition-all duration-500 text-base ${isEmergencyMode ? 'bg-red-50' : 'bg-[#fdfdfd]'}`}>
       {/* Global Loading Overlay for Language Change */}
       <AnimatePresence mode="wait">
         {isChangingLanguage && (
@@ -548,10 +595,13 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
         )}
       </AnimatePresence>
 
-      <div className="fixed inset-0 bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.03),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(6,182,212,0.03),transparent_40%)] pointer-events-none" />
+      <div className={`fixed inset-0 pointer-events-none ${isEmergencyMode
+        ? 'bg-[radial-gradient(circle_at_top_right,rgba(239,68,68,0.12),transparent_45%),radial-gradient(circle_at_bottom_left,rgba(220,38,38,0.08),transparent_45%)]'
+        : 'bg-[radial-gradient(circle_at_top_right,rgba(16,185,129,0.03),transparent_40%),radial-gradient(circle_at_bottom_left,rgba(6,182,212,0.03),transparent_40%)]'
+        }`} />
 
       {/* Header */}
-      <header className="sticky top-0 z-30 border-b border-white bg-white/60 backdrop-blur-2xl">
+      <header className={`sticky top-0 z-30 border-b backdrop-blur-2xl ${isEmergencyMode ? 'border-red-100 bg-red-50/90' : 'border-white bg-white/60'}`}>
         <div className="mx-auto flex max-w-7xl items-center justify-between px-4 sm:px-6 py-3 sm:py-4">
           <div className="flex items-center gap-3 sm:gap-6">
             <motion.div
@@ -559,10 +609,10 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
               className="relative"
             >
               <img src={alaviaLogo} alt="Alavia" className="h-11 w-11 rounded-2xl object-contain shadow-sm border border-slate-100" />
-              <div className="absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-white bg-emerald-500" />
+              <div className={`absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-white ${isEmergencyMode ? 'bg-red-600' : 'bg-emerald-500'}`} />
             </motion.div>
             <div className="flex flex-col">
-              <h1 className="hidden sm:block text-[10px] font-black uppercase tracking-[0.2em] text-emerald-600/80">Alavia AI</h1>
+              <h1 className={`hidden sm:block text-[10px] font-black uppercase tracking-[0.2em] ${isEmergencyMode ? 'text-red-700' : 'text-emerald-600/80'}`}>Alavia AI</h1>
               <p className="text-lg sm:text-xl font-black text-slate-800 tracking-tight leading-none">
                 {userName ? `Hi, ${userName.split(' ')[0]}` : t('voice.healthSession')}
               </p>
@@ -586,7 +636,11 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
             <motion.button
               whileTap={{ scale: 0.9 }}
-              className="group rounded-full bg-red-500/5 p-2 sm:p-2.5 text-red-600 transition-all hover:bg-red-500 hover:text-white border border-red-500/10"
+              onClick={activateEmergencyMode}
+              className={`group rounded-full p-2 sm:p-2.5 transition-all border ${isEmergencyMode
+                ? 'bg-red-600 text-white border-red-700'
+                : 'bg-red-500/5 text-red-600 hover:bg-red-500 hover:text-white border-red-500/10'
+                }`}
               title={t('voice.emergencyHelp')}
             >
               <AlertTriangle size={18} />
@@ -611,6 +665,54 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
         </div>
       </header>
 
+      <AnimatePresence>
+        {isEmergencyMode && (
+          <motion.section
+            initial={{ opacity: 0, y: -12 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -12 }}
+            className="sticky top-[72px] z-20 mx-auto mt-2 w-[95%] max-w-xl rounded-2xl border border-red-200 bg-red-100 px-4 py-3"
+          >
+            <div className="flex items-center justify-between gap-3">
+              <div className="flex items-center gap-2 text-red-800">
+                <AlertTriangle size={18} />
+                <p className="text-sm font-black">Emergency Mode Active</p>
+              </div>
+              <button
+                type="button"
+                onClick={() => {
+                  setIsEmergencyMode(false)
+                  setShowEmergencyPanel(false)
+                }}
+                className="min-h-12 rounded-xl border border-red-300 bg-white px-4 text-xs font-bold uppercase tracking-wide text-red-700"
+              >
+                Exit mode
+              </button>
+            </div>
+            {showEmergencyPanel && (
+              <div className="mt-3 grid grid-cols-2 gap-2">
+                <button
+                  type="button"
+                  onClick={handleEmergencyCall}
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-red-700 px-3 text-sm font-bold text-white"
+                >
+                  <PhoneCall size={16} />
+                  <span>Call contact</span>
+                </button>
+                <button
+                  type="button"
+                  onClick={handleEmergencySms}
+                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-red-300 bg-white px-3 text-sm font-bold text-red-700"
+                >
+                  <MessageCircle size={16} />
+                  <span>SMS contact</span>
+                </button>
+              </div>
+            )}
+          </motion.section>
+        )}
+      </AnimatePresence>
+
       {/* Main Content */}
       <main className="mx-auto max-w-xl px-6 pt-8 pb-32 relative z-10">
         <div className="flex flex-col items-center gap-10 text-center">
@@ -620,7 +722,9 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
             initial={{ opacity: 0, y: -10 }}
             animate={{ opacity: 1, y: 0 }}
             className={`flex items-center gap-2 rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] border shadow-sm transition-all duration-500 ${isListening
-              ? 'bg-emerald-500 text-white border-emerald-400 shadow-emerald-200'
+              ? isEmergencyMode
+                ? 'bg-red-600 text-white border-red-500 shadow-red-200'
+                : 'bg-emerald-500 text-white border-emerald-400 shadow-emerald-200'
               : 'bg-white text-slate-400 border-slate-100'
               }`}
           >
@@ -660,7 +764,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                       animate={{ scale: 1.6, opacity: 1 }}
                       exit={{ scale: 2.2, opacity: 0 }}
                       transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-                      className="absolute inset-0 rounded-full bg-emerald-500/10"
+                      className={`absolute inset-0 rounded-full ${isEmergencyMode ? 'bg-red-500/15' : 'bg-emerald-500/10'}`}
                     />
                     <motion.div
                       key="pulse-2"
@@ -668,7 +772,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                       animate={{ scale: 2.2, opacity: 1 }}
                       exit={{ scale: 3, opacity: 0 }}
                       transition={{ duration: 2.5, repeat: Infinity, ease: "easeOut", delay: 0.6 }}
-                      className="absolute inset-0 rounded-full bg-emerald-500/5"
+                      className={`absolute inset-0 rounded-full ${isEmergencyMode ? 'bg-red-500/10' : 'bg-emerald-500/5'}`}
                     />
                   </>
                 )}
@@ -707,7 +811,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                     {Array.from({ length: 15 }).map((_, i) => (
                       <motion.span
                         key={i}
-                        className="wave-bar bg-emerald-500/80"
+                        className={`wave-bar ${isEmergencyMode ? 'bg-red-500/90' : 'bg-emerald-500/80'}`}
                         style={{ animationDelay: `${i * 80}ms` }}
                       />
                     ))}
