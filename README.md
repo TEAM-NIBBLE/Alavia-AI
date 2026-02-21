@@ -1,46 +1,37 @@
 # Alavia-AI
 
-Multilingual, voice-first AI health triage assistant for Nigeria. This MVP provides rule-based triage, first aid guidance, and smart hospital routing for Lagos. It is **not** a diagnosis or prescription system.
+Alavia-AI is a multilingual, voice-first AI health triage assistant built for Nigeria. It provides guided symptom collection, rule-based triage, first-aid guidance, and smart hospital routing. It is an MVP and is not a replacement for medical advice, diagnosis, or prescription.
 
-## Hackathon Demo Summary
-- Voice-first triage: STT ? structured questions ? rule-based severity
-- Multilingual: English, Pidgin, Yoruba, Hausa, Igbo
-- Smart routing: ranked Lagos hospitals by distance + specialty + emergency readiness
-- Admin tools: manage hospitals + analytics
-- OpenAI: speech (STT/TTS) + optional phrasing
+**What the AI does**
+- Collects user symptoms via voice (STT) or text and keeps a short, conversational triage flow.
+- Uses a deterministic rule engine (and optional AI categorization) to assess severity and recommend first-aid steps.
+- Routes users to nearby hospitals ranked by distance, specialty, and emergency readiness.
+- Speaks responses back to users using TTS; supports multiple Nigerian languages.
 
-## What This Does
-User flow:
-1. User registers/logs in
-2. Starts a consultation
-3. Speaks symptoms ? STT ? triage questions
-4. Rule engine decides severity + first aid + recommended specialty
-5. Hospitals are ranked by location and suitability
-6. TTS speaks responses back to the user
+**How it works (high level)**
+- Frontend sends user input to the backend consultation endpoints.
+- Backend runs the triage flow: emits the next question, evaluates answers against rules, and updates consultation status.
+- If the consultation is marked complete, backend produces first-aid advice, severity, and recommended specialty, and returns a consultation detail summary.
+- Speech endpoints handle STT (audio → transcript) and TTS (text → audio URL). The UI auto-plays TTS and either opens the keyboard or starts the mic depending on how the session was started.
 
-## Repo Structure
-- `backend/alavia-api` � Laravel 12 REST API
-- `frontend` � React + TypeScript (Vite)
+Tech stack
+- Frontend: React + TypeScript, Vite, Tailwind CSS, framer-motion, react-i18next
+- Backend: Laravel (PHP) REST API (Sanctum for auth)
+- Speech & AI: Backend connects to speech services / AI providers for STT/TTS and optional language-aware instructions
 
-## Backend Features
-- Auth (Sanctum) + profile
-- Consultations with encrypted messages (AES-256)
-- Rule-based triage with optional AI category detection
-- Lagos hospitals sync from Overpass API
-- Hospitals search & routing with Haversine ranking
-- Speech endpoints (STT / TTS)
-- Admin CRUD + analytics
-- OpenAPI + Postman collection + payload samples
+Repository layout
+- `frontend/` — React + TypeScript app (Vite)
+- `backend/alavia-api/` — Laravel API and business logic
 
-## Frontend (Quick Start)
-```bash
+Quick start (frontend)
+```
 cd frontend
 npm install
 npm run dev
 ```
 
-## Backend (Quick Start)
-```bash
+Quick start (backend)
+```
 cd backend/alavia-api
 cp .env.example .env
 composer install
@@ -49,71 +40,24 @@ php artisan migrate
 php artisan storage:link
 ```
 
-### Required Backend Env Vars
-- `APP_KEY`
-- `DB_CONNECTION`, `DB_HOST`, `DB_PORT`, `DB_DATABASE`, `DB_USERNAME`, `DB_PASSWORD`
-- `OPENAI_API_KEY` (or `OPENAI_KEY` fallback)
-- `ENCRYPTION_KEY`
-- `ADMIN_EMAIL`, `ADMIN_PASSWORD`
+Key API endpoints (examples)
+- `POST /api/auth/register` — register user
+- `POST /api/auth/login` — login
+- `POST /api/consultations/start` — start a consultation
+- `POST /api/consultations/{id}/message` — send a follow-up message
+- `GET /api/consultations/{id}` — consultation detail
+- `POST /api/speech/stt` — speech-to-text
+- `POST /api/speech/tts` — text-to-speech
 
-### Optional Backend Env Vars
-- `TRIAGE_AI_ENABLED` (false by default)
-- `OVERPASS_URL`, `OVERPASS_LAGOS_BBOX`
+Team
+- Project built by TEAM NIBBLE
+- Members: Toluwani Bakare, Onaade Abdulmuqtadir, Olanrewaju Olamide, Yusuf Masroor Ahmad
 
-## Demo Commands
-Sync Lagos hospitals:
-```bash
-php artisan hospitals:sync-lagos --limit=50
-```
+License & usage
+This project is a hackathon prototype and may not be used, copied, distributed, or modified without explicit permission from the TEAM NIBBLE contributors. If you wish to use this project in whole or part, please contact the maintainers to request permission.
 
-Seed hospital meta (facilities/specialties templates):
-```bash
-php artisan db:seed --class=HospitalMetaSeeder
-```
+## Safety & scope
+- This MVP does **not** provide medical diagnoses or prescriptions.
+- It uses deterministic triage rules; AI is used only for speech processing and optional phrasing/categorization.
 
-Run tests:
-```bash
-php artisan test
-```
-
-## Key API Endpoints
-Auth:
-- `POST /api/auth/register`
-- `POST /api/auth/login`
-- `POST /api/auth/logout`
-
-Consultations:
-- `POST /api/consultations/start`
-- `POST /api/consultations/{id}/message`
-- `GET /api/consultations/{id}`
-
-Hospitals:
-- `GET /api/hospitals` (filters + ranking)
-- `GET /api/hospitals/{id}`
-
-Speech:
-- `POST /api/speech/stt`
-- `POST /api/speech/tts`
-
-Admin:
-- `POST /api/admin/login`
-- `GET/POST/PATCH/DELETE /api/admin/hospitals`
-- `GET /api/admin/analytics/overview`
-
-Full payload examples:
-- `backend/alavia-api/docs/payloads.md`
-
-OpenAPI spec:
-- `backend/alavia-api/docs/openapi.yaml`
-
-Postman collection:
-- `backend/alavia-api/docs/postman_collection.json`
-
-## Safety + Scope
-This MVP:
-- Does **not** diagnose or prescribe
-- Uses deterministic rule-based severity
-- Uses AI only for speech and optional phrasing/categorization
-
-## License
-Hackathon prototype. All rights reserved by the team.
+For full payload examples and API documentation, see `backend/alavia-api/docs/payloads.md` and `backend/alavia-api/docs/openapi.yaml`.
