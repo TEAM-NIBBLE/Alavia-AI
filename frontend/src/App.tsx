@@ -4,9 +4,10 @@ import alaviaLogo from './assets/alavia-ai_logo.png'
 import SignUpPage from './components/SignUpPage'
 import SignInPage from './components/SignInPage'
 import VoiceInteractionScreen from './components/VoiceInteractionScreen'
+import ProfilePage from './components/ProfilePage'
 import './App.css'
 
-type OnboardingStep = 'splash' | 'language' | 'signup' | 'signin' | 'app'
+type OnboardingStep = 'splash' | 'language' | 'signup' | 'signin' | 'app' | 'profile'
 type LanguageCode = 'en' | 'pcm' | 'yo' | 'ha' | 'ig'
 
 const languageCodes: LanguageCode[] = ['en', 'pcm', 'yo', 'ha', 'ig']
@@ -112,6 +113,17 @@ function App() {
     return (
       <VoiceInteractionScreen
         userName={userName}
+        onLogout={handleLogout}
+        onLanguageChange={handleLanguageChange}
+        onViewProfile={() => setStep('profile')}
+      />
+    )
+  }
+
+  if (step === 'profile') {
+    return (
+      <ProfilePage
+        onBack={() => setStep('app')}
         onLogout={handleLogout}
         onLanguageChange={handleLanguageChange}
       />

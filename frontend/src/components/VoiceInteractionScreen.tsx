@@ -123,9 +123,10 @@ interface VoiceInteractionScreenProps {
   userName?: string
   onLogout: () => void
   onLanguageChange: (code: any) => void
+  onViewProfile: () => void
 }
 
-export default function VoiceInteractionScreen({ userName, onLogout, onLanguageChange }: VoiceInteractionScreenProps) {
+export default function VoiceInteractionScreen({ userName, onLogout, onLanguageChange, onViewProfile }: VoiceInteractionScreenProps) {
   const { t, i18n } = useTranslation()
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const transcriptRef = useRef('')
@@ -963,8 +964,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
               <button
                 onClick={() => {
                   setShowUserDropdown(false)
-                  // Navigate to profile or show profile modal
-                  console.log('Open profile')
+                  onViewProfile()
                 }}
                 className="flex w-full items-center gap-3 rounded-xl px-4 py-4 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 active:bg-slate-100"
               >
