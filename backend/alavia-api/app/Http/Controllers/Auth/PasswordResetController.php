@@ -37,9 +37,9 @@ class PasswordResetController extends Controller
             ], 422);
         }
 
-        $user->forceFill([
-            'password' => Hash::make($data['password']),
-        ])->save();
+        // $user->forceFill([
+        //     'password' => Hash::make($data['password']),
+        // ])->save();
 
         Password::broker()->deleteToken($user);
 
