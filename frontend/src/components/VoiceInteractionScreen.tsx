@@ -15,7 +15,8 @@ import {
   Globe,
   ChevronDown,
   LogOut,
-  Loader2
+  Loader2,
+  MicOff
 } from 'lucide-react'
 import alaviaLogo from '../assets/alavia-ai_logo.png'
 
@@ -106,7 +107,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const [showUserDropdown, setShowUserDropdown] = useState(false)
   const [isChangingLanguage, setIsChangingLanguage] = useState(false)
   const [textInput, setTextInput] = useState('')
-  const [largeTextMode, setLargeTextMode] = useState(false)
 
   const selectedLanguage = (i18n.language || 'en').toLowerCase()
 
@@ -210,7 +210,14 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
     setSessionStatus('listening')
     setInterimTranscript('')
-    recognitionRef.current?.start()
+
+    try {
+      recognitionRef.current?.start()
+    } catch (err) {
+      console.error('Speech recognition start failed:', err)
+      // If it fails because it's already started, we just continue
+    }
+
     setIsListening(true)
     triggerHaptics(30)
   }
@@ -339,7 +346,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const currentTranscript = (interimTranscript || transcript).trim()
 
   return (
-    <div className={`min-h-screen bg-[#fdfdfd] text-slate-900 transition-all duration-500 ${largeTextMode ? 'text-lg' : 'text-base'}`}>
+    <div className="min-h-screen bg-[#fdfdfd] text-slate-900 transition-all duration-500 text-base">
       {/* Global Loading Overlay for Language Change */}
       <AnimatePresence mode="wait">
         {isChangingLanguage && (
@@ -476,12 +483,28 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
               : 'bg-white text-slate-400 border-slate-100'
               }`}
           >
-            {isListening ? (
-              <Activity size={14} className="animate-pulse" />
-            ) : (
-              <ShieldCheck size={14} />
+            {!supportsSpeech && (
+              <div className="flex items-center gap-2">
+                <MicOff size={14} className="text-amber-500" />
+                <span className="text-amber-600">Browser Unsupported</span>
+              </div>
             )}
-            {isListening ? t('voice.status.listening') : sessionStatus === 'processing' ? t('voice.status.processing') : t('voice.status.ready')}
+            {supportsSpeech && micPermission === 'denied' && (
+              <div className="flex items-center gap-2">
+                <MicOff size={14} className="text-red-500" />
+                <span className="text-red-600">Mic Blocked</span>
+              </div>
+            )}
+            {supportsSpeech && micPermission !== 'denied' && (
+              <>
+                {isListening ? (
+                  <Activity size={14} className="animate-pulse" />
+                ) : (
+                  <ShieldCheck size={14} />
+                )}
+                {isListening ? t('voice.status.listening') : sessionStatus === 'processing' ? t('voice.status.processing') : t('voice.status.ready')}
+              </>
+            )}
           </motion.div>
 
           {/* Hero Section */}
@@ -518,9 +541,18 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                 onMouseUp={handleHoldEnd}
                 onTouchStart={handleHoldStart}
                 onTouchEnd={handleHoldEnd}
-                className={`speak-button relative z-10 border-4 border-white ${isListening ? 'is-live scale-110' : 'bg-white'}`}
+                className={`speak-button relative z-10 border-4 border-white ${micPermission === 'denied'
+                  ? 'bg-red-50 text-red-500 border-red-200'
+                  : isListening
+                    ? 'is-live scale-110'
+                    : 'bg-white text-slate-900 shadow-xl'
+                  }`}
               >
-                <Mic size={56} strokeWidth={2.5} />
+                {micPermission === 'denied' ? (
+                  <MicOff size={56} strokeWidth={2.5} />
+                ) : (
+                  <Mic size={56} strokeWidth={2.5} />
+                )}
               </motion.button>
 
               <AnimatePresence>
@@ -552,9 +584,13 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
               </motion.h2>
               <motion.p
                 layout
-                className="text-base font-bold text-slate-400 leading-relaxed"
+                className={`text-base font-bold leading-relaxed ${micPermission === 'denied' ? 'text-red-500' : 'text-slate-400'}`}
               >
-                {isListening ? t('voice.listeningHint') : t('voice.speakHint')}
+                {micPermission === 'denied'
+                  ? t('voice.micDisabledText')
+                  : isListening
+                    ? t('voice.listeningHint')
+                    : t('voice.speakHint')}
               </motion.p>
             </div>
           </section>
@@ -577,16 +613,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                 {t('voice.modeHold')}
               </button>
             </div>
-            <motion.button
-              whileTap={{ scale: 0.9 }}
-              onClick={() => setLargeTextMode(p => !p)}
-              className={`flex h-[44px] w-[44px] items-center justify-center rounded-[20px] border-2 transition-all duration-300 font-black text-sm ${largeTextMode
-                ? 'border-emerald-500 bg-emerald-500 text-white shadow-lg shadow-emerald-200'
-                : 'border-white bg-white text-slate-400 shadow-xl shadow-slate-200/50 hover:border-slate-100'
-                }`}
-            >
-              Aa
-            </motion.button>
           </section>
 
           {/* Results Area */}
@@ -665,7 +691,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                         {questionIndex + 1} of {TRIAGE_QUESTIONS.length}
                       </span>
                     </div>
-                    <h4 className="text-2xl font-black leading-tight mb-8 tracking-tight">
+                    <h4 className="text-2xl font-black leading-tight mb-8 tracking-tight text-emerald-400">
                       {activeQuestion.question}
                     </h4>
                     <div className="flex gap-4">
