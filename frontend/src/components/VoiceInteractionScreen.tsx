@@ -33,6 +33,7 @@ import {
   Info
 } from 'lucide-react'
 import alaviaLogo from '../assets/alavia-ai_logo.png'
+import ProfilePage from './ProfilePage'
 
 type InputMode = 'tap' | 'hold'
 type SessionStatus = 'ready' | 'listening' | 'processing'
@@ -144,6 +145,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const [showKeyboardPanel, setShowKeyboardPanel] = useState(false)
   const [showLanguagePanel, setShowLanguagePanel] = useState(false)
   const [showUserDropdown, setShowUserDropdown] = useState(false)
+  const [showProfile, setShowProfile] = useState(false)
   const [isChangingLanguage, setIsChangingLanguage] = useState(false)
   const [textInput, setTextInput] = useState('')
 
@@ -963,8 +965,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
               <button
                 onClick={() => {
                   setShowUserDropdown(false)
-                  // Navigate to profile or show profile modal
-                  console.log('Open profile')
+                  setShowProfile(true)
                 }}
                 className="flex w-full items-center gap-3 rounded-xl px-4 py-4 text-sm font-bold text-slate-700 transition-all hover:bg-slate-50 active:bg-slate-100"
               >
@@ -1062,6 +1063,29 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
           </p>
         </div>
       </footer>
+
+      <AnimatePresence>
+        {showProfile && (
+          <motion.div
+            initial={{ opacity: 0, x: '100%' }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: '100%' }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed inset-0 z-[150]"
+          >
+            <ProfilePage
+              onBack={() => setShowProfile(false)}
+              onLogout={() => {
+                setShowProfile(false)
+                onLogout()
+              }}
+              onLanguageChange={(code) => {
+                onLanguageChange(code)
+              }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   )
 }
