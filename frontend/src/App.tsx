@@ -1,9 +1,11 @@
 import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import alaviaLogo from './assets/alavia-ai_logo.png'
+import SignUpPage from './components/SignUpPage'
+import SignInPage from './components/SignInPage'
 import './App.css'
 
-type OnboardingStep = 'splash' | 'language'
+type OnboardingStep = 'splash' | 'language' | 'signup' | 'signin' | 'app'
 type LanguageCode = 'en' | 'pcm' | 'yo' | 'ha' | 'ig'
 
 const languageCodes: LanguageCode[] = ['en', 'pcm', 'yo', 'ha', 'ig']
@@ -13,13 +15,19 @@ function App() {
   const [step, setStep] = useState<OnboardingStep>('splash')
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(
     (localStorage.getItem('alavia.selectedLanguage') as LanguageCode) ||
-    (i18n.language as LanguageCode) ||
-    'en'
+      (i18n.language as LanguageCode) ||
+      'en'
   )
-
-  // Track if we are currently "continuing" to show the right translated message
   const [isContinuing, setIsContinuing] = useState(false)
   const [isSaved, setIsSaved] = useState(false)
+  const [userName, setUserName] = useState<string>(() => {
+    try {
+      const stored = localStorage.getItem('alavia.user')
+      return stored ? (JSON.parse(stored) as { name: string }).name : ''
+    } catch {
+      return ''
+    }
+  })
 
   useEffect(() => {
     const timer = setTimeout(() => {
@@ -38,13 +46,90 @@ function App() {
 
   const handleContinue = () => {
     setIsContinuing(true)
-
-    // Smooth transition simulation
     setTimeout(() => {
       localStorage.setItem('alavia.selectedLanguage', selectedLanguage)
       setIsContinuing(false)
       setIsSaved(true)
+      setTimeout(() => {
+        const existingUser = localStorage.getItem('alavia.user')
+        setStep(existingUser ? 'signin' : 'signup')
+      }, 700)
     }, 800)
+  }
+
+  const handleSignUpSuccess = (user: { name: string }) => {
+    setUserName(user.name)
+    setStep('app')
+  }
+
+  const handleSignInSuccess = () => {
+    try {
+      const stored = localStorage.getItem('alavia.user')
+      if (stored) setUserName((JSON.parse(stored) as { name: string }).name)
+    } catch { /* ignore */ }
+    setStep('app')
+  }
+
+  // Auth pages render as full-page replacements
+  if (step === 'signup') {
+    return (
+      <SignUpPage
+        onSuccess={handleSignUpSuccess}
+        onSwitchToSignIn={() => setStep('signin')}
+        onBack={() => { setIsSaved(false); setStep('language') }}
+      />
+    )
+  }
+
+  if (step === 'signin') {
+    return (
+      <SignInPage
+        onSuccess={handleSignInSuccess}
+        onSwitchToSignUp={() => setStep('signup')}
+        onBack={() => { setIsSaved(false); setStep('language') }}
+      />
+    )
+  }
+
+  if (step === 'app') {
+    return (
+      <div className="relative min-h-screen overflow-hidden bg-white">
+        <div className="absolute top-0 left-0 right-0 h-1.5 bg-emerald-600" />
+        <div className="absolute left-0 top-0 h-full w-1.5 bg-emerald-600/30" />
+        <div className="absolute right-0 top-0 h-full w-1.5 bg-emerald-600/30" />
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute inset-0"
+          style={{
+            background:
+              'radial-gradient(circle at top right, rgba(16,185,129,0.1) 0%, transparent 50%)'
+          }}
+        />
+        <div className="relative mx-auto flex min-h-screen w-full max-w-md flex-col items-center justify-center px-6 text-center">
+          <div className="mb-6 flex h-20 w-20 items-center justify-center rounded-3xl bg-emerald-600 shadow-xl shadow-emerald-200">
+            <img src={alaviaLogo} alt="Alavia AI" className="h-14 w-14 rounded-2xl object-contain" />
+          </div>
+          <div className="mb-2 rounded-full bg-emerald-100 px-4 py-1 text-xs font-bold uppercase tracking-wider text-emerald-700">
+            Welcome
+          </div>
+          <h1 className="mt-2 text-3xl font-extrabold text-slate-900">
+            Hello, {userName || 'there'}! 👋
+          </h1>
+          <p className="mt-3 text-slate-500">
+            You're now signed in to Alavia AI. Your health journey in your language starts here.
+          </p>
+          <button
+            onClick={() => {
+              localStorage.removeItem('alavia.user')
+              setStep('signin')
+            }}
+            className="mt-10 rounded-xl border border-slate-200 px-6 py-2.5 text-sm font-medium text-slate-500 transition hover:border-emerald-300 hover:text-emerald-600"
+          >
+            Sign out
+          </button>
+        </div>
+      </div>
+    )
   }
 
   return (
@@ -173,6 +258,7 @@ function App() {
                 {isContinuing ? t('onboarding.saving') : t('onboarding.saved')}
               </p>
             )}
+
 
             <div className="mt-8 rounded-2xl bg-slate-50 p-4 border border-slate-100">
               <p className="text-xs leading-relaxed text-slate-400">
