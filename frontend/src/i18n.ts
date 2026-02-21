@@ -1123,6 +1123,8 @@ i18n.use(initReactI18next).init({
   resources,
   lng: selectedLanguage,
   fallbackLng: 'en',
+  returnNull: false,
+  parseMissingKeyHandler: (key) => key.split('.').pop() ?? key,
   interpolation: {
     escapeValue: false
   }
