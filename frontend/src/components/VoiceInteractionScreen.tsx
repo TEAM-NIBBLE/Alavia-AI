@@ -185,7 +185,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
   const currentLanguageName = t(`language.${selectedLanguage}.name`)
   const LANGUAGE_CONFIG: Record<string, { displayName: string; speechLocale: string; apiLanguage: string }> = {
-    en: { displayName: 'English', speechLocale: 'en-NG', apiLanguage: 'ENGLISH' },
+    en: { displayName: 'English', speechLocale: 'en-NG', apiLanguage: 'EN' },
     pcm: { displayName: 'Nigerian Pidgin English', speechLocale: 'en-NG', apiLanguage: 'PIDGIN' },
     yo: { displayName: 'Yoruba', speechLocale: 'yo-NG', apiLanguage: 'YORUBA' },
     ha: { displayName: 'Hausa', speechLocale: 'ha-NG', apiLanguage: 'HAUSA' },
@@ -197,8 +197,18 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     return typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
   }, [])
 
+  const localizeServerQuestion = (message: string) => {
+    if (selectedLanguage === 'en') return message
+    const msg = message.toLowerCase()
+    if (msg.includes('breath')) return t('voice.questions.breathing')
+    if (msg.includes('faint') || msg.includes('confusion')) return t('voice.questions.fainting')
+    if (msg.includes('worse') || msg.includes('getting worse')) return t('voice.questions.worse')
+    if (msg.includes('weakness') || msg.includes('one sided')) return t('voice.questions.weakness')
+    return message
+  }
+
   const activeQuestion: TriageQuestion | null = currentAIMessage && !consultationComplete
-    ? { id: String(currentAIMessageSeq), question: currentAIMessage }
+    ? { id: String(currentAIMessageSeq), question: localizeServerQuestion(currentAIMessage) }
     : null
 
   const speakText = async (text: string, onEnd?: () => void) => {
@@ -215,11 +225,23 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       })
       if (tts.audio_url) {
         audioRef.current?.pause()
+        if (audioRef.current && audioRef.current.src.startsWith('blob:')) {
+          URL.revokeObjectURL(audioRef.current.src)
+        }
         const audio = new Audio(tts.audio_url)
         audioRef.current = audio
-        if (onEnd) audio.onended = onEnd
-        await audio.play()
-        return
+        audio.onended = () => {
+          if (audio.src.startsWith('blob:')) URL.revokeObjectURL(audio.src)
+          onEnd?.()
+        }
+        let didPlay = false
+        try {
+          await audio.play()
+          didPlay = true
+        } catch {
+          // If browser blocks autoplay for blob/media URLs, fallback to Web Speech TTS.
+        }
+        if (didPlay) return
       }
     } catch {
       // fallback to browser synthesis
