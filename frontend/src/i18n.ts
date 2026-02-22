@@ -234,7 +234,16 @@ const resources = {
         navigateFullMaps: 'Navigate in Full Maps',
         distanceAway: '{{distance}} away',
         moreSpecialties: '+{{count}} more',
-        emergencyModeActivated: 'Emergency mode activated. Call or send SMS to your emergency contact now.'
+        emergencyModeActivated: 'Emergency mode activated. Call or send SMS to your emergency contact now.',
+        thinking: 'Alavia is thinking',
+        exitMode: 'Exit mode',
+        noHospitals: 'No hospital results available right now.',
+        distanceUnavailable: 'Distance unavailable',
+        keyboardPanelHint: 'Use the keyboard panel at the bottom right',
+        mapYou: 'You',
+        mapHospital: 'Hospital',
+        mapRoute: 'Route',
+        severityLabel: '{{severity}}'
       },
       profile: {
         title: 'Profile & Settings',
@@ -337,6 +346,108 @@ const resources = {
         emergencyCallLabel: 'Call',
         emergencySmsLabel: 'SMS',
         emergencyAppLabel: 'App'
+      },
+      firstAidScreen: {
+        title: 'First Aid Guidance',
+        back: 'Back',
+        standardText: 'Standard Text',
+        largeText: 'Large Text',
+        lightMode: 'Light Mode',
+        darkMode: 'Dark Mode',
+        keepSimple: 'Keep it simple',
+        understoodTitle: 'What I understood',
+        playAudio: 'Play audio summary',
+        translate: 'Translate',
+        doNow: 'Do this now',
+        avoidTitle: 'Avoid this',
+        nextStepsTitle: 'Next steps',
+        viewHospitals: 'View hospitals',
+        endSave: 'End & save',
+        emergencyTitle: 'Emergency signs detected',
+        emergencyBody: 'Stay with someone if possible, avoid exertion, and route to the nearest emergency-ready hospital now.',
+        routeNow: 'Route now',
+        close: 'Close',
+        readAloud: 'Read Aloud',
+        timerRunning: 'Timer Running',
+        startTimer: 'Start {{minutes}} min timer',
+        timerCompleted: '{{title}}. Timer completed.',
+        redFlagsTitle: 'Watch for these signs',
+        redFlagsCta: 'I have one of these signs',
+        call: 'Call',
+        directions: 'Directions',
+        save: 'Save',
+        nextSteps: {
+          primary: {
+            low: 'Continue self care',
+            medium: 'Book a clinic visit',
+            high: 'Go to a hospital now',
+            critical: 'Emergency actions'
+          },
+          secondary: {
+            low: 'Find clinic near me',
+            medium: 'Find hospital near me',
+            high: 'Call emergency contact',
+            critical: 'Route to nearest emergency hospital'
+          }
+        },
+        avoid: {
+          low: ['Do not ignore new breathing issues.', 'Do not self-medicate with unknown drugs.'],
+          medium: ['Do not drive if you feel weak or dizzy.', 'Do not delay care beyond today if symptoms persist.'],
+          high: ['Do not stay alone if symptoms are worsening.', 'Do not do heavy activity right now.'],
+          critical: ['Do not wait at home for symptoms to pass.', 'Do not eat or drink if choking risk is present.']
+        }
+      },
+      routing: {
+        sos: 'SOS',
+        title: 'Hospital Routing',
+        back: 'Back',
+        location: {
+          using: 'Using your location',
+          checking: 'Checking location...',
+          manual: 'Enter your area'
+        },
+        standardText: 'Standard Text',
+        largeText: 'Large Text',
+        light: 'Light',
+        dark: 'Dark',
+        searchPlaceholder: 'Search area or landmark',
+        filters: {
+          nearest: 'Nearest',
+          best: 'Best match',
+          public: 'Public',
+          private: 'Private',
+          emergency: 'Emergency ready'
+        },
+        rankInfo: 'We ranked hospitals by specialty and urgency, then distance.',
+        loading: 'Loading hospitals from API...',
+        error: 'Could not load hospitals from API.',
+        showingFallback: 'Showing fallback list.',
+        locationDenied: 'Location access is denied. Enable location in browser settings or search by your area manually.',
+        noMatchesTitle: 'No exact matches found',
+        noMatchesBody: 'Try another area, or call emergency services if symptoms are severe.',
+        mapTitle: 'Map View (MVP Placeholder)',
+        mapHint: 'Pins shown as list',
+        mapPlaceholder: 'Map container placeholder',
+        listView: 'List view',
+        mapView: 'Map view',
+        kmAway: '{{km}} km',
+        addressUnavailable: 'Address unavailable',
+        defaultPhone: '112',
+        unknown: 'Unknown',
+        match: {
+          bestFor: 'Best for {{category}}',
+          emergencyUnit: 'Has emergency unit',
+          generalCare: 'General care available'
+        },
+        card: {
+          distance: '{{km}} km · ~{{minutes}} min',
+          public: 'Public',
+          private: 'Private',
+          emergencyReady: 'Emergency Ready',
+          call: 'Call',
+          directions: 'Directions',
+          details: 'Details'
+        }
       }
     }
   },
@@ -572,7 +683,16 @@ const resources = {
         navigateFullMaps: 'Open full map',
         distanceAway: '{{distance}} away',
         moreSpecialties: '+{{count}} more',
-        emergencyModeActivated: 'Emergency mode don activate. Call or send SMS to your emergency person now.'
+        emergencyModeActivated: 'Emergency mode don activate. Call or send SMS to your emergency person now.',
+        thinking: 'Alavia dey think',
+        exitMode: 'Comot from mode',
+        noHospitals: 'No hospital result dey available now.',
+        distanceUnavailable: 'Distance no dey available',
+        keyboardPanelHint: 'Use the keyboard for bottom right side',
+        mapYou: 'You',
+        mapHospital: 'Hospital',
+        mapRoute: 'Road',
+        severityLabel: '{{severity}}'
       },
       profile: {
         title: 'Profile & Settings',
@@ -810,10 +930,10 @@ const resources = {
         appName: 'Alavia AI',
       },
       severity: {
-        low: 'Low',
-        medium: 'Medium',
-        high: 'High',
-        critical: 'Critical',
+        low: 'Kékeré',
+        medium: 'Àárín',
+        high: 'Gíga',
+        critical: 'Pàjáwìrì',
       },
       auth: {
         signupTitle: 'Create your account',
@@ -1012,7 +1132,16 @@ const resources = {
         navigateFullMaps: 'Ṣí máàpù gbogbo',
         distanceAway: '{{distance}} jìnnà',
         moreSpecialties: '+{{count}} síi',
-        emergencyModeActivated: 'Ọ̀pọ̀yàní pàjáwìrì ti ṣíṣẹ́. Pe tàbí ran SMS sí ẹni ọ̀pọ̀yàní pàjáwìrì rẹ báyìí.'
+        emergencyModeActivated: 'Ọ̀pọ̀yàní pàjáwìrì ti ṣíṣẹ́. Pe tàbí ran SMS sí ẹni ọ̀pọ̀yàní pàjáwìrì rẹ báyìí.',
+        thinking: 'Alavia ń ronú',
+        exitMode: 'Jáde nínú ọ̀nà',
+        noHospitals: 'Kò sí àbájáde ilé ìwòsàn lọ́wọ́lọ́wọ́.',
+        distanceUnavailable: 'Ìjìnnà kò ṣeé rí',
+        keyboardPanelHint: 'Lo ẹ̀rọ ìtẹ̀wé ní ìsàlẹ̀ ọ̀tún',
+        mapYou: 'Ìwọ',
+        mapHospital: 'Ilé ìwòsàn',
+        mapRoute: 'Ọ̀nà',
+        severityLabel: '{{severity}}'
       },
       profile: {
         title: 'Profaili & Eto',
@@ -1250,10 +1379,10 @@ const resources = {
         appName: 'Alavia AI',
       },
       severity: {
-        low: 'Low',
-        medium: 'Medium',
-        high: 'High',
-        critical: 'Critical',
+        low: 'Ƙanƙanta',
+        medium: 'Matsakaici',
+        high: 'Babba',
+        critical: 'Gaggawa',
       },
       auth: {
         signupTitle: 'Kirkiro asusun ku',
@@ -1287,7 +1416,27 @@ const resources = {
         logout: 'Fita',
         profile: 'Bayanin Nawa',
         step2Label: 'Mataki na 2 cikin 2',
-        back: 'Koma baya'
+        back: 'Koma baya',
+        errors: {
+          signupConflict: 'Akwai asusun da wannan imel ko lambar waya. Da fatan za a shiga.',
+          signupInvalid: 'Wasu bayanan rajista ba daidai ba ne. Da fatan za a sake duba.',
+          signupDefault: 'Ba a iya kirkiro asusu a yanzu.',
+          signupNetwork: 'Ba a iya samun sabar. Duba Intanet dinku.',
+          signInInvalid: 'Imel ko lambar waya ko kalmar sirri ba daidai ba.',
+          signInNotFound: 'Ba a sami asusu ba. Da fatan za a yi rajista.',
+          signInInvalidDetails: 'Da fatan za a sake duba bayanan shiga.',
+          signInDefault: 'Ba a iya shiga a yanzu.',
+          signInNetwork: 'Ba a iya samun sabar. Duba Intanet dinku.',
+          forgotPasswordFailed: 'Ba a iya aika link na sake saiti.'
+        },
+        validation: {
+          fullNameRequired: 'Ana bukatar cikakken suna',
+          emailRequired: 'Ana bukatar ingantaccen imel',
+          phoneRequired: 'Ana bukatar ingantacciyar lambar waya',
+          passwordMin: 'Kalmar sirri ta kasance aƙalla haruffa 6',
+          emailOrPhoneRequired: 'Ana bukatar imel ko lambar waya',
+          passwordRequired: 'Ana bukatar kalmar sirri'
+        }
       },
       voice: {
         sessionStatusLabel: 'Matsayin zama',
@@ -1432,7 +1581,16 @@ const resources = {
         navigateFullMaps: 'Buɗe cikakken taswira',
         distanceAway: '{{distance}} nesa',
         moreSpecialties: '+{{count}} ƙari',
-        emergencyModeActivated: 'An kunna yanayin gaggawa. Kira ko aika SMS ga lambar gaggawa yanzu.'
+        emergencyModeActivated: 'An kunna yanayin gaggawa. Kira ko aika SMS ga lambar gaggawa yanzu.',
+        thinking: 'Alavia tana tunani',
+        exitMode: 'Fita daga wannan yanayi',
+        noHospitals: 'Babu sakamakon asibiti a yanzu.',
+        distanceUnavailable: 'Ba a san nisa ba',
+        keyboardPanelHint: 'Yi amfani da madannin da ke ƙasa dama',
+        mapYou: 'Kai',
+        mapHospital: 'Asibiti',
+        mapRoute: 'Hanya',
+        severityLabel: '{{severity}}'
       },
       profile: {
         title: 'Bayani & Saituna',
@@ -1535,6 +1693,108 @@ const resources = {
         emergencyCallLabel: 'Kira',
         emergencySmsLabel: 'SMS',
         emergencyAppLabel: 'App'
+      },
+      firstAidScreen: {
+        title: 'Jagorar Agajin Gaggawa',
+        back: 'Koma baya',
+        standardText: 'Rubutu na al ada',
+        largeText: 'Babban Rubutu',
+        lightMode: 'Haske',
+        darkMode: 'Duhu',
+        keepSimple: 'Sa shi sauqi',
+        understoodTitle: 'Abin da na fahimta',
+        playAudio: 'Kunna taƙaitaccen murya',
+        translate: 'Fassara',
+        doNow: 'Yi wannan yanzu',
+        avoidTitle: 'Guje wa wannan',
+        nextStepsTitle: 'Mataki na gaba',
+        viewHospitals: 'Duba asibiti',
+        endSave: 'Gama & adana',
+        emergencyTitle: 'An gano alamun gaggawa',
+        emergencyBody: 'Zauna tare da wani idan akwai, guje wa gajiyarwa, kuma tafi asibiti mafi kusa yanzu.',
+        routeNow: 'Tashi yanzu',
+        close: 'Rufe',
+        readAloud: 'Karanta da babbar murya',
+        timerRunning: 'Agogon yana tafiya',
+        startTimer: 'Fara agogo {{minutes}} min',
+        timerCompleted: '{{title}}. An gama agogo.',
+        redFlagsTitle: 'Yi hankali da waɗannan alamun',
+        redFlagsCta: 'Ina da ɗaya daga cikin waɗannan alamun',
+        call: 'Kira',
+        directions: 'Jagoranci',
+        save: 'Adana',
+        nextSteps: {
+          primary: {
+            low: 'Ci gaba da kulawa da kanka',
+            medium: 'Yi alkawarin zuwa asibiti',
+            high: 'Je asibiti yanzu',
+            critical: 'Matakin gaggawa'
+          },
+          secondary: {
+            low: 'Nemo asibiti a kusa da ni',
+            medium: 'Nemo asibiti a kusa da ni',
+            high: 'Kira lambar gaggawa',
+            critical: 'Tashi zuwa asibiti mafi kusa'
+          }
+        },
+        avoid: {
+          low: ['Kada ka yi biris da matsalar numfashi sabuwa.', 'Kada ka sha maganin da ba ka sani ba.'],
+          medium: ['Kada ka tuka mota idan kana jin rauni ko jiri.', 'Kada ka jinkirta ba da magani idan alamun sun ci gaba.'],
+          high: ['Kada ka zauna shi kaɗai idan alamun suna ƙaruwa.', 'Kada ka yi aiki mai nauyi yanzu.'],
+          critical: ['Kada ka jira a gida.', 'Kada ka ci ko sha idan akwai haɗarin shaƙawa.']
+        }
+      },
+      routing: {
+        sos: 'SOS',
+        title: 'Neman Asibiti',
+        back: 'Koma baya',
+        location: {
+          using: 'Ana amfani da wurinku',
+          checking: 'Ana binciken wuri...',
+          manual: 'Shigar da yankin ku'
+        },
+        standardText: 'Rubutu na al ada',
+        largeText: 'Babban Rubutu',
+        light: 'Haske',
+        dark: 'Duhu',
+        searchPlaceholder: 'Nemo yanki ko wuri',
+        filters: {
+          nearest: 'Mafi kusa',
+          best: 'Mafi dacewa',
+          public: 'Na gwamnati',
+          private: 'Mai zaman kansa',
+          emergency: 'Mai ɗakin gaggawa'
+        },
+        rankInfo: 'Mun tsara asibiti gwargwadon ƙwarewa da gaggawa, sannan nisa.',
+        loading: 'Ana lodi asibiti...',
+        error: 'Ba a iya lodi asibiti.',
+        showingFallback: 'Ana nuna jerin madadin.',
+        locationDenied: 'An hana samun wuri. Kunna izinin wuri a cikin saitin browser.',
+        noMatchesTitle: 'Ba a sami daidaito ba',
+        noMatchesBody: 'Gwada wani yanki, ko kira lambar gaggawa.',
+        mapTitle: 'Kallon Taswirar',
+        mapHint: 'Ana nuna a matsayin jeri',
+        mapPlaceholder: 'Wurin taswirar',
+        listView: 'Kallon jeri',
+        mapView: 'Kallon taswira',
+        kmAway: '{{km}} km',
+        addressUnavailable: 'Adireshin ba shi nan',
+        defaultPhone: '112',
+        unknown: 'Ba a sani ba',
+        match: {
+          bestFor: 'Mafi dacewa domin {{category}}',
+          emergencyUnit: 'Akwai ɗakin gaggawa',
+          generalCare: 'Kula ta gaba ɗaya'
+        },
+        card: {
+          distance: '{{km}} km · ~{{minutes}} min',
+          public: 'Na gwamnati',
+          private: 'Mai zaman kansa',
+          emergencyReady: 'A shirye domin gaggawa',
+          call: 'Kira',
+          directions: 'Jagoranci',
+          details: 'Cikakkun bayanai'
+        }
       }
     }
   },
@@ -1568,10 +1828,10 @@ const resources = {
         appName: 'Alavia AI',
       },
       severity: {
-        low: 'Low',
-        medium: 'Medium',
-        high: 'High',
-        critical: 'Critical',
+        low: 'Obere',
+        medium: 'Etiti',
+        high: 'Elu',
+        critical: 'Mberede',
       },
       auth: {
         signupTitle: 'Mep?ta aka?nt? gi',
@@ -1770,7 +2030,16 @@ const resources = {
         navigateFullMaps: 'Mepee maapụ zuru ezu',
         distanceAway: '{{distance}} dị anya',
         moreSpecialties: '+{{count}} ọzọ',
-        emergencyModeActivated: 'Akpalitela ọnọdụ mberede. Kpọọ ma ọ bụ zipu SMS nye onye mberede gị ugbu a.'
+        emergencyModeActivated: 'Akpalitela ọnọdụ mberede. Kpọọ ma ọ bụ zipu SMS nye onye mberede gị ugbu a.',
+        thinking: 'Alavia na-eche echiche',
+        exitMode: 'Si na ọnọdụ a pụọ',
+        noHospitals: 'Enweghị nsonaazụ ụlọ ọgwụ ugbu a.',
+        distanceUnavailable: 'Ịdị anya adịghị',
+        keyboardPanelHint: 'Jiri ọdụ ntanetị dị n\'aka nri n\'okpuru',
+        mapYou: 'Gị',
+        mapHospital: 'Ụlọ ọgwụ',
+        mapRoute: 'Ụzọ',
+        severityLabel: '{{severity}}'
       },
       profile: {
         title: 'Profailụ & Ntọala',
@@ -1870,9 +2139,111 @@ const resources = {
         accessibilityContrast: 'Nkewa',
         accessibilityAudioOn: 'Audio d? n??r?',
         accessibilityReading: '?g?',
-        emergencyCallLabel: 'Kp??',
+        emergencyCallLabel: 'Kpọọ',
         emergencySmsLabel: 'SMS',
         emergencyAppLabel: 'App'
+      },
+      firstAidScreen: {
+        title: 'Nduzi Enyemaka Mbụ',
+        back: 'Laghachi azụ',
+        standardText: 'Ederede nkịtị',
+        largeText: 'Ederede buru ibu',
+        lightMode: 'Ìhè',
+        darkMode: 'Ọchịchịrị',
+        keepSimple: 'Mee ya dị mfe',
+        understoodTitle: 'Ihe m ghọtara',
+        playAudio: 'Kụọ nchịkọta olu',
+        translate: 'Sụgharịa',
+        doNow: 'Mee nke a ugbu a',
+        avoidTitle: 'Zere nke a',
+        nextStepsTitle: 'Nzọụkwụ ọzọ',
+        viewHospitals: 'Lee ụlọ ọgwụ',
+        endSave: 'Kwụsị & chekwaa',
+        emergencyTitle: 'Achọpụtara ihe ịrịba ama mberede',
+        emergencyBody: 'Nọnyere mmadụ ma ọ bụrụ na ị nwere ike, zere ọrụ ike, gaa ụlọ ọgwụ kacha nso ugbu a.',
+        routeNow: 'Gaa ugbu a',
+        close: 'Mechie',
+        readAloud: 'Gụọ elu',
+        timerRunning: 'Elekere na-agba',
+        startTimer: 'Malite elekere {{minutes}} nkeji',
+        timerCompleted: '{{title}}. Elekere agwụla.',
+        redFlagsTitle: 'Lezie anya na ihe ndị a',
+        redFlagsCta: 'Enwere m otu n ime ihe ndị a',
+        call: 'Kpọọ',
+        directions: 'Nduzi',
+        save: 'Chekwaa',
+        nextSteps: {
+          primary: {
+            low: 'Gaa n ihu na-elekọta onwe gị',
+            medium: 'Debanye aha ịga ụlọ ọgwụ',
+            high: 'Gaa ụlọ ọgwụ ugbu a',
+            critical: 'Ihe omume mberede'
+          },
+          secondary: {
+            low: 'Chọọ ụlọ ọgwụ dị nso',
+            medium: 'Chọọ ụlọ ọgwụ dị nso',
+            high: 'Kpọọ onye mkpọ mberede',
+            critical: 'Gaa ụlọ ọgwụ mberede kacha nso'
+          }
+        },
+        avoid: {
+          low: ['Elegharịla nsogbu iku ume ọhụrụ.', 'Ewerela ọgwụ nke ị na-amaghị.'],
+          medium: ['Anyala ụgbọ ala ma ọ bụrụ na ị na-adịghị ike.', 'Egbula oge ịga ụlọ ọgwụ ma ihe ịrịba ama gaa n ihu.'],
+          high: ['Anọkwala naanị gị ma ihe ịrịba ama na-aka njọ.', 'Emela ọrụ ike ugbu a.'],
+          critical: ['Echerekwala n ụlọ.', 'Erila ihe ma ọ bụ ṅụọ ihe ma enwere ihe ize ndụ.']
+        }
+      },
+      routing: {
+        sos: 'SOS',
+        title: 'Ịchọ Ụlọ Ọgwụ',
+        back: 'Laghachi azụ',
+        location: {
+          using: 'Ana-eji ebe gị',
+          checking: 'Ana-elele ebe...',
+          manual: 'Tinye mpaghara gị'
+        },
+        standardText: 'Ederede nkịtị',
+        largeText: 'Ederede buru ibu',
+        light: 'Ìhè',
+        dark: 'Ọchịchịrị',
+        searchPlaceholder: 'Chọọ mpaghara ma ọ bụ ebe amaara',
+        filters: {
+          nearest: 'Nke kacha nso',
+          best: 'Nke kacha mma',
+          public: 'Nke gọọmenti',
+          private: 'Nke onwe',
+          emergency: 'Akwadoro mberede'
+        },
+        rankInfo: 'Anyị haziri ụlọ ọgwụ site na nka na nzụzọ, oke ngwa ngwa, wee nso.',
+        loading: 'Na-ebugo ụlọ ọgwụ...',
+        error: 'Enweghị ike ibugharị ụlọ ọgwụ.',
+        showingFallback: 'Na-egosi ndepụta ndịiche.',
+        locationDenied: 'Agbochila ịnweta ebe. Mepee ikike ebe na ntọala brawza.',
+        noMatchesTitle: 'Achọtaraghị nhazi dakọtara',
+        noMatchesBody: 'Nwalee mpaghara ọzọ, ma ọ bụ kpọọ ọrụ mberede.',
+        mapTitle: 'Nlele Maapụ',
+        mapHint: 'Ana-egosi dịka ndepụta',
+        mapPlaceholder: 'Ebe maapụ',
+        listView: 'Nlele ndepụta',
+        mapView: 'Nlele maapụ',
+        kmAway: '{{km}} km',
+        addressUnavailable: 'Adresị adịghị',
+        defaultPhone: '112',
+        unknown: 'Amaghị',
+        match: {
+          bestFor: 'Kacha mma maka {{category}}',
+          emergencyUnit: 'Nwere ọnụ mberede',
+          generalCare: 'Nlekọta nile dị'
+        },
+        card: {
+          distance: '{{km}} km · ~{{minutes}} nkeji',
+          public: 'Nke gọọmenti',
+          private: 'Nke onwe',
+          emergencyReady: 'Akwadoro mberede',
+          call: 'Kpọọ',
+          directions: 'Nduzi',
+          details: 'Nkọwapụta'
+        }
       }
     }
   }

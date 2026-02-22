@@ -1148,7 +1148,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                 }}
                 className="min-h-12 rounded-xl border border-red-300 bg-white px-4 text-xs font-bold uppercase tracking-wide text-red-700"
               >
-                Exit mode
+                {t('voice.exitMode')}
               </button>
             </div>
             {showEmergencyPanel && (
@@ -1176,8 +1176,8 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-xl px-6 pt-8 pb-32 relative z-10">
-        <div className="flex flex-col items-center gap-10 text-center">
+      <main className="mx-auto max-w-xl px-4 sm:px-6 pt-6 sm:pt-8 pb-28 sm:pb-32 relative z-10">
+        <div className="flex flex-col items-center gap-10 sm:gap-10 text-center">
 
           {/* Status Badge */}
           <motion.div
@@ -1215,7 +1215,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
           </motion.div>
 
           {/* Hero Section */}
-          <section className="relative flex flex-col items-center gap-10">
+          <section className="relative flex flex-col items-center gap-6 sm:gap-10">
             <div className="relative">
               <AnimatePresence>
                 {isListening && (
@@ -1377,7 +1377,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                   key="ai-response"
                   initial={{ opacity: 0, scale: 0.95, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
-                  className="triage-card border-none p-8 shadow-emerald-200/40 bg-gradient-to-br from-white to-emerald-50/30"
+                  className="triage-card border-none p-5 sm:p-8 shadow-emerald-200/40 bg-gradient-to-br from-white to-emerald-50/30"
                 >
                   <div className="mb-4 flex items-center justify-between">
                     <h3 className="text-2xl font-black text-slate-900 tracking-tighter">{aiResponse.heading}</h3>
@@ -1391,11 +1391,11 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                           const SeverityIcon = severityStyle[aiResponse.severity!].icon
                           return <SeverityIcon size={12} strokeWidth={3} />
                         })()}
-                        {aiResponse.severity}
+                        {t(`severity.${aiResponse.severity}`)}
                       </motion.span>
                     )}
                   </div>
-                  <p className="text-xl font-bold leading-snug text-slate-600 mb-8 tracking-tight">{aiResponse.summary}</p>
+                  <p className="text-lg sm:text-xl font-bold leading-snug text-slate-600 mb-6 sm:mb-8 tracking-tight">{aiResponse.summary}</p>
                   <motion.button
                     whileHover={{ scale: 1.02, translateY: -2 }}
                     whileTap={{ scale: 0.98 }}
@@ -1427,7 +1427,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                       </motion.div>
                     </div>
                     <div className="flex-1">
-                      <p className="text-sm font-black text-white/90 tracking-tight">Alavia is thinking</p>
+                      <p className="text-sm font-black text-white/90 tracking-tight">{t('voice.thinking')}</p>
                       <div className="mt-1.5 flex gap-1.5">
                         {[0, 1, 2].map((i) => (
                           <motion.div
@@ -1448,7 +1448,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                   key={activeQuestion.id}
                   initial={{ opacity: 0, x: 40 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="triage-card bg-slate-900 p-8 text-white shadow-2xl shadow-slate-900/30 border-none relative overflow-hidden"
+                  className="triage-card bg-slate-900 p-5 sm:p-8 text-white shadow-2xl shadow-slate-900/30 border-none relative overflow-hidden"
                 >
                   <motion.div
                     animate={{
@@ -1483,7 +1483,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                           <span>{conversationMode === 'keyboard' ? t('voice.modeTap') : t('voice.typeSymptoms')}</span>
                         </motion.button>
                       </div>
-                      <h4 className="text-2xl font-black leading-tight tracking-tight text-emerald-400">
+                      <h4 className="text-xl sm:text-2xl font-black leading-tight tracking-tight text-emerald-400">
                         {activeQuestion.question}
                       </h4>
                     </div>
@@ -1499,7 +1499,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                           <Keyboard size={14} className="text-emerald-300" />
                           <span className="text-sm font-black text-emerald-300">{t('voice.typeYourAnswer')}</span>
                         </div>
-                        <p className="mt-2 text-xs font-semibold text-white/60">Use the keyboard panel at the bottom right →</p>
+                        <p className="mt-2 text-xs font-semibold text-white/60">{t('voice.keyboardPanelHint')}</p>
                       </motion.div>
                     ) : (
                     <div className={`rounded-2xl border px-4 py-3 transition-all ${
@@ -1554,7 +1554,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                   animate={{ opacity: 1, y: 0 }}
                   className="space-y-6"
                 >
-                  <div className="rounded-[32px] bg-white p-6 sm:p-8 shadow-2xl shadow-slate-200/50 border border-slate-50">
+                  <div className="rounded-[32px] bg-white p-5 sm:p-8 shadow-2xl shadow-slate-200/50 border border-slate-50">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-200">
                         <Activity size={20} />
@@ -1583,7 +1583,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                     </div>
                   </div>
 
-                  <div className="rounded-[32px] bg-slate-900 p-8 shadow-2xl shadow-slate-900/20 text-white overflow-hidden relative">
+                  <div className="rounded-[32px] bg-slate-900 p-5 sm:p-8 shadow-2xl shadow-slate-900/20 text-white overflow-hidden relative">
                     <motion.div
                       animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
                       transition={{ duration: 5, repeat: Infinity }}
@@ -1593,7 +1593,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                     <div className="relative z-10">
                       <div className="flex items-center justify-between mb-4">
                         <div>
-                          <h3 className="text-2xl font-black mb-1 tracking-tight">{t('voice.routingTitle')}</h3>
+                          <h3 className="text-lg sm:text-2xl font-black mb-1 tracking-tight">{t('voice.routingTitle')}</h3>
                           <p className="text-sm font-bold text-white/50">{t('voice.routingDesc')}</p>
                         </div>
                         <div className="h-12 w-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
@@ -1723,7 +1723,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                                   <div className="relative h-3 w-3 rounded-full bg-blue-500 border-[2.5px] border-white shadow-[0_0_12px_rgba(59,130,246,0.9)]" />
                                   {/* Label */}
                                   <span className="absolute left-5 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-blue-500/90 px-2 py-0.5 text-[8px] font-black text-white shadow-lg backdrop-blur-sm">
-                                    You
+                                    {t('voice.mapYou')}
                                   </span>
                                 </div>
                               </div>
@@ -1763,15 +1763,15 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                               <div className="flex items-center gap-3 rounded-lg bg-black/50 px-3 py-1.5 backdrop-blur-md border border-white/5">
                                 <div className="flex items-center gap-1.5">
                                   <div className="h-2 w-2 rounded-full bg-blue-500 border border-white/60" />
-                                  <span className="text-[8px] font-bold text-white/70">You</span>
+                                  <span className="text-[8px] font-bold text-white/70">{t('voice.mapYou')}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                   <div className="h-2 w-2 rounded-full bg-emerald-500 border border-white/60" />
-                                  <span className="text-[8px] font-bold text-white/70">Hospital</span>
+                                  <span className="text-[8px] font-bold text-white/70">{t('voice.mapHospital')}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                   <div className="h-0.5 w-4 border-t border-dashed border-emerald-400/60" />
-                                  <span className="text-[8px] font-bold text-white/70">Route</span>
+                                  <span className="text-[8px] font-bold text-white/70">{t('voice.mapRoute')}</span>
                                 </div>
                               </div>
                               <span className="rounded-lg bg-black/50 px-2 py-1 text-[7px] font-bold text-white/40 backdrop-blur-md border border-white/5">
@@ -1795,28 +1795,28 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
                         {!isHospitalsLoading && !hospitalsError && displayHospitals.length === 0 && (
                           <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-sm font-bold text-white/70">
-                            No hospital results available right now.
+                            {t('voice.noHospitals')}
                           </div>
                         )}
 
                         {!isHospitalsLoading && !hospitalsError && displayHospitals.map((hospital, index) => {
                           const distanceLabel = hospital.effectiveDistanceKm != null
                             ? `${hospital.effectiveDistanceKm} km away`
-                            : 'Distance unavailable'
+                            : t('voice.distanceUnavailable')
 
                           return (
                             <motion.div
                               key={hospital.id}
                               whileHover={{ y: -4 }}
-                              className="group flex flex-col p-5 rounded-[28px] bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                              className="group flex flex-col p-4 sm:p-5 rounded-[28px] bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
                             >
-                              <div className="flex items-start justify-between mb-4 gap-3">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-3">
                                 <div className="flex items-center gap-4">
-                                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
+                                  <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
                                     <Navigation size={20} />
                                   </div>
                                   <div>
-                                    <h5 className="font-black text-base text-white tracking-tight leading-tight">{hospital.name}</h5>
+                                    <h5 className="font-black text-sm sm:text-base text-white tracking-tight leading-tight">{hospital.name}</h5>
                                     <div className="flex items-center gap-3 text-[10px] font-bold text-emerald-400 mt-1 flex-wrap">
                                       <span className="uppercase tracking-wider">
                                         {hospital.is_public ? t('voice.hospitals.public') : t('voice.hospitals.private')}
@@ -2046,7 +2046,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       </AnimatePresence>
 
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-white/50 bg-white/40 py-5 backdrop-blur-xl">
+      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-white/50 bg-white/40 py-3 sm:py-5 backdrop-blur-xl">
         <div className="flex flex-col items-center justify-center gap-1.5">
           <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400">
             {t('voice.footer')}
@@ -2085,7 +2085,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
             animate={{ opacity: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, y: 100, x: 100 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed bottom-20 right-6 z-50 w-[400px] max-w-[calc(100vw-3rem)]"
+            className="fixed bottom-20 right-4 left-4 sm:left-auto sm:right-6 z-50 sm:w-[400px] sm:max-w-[calc(100vw-3rem)]"
           >
             <div className="rounded-2xl border-2 border-emerald-500/50 bg-slate-900 p-5 shadow-2xl shadow-emerald-500/20">
               <div className="mb-3 flex items-center justify-between">

@@ -100,8 +100,8 @@ body {
 
 /* Premium Voice Assistant Styles */
 .speak-button {
-  width: 140px;
-  height: 140px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   display: flex;
   align-items: center;
@@ -115,6 +115,13 @@ body {
     0 8px 15px -10px rgba(16, 185, 129, 0.2),
     inset 0 0 0 1px rgba(16, 185, 129, 0.1);
   color: #059669;
+}
+
+@media (min-width: 640px) {
+  .speak-button {
+    width: 140px;
+    height: 140px;
+  }
 }
 
 .speak-button:hover {
