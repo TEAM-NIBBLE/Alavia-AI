@@ -24,11 +24,37 @@ Repository layout
 - `backend/alavia-api/` — Laravel API and business logic
 
 Quick start (frontend)
-```
+
+1. Navigate to the frontend folder:
+```bash
 cd frontend
+```
+
+2. Install dependencies:
+```bash
 npm install
+```
+
+3. Create the environment file:
+```bash
+# Create a .env file in the frontend/ folder with the following content:
+VITE_API_BASE_URL=https://api.tmb.it.com
+```
+On Windows (PowerShell):
+```powershell
+"VITE_API_BASE_URL=https://api.tmb.it.com" | Out-File -Encoding utf8 .env
+```
+On Mac/Linux:
+```bash
+echo "VITE_API_BASE_URL=https://api.tmb.it.com" > .env
+```
+
+4. Start the development server:
+```bash
 npm run dev
 ```
+
+The app will be available at `http://localhost:5173` by default.
 
 Quick start (backend)
 ```
