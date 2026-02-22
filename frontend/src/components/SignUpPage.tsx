@@ -20,15 +20,15 @@ export default function SignUpPage({ onSuccess, onSwitchToSignIn, onBack }: Sign
 
   const formatSignUpError = (error: unknown) => {
     if (error instanceof ApiError) {
-      if (error.status === 409) return 'An account with this email/phone already exists. Please sign in.'
-      if (error.status === 422) return 'Some signup details are invalid. Please review and try again.'
-      return error.message || 'Unable to create account right now.'
+      if (error.status === 409) return t('auth.errors.signupConflict')
+      if (error.status === 422) return t('auth.errors.signupInvalid')
+      return error.message || t('auth.errors.signupDefault')
     }
     if (error instanceof Error) {
-      if (/fetch|network|timeout/i.test(error.message)) return 'Cannot reach server. Check your internet or API base URL.'
+      if (/fetch|network|timeout/i.test(error.message)) return t('auth.errors.signupNetwork')
       return error.message
     }
-    return 'Unable to create account right now.'
+    return t('auth.errors.signupDefault')
   }
 
   const mapLanguageCode = (value: string) => {
@@ -42,13 +42,13 @@ export default function SignUpPage({ onSuccess, onSwitchToSignIn, onBack }: Sign
 
   const validate = () => {
     const newErrors: Partial<typeof form> = {}
-    if (!form.name.trim()) newErrors.name = 'Full name is required'
+    if (!form.name.trim()) newErrors.name = t('auth.validation.fullNameRequired')
     if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      newErrors.email = 'Valid email is required'
+      newErrors.email = t('auth.validation.emailRequired')
     if (!form.phone.trim() || !/^\+?[\d\s\-()]{7,15}$/.test(form.phone))
-      newErrors.phone = 'Valid phone number is required'
+      newErrors.phone = t('auth.validation.phoneRequired')
     if (!form.password || form.password.length < 6)
-      newErrors.password = 'Password must be at least 6 characters'
+      newErrors.password = t('auth.validation.passwordMin')
     return newErrors
   }
 

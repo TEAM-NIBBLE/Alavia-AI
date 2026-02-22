@@ -80,6 +80,7 @@ export interface ProfilePatchResponse {
 }
 
 export interface HospitalsQuery {
+  [key: string]: string | number | boolean | undefined
   lat?: number
   lng?: number
   specialty?: string
@@ -102,12 +103,14 @@ export interface HospitalListItem {
   is_public?: boolean
   isEmergencyReady?: boolean
   emergency_ready?: boolean
-  specialties?: string[] | string
-  facilities?: string[] | string
+  specialties?: string[]
+  facilities?: string[]
   openHours?: string
   open_hours?: string
   city?: string
   area?: string
+  rating?: number
+  is_24_hours?: boolean
 }
 
 export interface HospitalListResponse {

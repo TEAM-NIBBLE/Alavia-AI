@@ -25,13 +25,31 @@ import {
 } from 'lucide-react'
 import alaviaLogo from '../assets/alavia-ai_logo.png'
 import ProfilePage from './ProfilePage'
-import { consultationsApi, speechApi } from '../api/services'
-import type { ConsultationDetailResponse } from '../api/services'
+import { consultationsApi, hospitalsApi, speechApi } from '../api/services'
+import type { ConsultationDetailResponse, HospitalListItem } from '../api/services'
 
 type InputMode = 'tap' | 'hold'
 type SessionStatus = 'ready' | 'listening' | 'processing'
 type Severity = 'low' | 'medium' | 'high' | 'critical'
 type MicPermission = 'unknown' | 'granted' | 'denied'
+type LanguageCode = 'en' | 'pcm' | 'yo' | 'ha' | 'ig'
+
+const LANGUAGE_CONFIG: Record<LanguageCode, { displayName: string; speechLocale: string; apiLanguage: string }> = {
+  en: { displayName: 'English', speechLocale: 'en-NG', apiLanguage: 'EN' },
+  pcm: { displayName: 'Nigerian Pidgin English', speechLocale: 'en-NG', apiLanguage: 'PIDGIN' },
+  yo: { displayName: 'Yoruba', speechLocale: 'yo-NG', apiLanguage: 'YORUBA' },
+  ha: { displayName: 'Hausa', speechLocale: 'ha-NG', apiLanguage: 'HAUSA' },
+  ig: { displayName: 'Igbo', speechLocale: 'ig-NG', apiLanguage: 'IGBO' },
+}
+
+const normalizeLanguageCode = (raw?: string | null): LanguageCode => {
+  const normalized = (raw ?? '').toLowerCase().trim()
+  if (normalized.startsWith('pcm')) return 'pcm'
+  if (normalized.startsWith('yo')) return 'yo'
+  if (normalized.startsWith('ha')) return 'ha'
+  if (normalized.startsWith('ig')) return 'ig'
+  return 'en'
+}
 
 interface TriageQuestion {
   id: string
@@ -42,6 +60,17 @@ interface AIResponse {
   heading: string
   summary: string
   severity?: Severity
+}
+
+const stripSystemPrefix = (value: string) => value.replace(/^\[SYSTEM:[^\]]+\]\s*/i, '').trim()
+
+const normalizeSeverity = (value?: string | null): Severity | undefined => {
+  if (!value) return undefined
+  const normalized = value.toLowerCase()
+  if (normalized === 'low' || normalized === 'medium' || normalized === 'high' || normalized === 'critical') {
+    return normalized
+  }
+  return undefined
 }
 
 // Speech Recognition Types
@@ -85,31 +114,6 @@ const severityStyle: Record<Severity, { bg: string, text: string, border: string
   critical: { bg: 'bg-red-50', text: 'text-red-700', border: 'border-red-200', icon: AlertTriangle },
 }
 
-const DUMMY_HOSPITALS = [
-  {
-    id: 1,
-    name: 'Lagoon Hospital',
-    distance: '1.2km',
-    type: 'Private',
-    level: 'Specialist Hospital',
-    emergency: 'Emergency Ready 24 hours',
-    specialties: ['General Medicine', 'Emergency Medicine', 'Surgery', 'Cardiology'],
-    tags: ['Has ICU', 'Has Pharmacy', 'Open 24 Hours', 'Has Ambulance'],
-    coordinates: { x: 65, y: 40 }
-  },
-  {
-    id: 2,
-    name: 'Island Maternity Hospital',
-    distance: '2.5km',
-    type: 'Public',
-    level: 'General Hospital',
-    emergency: 'Emergency Ready 24 hours',
-    specialties: ['Obstetrics and Gynecology', 'Pediatrics'],
-    tags: ['Affordable', 'Open 24 Hours', 'Has Laboratory'],
-    coordinates: { x: 35, y: 55 }
-  }
-]
-
 interface VoiceInteractionScreenProps {
   userName?: string
   onLogout: () => void
@@ -119,6 +123,8 @@ interface VoiceInteractionScreenProps {
 export default function VoiceInteractionScreen({ userName, onLogout, onLanguageChange }: VoiceInteractionScreenProps) {
   const { t, i18n } = useTranslation()
   const recognitionRef = useRef<SpeechRecognition | null>(null)
+  const isFinalizingVoiceRef = useRef(false)
+  const lastSubmittedVoiceRef = useRef<{ text: string; at: number } | null>(null)
   const transcriptRef = useRef('')
   const interimRef = useRef('')
   const lastSpokenQuestionRef = useRef<string | null>(null)
@@ -139,9 +145,15 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const [interimTranscript, setInterimTranscript] = useState('')
   const [aiResponse, setAIResponse] = useState<AIResponse | null>(null)
   const consultationIdRef = useRef<number | null>(null)
+  const consultationLanguageRef = useRef<LanguageCode>(normalizeLanguageCode(i18n.language || 'en'))
   const [currentAIMessage, setCurrentAIMessage] = useState<string | null>(null)
   const [currentAIMessageSeq, setCurrentAIMessageSeq] = useState(0)
   const [consultationDetail, setConsultationDetail] = useState<ConsultationDetailResponse['consultation'] | null>(null)
+  const [routedHospitals, setRoutedHospitals] = useState<HospitalListItem[]>([])
+  const [isHospitalsLoading, setIsHospitalsLoading] = useState(false)
+  const [hospitalsError, setHospitalsError] = useState<string | null>(null)
+  const [userLocation, setUserLocation] = useState<{ lat: number; lng: number } | null>(null)
+  const [locationNotice, setLocationNotice] = useState<string | null>(null)
   const [consultationComplete, setConsultationComplete] = useState(false)
   const consultationCompleteRef = useRef(false)
   const [apiError, setApiError] = useState<string | null>(null)
@@ -152,6 +164,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const [showEmergencyPanel, setShowEmergencyPanel] = useState(false)
   const [isChangingLanguage, setIsChangingLanguage] = useState(false)
   const [textInput, setTextInput] = useState('')
+  const [consultationLanguage, setConsultationLanguage] = useState<LanguageCode>(normalizeLanguageCode(i18n.language || 'en'))
 
   const submitInlineKeyboardReply = () => {
     if (!textInput.trim()) return
@@ -173,7 +186,8 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     }
   }
 
-  const selectedLanguage = (i18n.language || 'en').toLowerCase()
+  const persistedLanguage = normalizeLanguageCode(localStorage.getItem('alavia.selectedLanguage'))
+  const selectedLanguage = normalizeLanguageCode(i18n.language || persistedLanguage)
 
   const languages = [
     { code: 'en' },
@@ -184,26 +198,22 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   ]
 
   const currentLanguageName = t(`language.${selectedLanguage}.name`)
-  const LANGUAGE_CONFIG: Record<string, { displayName: string; speechLocale: string; apiLanguage: string }> = {
-    en: { displayName: 'English', speechLocale: 'en-NG', apiLanguage: 'EN' },
-    pcm: { displayName: 'Nigerian Pidgin English', speechLocale: 'en-NG', apiLanguage: 'PIDGIN' },
-    yo: { displayName: 'Yoruba', speechLocale: 'yo-NG', apiLanguage: 'YORUBA' },
-    ha: { displayName: 'Hausa', speechLocale: 'ha-NG', apiLanguage: 'HAUSA' },
-    ig: { displayName: 'Igbo', speechLocale: 'ig-NG', apiLanguage: 'IGBO' },
-  }
-  const selectedLangConfig = LANGUAGE_CONFIG[selectedLanguage] ?? LANGUAGE_CONFIG.en
+  const consultationLangConfig = LANGUAGE_CONFIG[consultationLanguage] ?? LANGUAGE_CONFIG.en
+  const triageT = useMemo(() => i18n.getFixedT(consultationLanguage), [consultationLanguage, i18n])
 
   const supportsSpeech = useMemo(() => {
     return typeof window !== 'undefined' && ('SpeechRecognition' in window || 'webkitSpeechRecognition' in window)
   }, [])
 
   const localizeServerQuestion = (message: string) => {
-    if (selectedLanguage === 'en') return message
+    if (consultationLanguage === 'en') return message
     const msg = message.toLowerCase()
-    if (msg.includes('breath')) return t('voice.questions.breathing')
-    if (msg.includes('faint') || msg.includes('confusion')) return t('voice.questions.fainting')
-    if (msg.includes('worse') || msg.includes('getting worse')) return t('voice.questions.worse')
-    if (msg.includes('weakness') || msg.includes('one sided')) return t('voice.questions.weakness')
+    // Client-side fallback localization for common triage questions
+    // when the AI model responds in English despite language instructions
+    if (msg.includes('breath') || msg.includes('breathing')) return triageT('voice.questions.breathing')
+    if (msg.includes('faint') || msg.includes('confusion') || msg.includes('dizz')) return triageT('voice.questions.fainting')
+    if (msg.includes('worse') || msg.includes('getting worse') || msg.includes('worsen')) return triageT('voice.questions.worse')
+    if (msg.includes('weakness') || msg.includes('one sided') || msg.includes('slur')) return triageT('voice.questions.weakness')
     return message
   }
 
@@ -211,94 +221,127 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     ? { id: String(currentAIMessageSeq), question: localizeServerQuestion(currentAIMessage) }
     : null
 
-  const speakText = async (text: string, onEnd?: () => void) => {
+  const speakText = async (text: string, onEnd?: () => void, languageOverride?: LanguageCode) => {
     if (!text.trim()) {
       onEnd?.()
       return
     }
 
+    const speechLanguage = languageOverride ?? consultationLanguageRef.current
+    const speechLangConfig = LANGUAGE_CONFIG[speechLanguage] ?? LANGUAGE_CONFIG.en
+
+    // Race the backend TTS against a tight timeout so the user never waits long.
+    // If the API responds fast we play the high-quality audio; otherwise we
+    // instantly fall through to the browser's built-in speech synthesis.
+    const TTS_TIMEOUT_MS = 2500
+
     try {
-      const tts = await speechApi.tts({
+      const ttsPromise = speechApi.tts({
         text,
-        language: selectedLangConfig.apiLanguage,
+        language: speechLangConfig.apiLanguage,
         voice: getPreferredTtsVoice(),
       })
-      if (tts.audio_url) {
+
+      // Timeout sentinel – resolves to null after TTS_TIMEOUT_MS
+      const timeoutPromise = new Promise<null>((resolve) =>
+        setTimeout(() => resolve(null), TTS_TIMEOUT_MS)
+      )
+
+      const tts = await Promise.race([ttsPromise, timeoutPromise])
+
+      if (tts && tts.audio_url) {
         audioRef.current?.pause()
         if (audioRef.current && audioRef.current.src.startsWith('blob:')) {
           URL.revokeObjectURL(audioRef.current.src)
         }
         const audio = new Audio(tts.audio_url)
+        audio.preload = 'auto'
         audioRef.current = audio
+
         audio.onended = () => {
           if (audio.src.startsWith('blob:')) URL.revokeObjectURL(audio.src)
           onEnd?.()
         }
-        let didPlay = false
-        try {
-          await audio.play()
-          didPlay = true
-        } catch {
-          // If browser blocks autoplay for blob/media URLs, fallback to Web Speech TTS.
+
+        audio.onerror = () => {
+          if ('speechSynthesis' in window) {
+            fallbackToSpeechSynthesis()
+          } else {
+            onEnd?.()
+          }
         }
-        if (didPlay) return
+
+        audio.play().catch(() => {
+          if ('speechSynthesis' in window) {
+            fallbackToSpeechSynthesis()
+          } else {
+            onEnd?.()
+          }
+        })
+        return
       }
+      // tts was null (timeout) or had no audio_url — fall through
     } catch {
-      // fallback to browser synthesis
+      // Network / API error — fall through to browser synthesis
     }
 
-    if (!('speechSynthesis' in window)) {
-      onEnd?.()
-      return
-    }
+    // Instant zero-latency fallback
+    fallbackToSpeechSynthesis()
 
-    // Map app language codes → BCP47 tags (priority order per language)
-    const LANG_BCP47: Record<string, string[]> = {
-      en:  ['en-NG', 'en-GB', 'en-US', 'en'],
-      pcm: ['en-NG', 'en-GB', 'en-US', 'en'],   // Nigerian Pidgin – closest TTS is NG English
-      yo:  ['yo', 'yo-NG', 'en-NG', 'en'],        // Yoruba (rare – falls back to NG English)
-      ha:  ['ha', 'ha-NE', 'en-NG', 'en'],        // Hausa
-      ig:  ['ig', 'ig-NG', 'en-NG', 'en'],        // Igbo
-    }
-    const bcp47List = [selectedLangConfig.speechLocale, ...(LANG_BCP47[selectedLanguage] ?? ['en-NG', 'en'])]
+    function fallbackToSpeechSynthesis() {
+      if (!('speechSynthesis' in window)) {
+        onEnd?.()
+        return
+      }
 
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = bcp47List[0]   // primary preference
-    utterance.rate = 0.95
-    utterance.pitch = 1.1           // warmer female pitch
+      // Map app language codes → BCP47 tags (priority order per language)
+      const LANG_BCP47: Record<string, string[]> = {
+        en:  ['en-NG', 'en-GB', 'en-US', 'en'],
+        pcm: ['en-NG', 'en-GB', 'en-US', 'en'],   // Nigerian Pidgin – closest TTS is NG English
+        yo:  ['yo', 'yo-NG', 'en-NG', 'en'],        // Yoruba (rare – falls back to NG English)
+        ha:  ['ha', 'ha-NE', 'en-NG', 'en'],        // Hausa
+        ig:  ['ig', 'ig-NG', 'en-NG', 'en'],        // Igbo
+      }
+      const bcp47List = [speechLangConfig.speechLocale, ...(LANG_BCP47[speechLanguage] ?? ['en-NG', 'en'])]
 
-    // Female voice name fragments
-    const FEMALE_NAMES = [
-      'zira', 'samantha', 'victoria', 'karen', 'fiona', 'susan', 'moira',
-      'veena', 'tessa', 'female', 'woman', 'serena', 'siri', 'ava', 'allison',
-      'joanna', 'ivy', 'kimberly', 'kendra', 'salli', 'olivia', 'aria', 'hazel',
-    ]
-    const isFemale = (v: SpeechSynthesisVoice) =>
-      FEMALE_NAMES.some(n => v.name.toLowerCase().includes(n))
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.lang = bcp47List[0]   // primary preference
+      utterance.rate = 1.12  // Faster for reduced delay perception
+      utterance.pitch = 1.08  // warmer female pitch
 
-    const voices = voicesRef.current
-    let chosen: SpeechSynthesisVoice | undefined
+      // Female voice name fragments
+      const FEMALE_NAMES = [
+        'zira', 'samantha', 'victoria', 'karen', 'fiona', 'susan', 'moira',
+        'veena', 'tessa', 'female', 'woman', 'serena', 'siri', 'ava', 'allison',
+        'joanna', 'ivy', 'kimberly', 'kendra', 'salli', 'olivia', 'aria', 'hazel',
+      ]
+      const isFemale = (v: SpeechSynthesisVoice) =>
+        FEMALE_NAMES.some(n => v.name.toLowerCase().includes(n))
 
-    // 1. Female voice matching any of the preferred BCP47 tags (in priority order)
-    for (const tag of bcp47List) {
-      chosen = voices.find(v => isFemale(v) && v.lang.startsWith(tag.split('-')[0]))
-      if (chosen) break
-    }
-    // 2. Any voice (not necessarily female) matching the language
-    if (!chosen) {
+      const voices = voicesRef.current
+      let chosen: SpeechSynthesisVoice | undefined
+
+      // 1. Female voice matching any of the preferred BCP47 tags (in priority order)
       for (const tag of bcp47List) {
-        chosen = voices.find(v => v.lang.startsWith(tag.split('-')[0]))
+        chosen = voices.find(v => isFemale(v) && v.lang.startsWith(tag.split('-')[0]))
         if (chosen) break
       }
+      // 2. Any voice (not necessarily female) matching the language
+      if (!chosen) {
+        for (const tag of bcp47List) {
+          chosen = voices.find(v => v.lang.startsWith(tag.split('-')[0]))
+          if (chosen) break
+        }
+      }
+      // 3. Any female English voice as last resort
+      if (!chosen) chosen = voices.find(v => isFemale(v) && v.lang.startsWith('en'))
+
+      if (chosen) utterance.voice = chosen
+
+      if (onEnd) utterance.onend = onEnd
+      window.speechSynthesis.cancel()
+      window.speechSynthesis.speak(utterance)
     }
-    // 3. Any female English voice as last resort
-    if (!chosen) chosen = voices.find(v => isFemale(v) && v.lang.startsWith('en'))
-
-    if (chosen) utterance.voice = chosen
-
-    if (onEnd) utterance.onend = onEnd
-    window.speechSynthesis.cancel()
-    window.speechSynthesis.speak(utterance)
   }
 
   const triggerHaptics = (pattern: number | number[]) => {
@@ -336,7 +379,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     setIsEmergencyMode(true)
     setShowEmergencyPanel(true)
     stopListening()
-    void speakText('Emergency mode activated. Call or send SMS to your emergency contact now.')
+    void speakText(t('voice.emergencyModeActivated'))
   }
 
   const handleEmergencyCall = () => {
@@ -361,8 +404,8 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
   // Instruction prepended to every message so the AI model always responds
   // in the correct language, regardless of backend language field support.
-  const langInstruction = (langName: string) =>
-    selectedLanguage === 'en'
+  const langInstruction = (langName: string, langCode: LanguageCode) =>
+    langCode === 'en'
       ? ''  // no prefix needed for English
       : `[SYSTEM: You MUST respond ONLY in ${langName}. Do NOT use English in your response. The user speaks ${langName}.] `
 
@@ -370,18 +413,21 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     console.debug('[VoiceInteraction] startConsultation called', { message, mode: conversationModeRef.current })
     setSessionStatus('processing')
     setApiError(null)
-        const langName = selectedLangConfig.displayName
-        const prefixed = langInstruction(langName) + message
+        const startLang = normalizeLanguageCode(localStorage.getItem('alavia.selectedLanguage') || i18n.language || selectedLanguage)
+        consultationLanguageRef.current = startLang
+        setConsultationLanguage(startLang)
+        const langName = LANGUAGE_CONFIG[startLang].displayName
+        const prefixed = langInstruction(langName, startLang) + message
     void (async () => {
       try {
-      const res = await consultationsApi.start(prefixed, selectedLangConfig.apiLanguage)
+      const res = await consultationsApi.start(prefixed, LANGUAGE_CONFIG[startLang].apiLanguage)
       console.debug('[VoiceInteraction] consultationsApi.start response', res)
         const id = res.consultation_id
         updateConsultationId(id)
         setCurrentAIMessage(res.message.content)
         setCurrentAIMessageSeq(1)
-        setAIResponse({ heading: t('voice.responseHeading'), summary: message })
-        void speakText(res.message.content)
+        setAIResponse({ heading: t('voice.responseHeading'), summary: stripSystemPrefix(message) })
+        void speakText(res.message.content, undefined, startLang)
       } catch (err) {
         setApiError(err instanceof Error ? err.message : 'Request failed')
       } finally {
@@ -399,31 +445,55 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     }
     setSessionStatus('processing')
     setApiError(null)
-        const langName = selectedLangConfig.displayName
+        const sessionLang = consultationLanguageRef.current
+        const langName = LANGUAGE_CONFIG[sessionLang].displayName
         // Keep reminding the AI of the language on every turn
-        const prefixed = langInstruction(langName) + content
+        const prefixed = langInstruction(langName, sessionLang) + content
     try {
-      const res = await consultationsApi.message(id, prefixed, selectedLangConfig.apiLanguage)
+      const res = await consultationsApi.message(id, prefixed, LANGUAGE_CONFIG[sessionLang].apiLanguage)
       console.debug('[VoiceInteraction] consultationsApi.message response', res)
+      
+      // Immediately start playing audio in parallel with state updates to reduce perceived delay
+      const normalizedStatus = String(res.status ?? '').toLowerCase()
+      const isComplete = ['complete', 'completed', 'closed', 'ended'].includes(normalizedStatus)
+      
+      if (!isComplete && res.message.content) {
+        // Start audio playback immediately - don't wait
+        void speakText(res.message.content, undefined, sessionLang)
+      }
+      
       setCurrentAIMessage(res.message.content)
       setCurrentAIMessageSeq(prev => prev + 1)
       if (res.severity) {
-        setAIResponse(prev => prev ? { ...prev, severity: res.severity as Severity } : prev)
+        const normalized = normalizeSeverity(res.severity)
+        if (normalized) {
+          setAIResponse(prev => prev ? { ...prev, severity: normalized } : prev)
+        }
       }
-      if (res.status === 'complete' || res.status === 'closed' || res.status === 'ended') {
+      
+      if (isComplete) {
         updateConsultationComplete(true)
         try {
           const detail = await consultationsApi.detail(id)
           setConsultationDetail(detail.consultation)
+          if (detail.consultation.summary) {
+            setAIResponse(prev => prev ? {
+              ...prev,
+              summary: stripSystemPrefix(detail.consultation.summary),
+            } : {
+              heading: t('voice.responseHeading'),
+              summary: stripSystemPrefix(detail.consultation.summary),
+            })
+          }
           if (detail.consultation.severity) {
-            const sev = detail.consultation.severity as Severity
-            setAIResponse(prev => prev ? { ...prev, severity: sev } : prev)
+            const sev = normalizeSeverity(detail.consultation.severity)
+            if (sev) {
+              setAIResponse(prev => prev ? { ...prev, severity: sev } : prev)
+            }
           }
         } catch {
           // detail fetch failed — first aid will be empty
         }
-      } else {
-        void speakText(res.message.content)
       }
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'Request failed')
@@ -448,6 +518,9 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     } else {
       if (isComplete) {
         updateConsultationId(null)
+        const nextLang = normalizeLanguageCode(localStorage.getItem('alavia.selectedLanguage') || i18n.language || selectedLanguage)
+        consultationLanguageRef.current = nextLang
+        setConsultationLanguage(nextLang)
         setCurrentAIMessage(null)
         setCurrentAIMessageSeq(0)
         setConsultationDetail(null)
@@ -491,6 +564,17 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const finalizeCurrentTranscript = () => {
     const finalText = `${transcriptRef.current} ${interimRef.current}`.trim()
     if (!finalText) return
+
+    if (isFinalizingVoiceRef.current) return
+
+    const now = Date.now()
+    const last = lastSubmittedVoiceRef.current
+    if (last && last.text === finalText && now - last.at < 3000) {
+      return
+    }
+
+    isFinalizingVoiceRef.current = true
+    lastSubmittedVoiceRef.current = { text: finalText, at: now }
     submitInputIntoFlow(finalText, 'voice')
   }
 
@@ -502,6 +586,121 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     setSessionStatus('ready')
     triggerHaptics([10, 20, 10])
   }
+
+  const fetchRoutedHospitals = async (severity?: string | null) => {
+    setIsHospitalsLoading(true)
+    setHospitalsError(null)
+    setLocationNotice(null)
+
+    let lat: number | undefined
+    let lng: number | undefined
+
+    if (navigator.geolocation) {
+      try {
+        const position = await new Promise<GeolocationPosition>((resolve, reject) => {
+          navigator.geolocation.getCurrentPosition(resolve, reject, {
+            enableHighAccuracy: false,
+            timeout: 4000,
+            maximumAge: 300000,
+          })
+        })
+        lat = position.coords.latitude
+        lng = position.coords.longitude
+        setUserLocation({ lat, lng })
+      } catch {
+        setUserLocation(null)
+        setLocationNotice('Location unavailable. Showing general nearest results.')
+      }
+    }
+
+    try {
+      const severityCode = (severity ?? '').toUpperCase()
+      const response = await hospitalsApi.list({
+        lat,
+        lng,
+        severity: severityCode || undefined,
+        emergency_ready: ['HIGH', 'CRITICAL'].includes(severityCode) ? true : undefined,
+      })
+      setRoutedHospitals(response.data ?? [])
+    } catch (err) {
+      setHospitalsError(err instanceof Error ? err.message : 'Failed to load hospitals')
+      setRoutedHospitals([])
+    } finally {
+      setIsHospitalsLoading(false)
+    }
+  }
+
+  const calculateDistanceKm = (fromLat: number, fromLng: number, toLat: number, toLng: number) => {
+    const toRad = (value: number) => (value * Math.PI) / 180
+    const earthKm = 6371
+    const dLat = toRad(toLat - fromLat)
+    const dLng = toRad(toLng - fromLng)
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(toRad(fromLat)) * Math.cos(toRad(toLat)) * Math.sin(dLng / 2) * Math.sin(dLng / 2)
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a))
+    return Number((earthKm * c).toFixed(1))
+  }
+
+  const displayHospitals = useMemo(() => {
+    const withDistance = routedHospitals.map((hospital) => {
+      const apiDistance = hospital.distance_km != null ? Number(hospital.distance_km) : null
+      const clientDistance = userLocation
+        ? calculateDistanceKm(userLocation.lat, userLocation.lng, hospital.lat, hospital.lng)
+        : null
+      const effectiveDistanceKm = apiDistance ?? clientDistance
+
+      return {
+        ...hospital,
+        effectiveDistanceKm,
+      }
+    })
+
+    return withDistance.sort((left, right) => {
+      if (left.effectiveDistanceKm == null && right.effectiveDistanceKm == null) return 0
+      if (left.effectiveDistanceKm == null) return 1
+      if (right.effectiveDistanceKm == null) return -1
+      return left.effectiveDistanceKm - right.effectiveDistanceKm
+    })
+  }, [routedHospitals, userLocation])
+
+  const mapPoints = useMemo(() => {
+    const hospitals = displayHospitals.slice(0, 6)
+    if (hospitals.length === 0) return { hospitals: [] as Array<{ id: number; name: string; x: number; y: number }>, user: null as null | { x: number; y: number } }
+
+    const lats = hospitals.map((h) => h.lat)
+    const lngs = hospitals.map((h) => h.lng)
+    if (userLocation) {
+      lats.push(userLocation.lat)
+      lngs.push(userLocation.lng)
+    }
+
+    const minLat = Math.min(...lats)
+    const maxLat = Math.max(...lats)
+    const minLng = Math.min(...lngs)
+    const maxLng = Math.max(...lngs)
+
+    const latRange = maxLat - minLat || 0.02
+    const lngRange = maxLng - minLng || 0.02
+
+    const toMapX = (lng: number) => 10 + ((lng - minLng) / lngRange) * 80
+    const toMapY = (lat: number) => 90 - ((lat - minLat) / latRange) * 80
+
+    return {
+      hospitals: hospitals.map((h) => ({
+        id: h.id,
+        name: h.name,
+        x: toMapX(h.lng),
+        y: toMapY(h.lat),
+      })),
+      user: userLocation
+        ? {
+            x: toMapX(userLocation.lng),
+            y: toMapY(userLocation.lat),
+          }
+        : null,
+    }
+  }, [displayHospitals, userLocation])
 
   const startListening = async () => {
     if (!supportsSpeech) return
@@ -516,6 +715,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     }
 
     shouldKeepListeningRef.current = true
+    isFinalizingVoiceRef.current = false
     clearSpeechTimers()
     setTranscript('')
     setSessionStatus('listening')
@@ -566,6 +766,31 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   }, [inputMode])
 
   useEffect(() => {
+    if (!consultationComplete) {
+      setRoutedHospitals([])
+      setHospitalsError(null)
+      setIsHospitalsLoading(false)
+      setLocationNotice(null)
+      return
+    }
+
+    void fetchRoutedHospitals(consultationDetail?.severity)
+  }, [consultationComplete, consultationDetail?.severity])
+
+  useEffect(() => {
+    if (sessionStatus === 'ready') {
+      isFinalizingVoiceRef.current = false
+    }
+  }, [sessionStatus])
+
+  useEffect(() => {
+    if (consultationIdRef.current !== null && !consultationCompleteRef.current) return
+    const nextLang = normalizeLanguageCode(localStorage.getItem('alavia.selectedLanguage') || i18n.language || selectedLanguage)
+    consultationLanguageRef.current = nextLang
+    setConsultationLanguage(nextLang)
+  }, [i18n.language, selectedLanguage])
+
+  useEffect(() => {
     if (!supportsSpeech) return
 
     const speechWindow = window as any
@@ -575,7 +800,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     const recognition = new SpeechRecognitionImpl()
     recognition.continuous = true
     recognition.interimResults = true
-    recognition.lang = selectedLangConfig.speechLocale
+    recognition.lang = consultationLangConfig.speechLocale
 
     recognition.onresult = (event: SpeechRecognitionEvent) => {
       let finalChunk = ''
@@ -655,7 +880,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       recognition.stop()
       recognitionRef.current = null
     }
-  }, [selectedLanguage, supportsSpeech])
+  }, [consultationLangConfig.speechLocale, supportsSpeech])
 
   useEffect(() => {
     const queryPermission = async () => {
@@ -687,16 +912,12 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       lastSpokenQuestionRef.current = activeQuestion.id
       if (conversationModeRef.current === 'keyboard') {
         // keyboard mode: speak question only; typing happens inline in triage card
-        setTimeout(() => {
-          void speakText(activeQuestion.question)
-        }, 800)
+        void speakText(activeQuestion.question)
       } else {
-        // voice mode: speak question then auto-start mic
-        setTimeout(() => {
-          speakText(activeQuestion.question, () => {
-            void startListening()
-          })
-        }, 800)
+        // voice mode: speak question then auto-start mic (no artificial delay)
+        speakText(activeQuestion.question, () => {
+          void startListening()
+        })
       }
     }
   }, [activeQuestion, aiResponse])
@@ -745,9 +966,9 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
               <div className={`absolute -bottom-1 -right-1 h-3.5 w-3.5 rounded-full border-2 border-white ${isEmergencyMode ? 'bg-red-600' : 'bg-emerald-500'}`} />
             </motion.div>
             <div className="flex flex-col">
-              <h1 className={`hidden sm:block text-[10px] font-black uppercase tracking-[0.2em] ${isEmergencyMode ? 'text-red-700' : 'text-emerald-600/80'}`}>Alavia AI</h1>
+              <h1 className={`hidden sm:block text-[10px] font-black uppercase tracking-[0.2em] ${isEmergencyMode ? 'text-red-700' : 'text-emerald-600/80'}`}>{t('common.appName')}</h1>
               <p className="text-lg sm:text-xl font-black text-slate-800 tracking-tight leading-none">
-                {userName ? `Hi, ${userName.split(' ')[0]}` : t('voice.healthSession')}
+                {userName ? `${t('voice.greeting')} ${userName.split(' ')[0]}` : t('voice.healthSession')}
               </p>
             </div>
           </div>
@@ -809,7 +1030,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
             <div className="flex items-center justify-between gap-3">
               <div className="flex items-center gap-2 text-red-800">
                 <AlertTriangle size={18} />
-                <p className="text-sm font-black">Emergency Mode Active</p>
+                <p className="text-sm font-black">{t('voice.emergencyActive')}</p>
               </div>
               <button
                 type="button"
@@ -830,7 +1051,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                   className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-red-700 px-3 text-sm font-bold text-white"
                 >
                   <PhoneCall size={16} />
-                  <span>Call contact</span>
+                  <span>{t('voice.emergencyCallContact')}</span>
                 </button>
                 <button
                   type="button"
@@ -838,7 +1059,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                   className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-red-300 bg-white px-3 text-sm font-bold text-red-700"
                 >
                   <MessageCircle size={16} />
-                  <span>SMS contact</span>
+                  <span>{t('voice.emergencySmsContact')}</span>
                 </button>
               </div>
             )}
@@ -864,13 +1085,13 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
             {!supportsSpeech && (
               <div className="flex items-center gap-2">
                 <MicOff size={14} className="text-amber-500" />
-                <span className="text-amber-600">Browser Unsupported</span>
+                <span className="text-amber-600">{t('voice.browserUnsupported')}</span>
               </div>
             )}
             {supportsSpeech && micPermission === 'denied' && (
               <div className="flex items-center gap-2">
                 <MicOff size={14} className="text-red-500" />
-                <span className="text-red-600">Mic Blocked</span>
+                <span className="text-red-600">{t('voice.micBlocked')}</span>
               </div>
             )}
             {supportsSpeech && micPermission !== 'denied' && (
@@ -912,6 +1133,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
               </AnimatePresence>
 
               <motion.button
+                type="button"
                 whileHover={{ scale: 1.05, translateY: -2 }}
                 whileTap={{ scale: 0.94 }}
                 onClick={handleSpeakTap}
@@ -974,7 +1196,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
           </section>
 
           {/* Input Controls */}
-          <section className="flex items-center gap-4">
+          <section className="flex flex-col items-center gap-3">
             <div className="flex rounded-[20px] bg-white p-1 shadow-xl shadow-slate-200/50 border border-slate-50">
               <button
                 onClick={() => setInputMode('tap')}
@@ -991,6 +1213,25 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                 {t('voice.modeHold')}
               </button>
             </div>
+            
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              onClick={() => {
+                const nextMode = conversationMode === 'keyboard' ? 'voice' : 'keyboard'
+                conversationModeRef.current = nextMode
+                setConversationMode(nextMode)
+                if (nextMode === 'keyboard') stopListening()
+              }}
+              className={`flex items-center gap-2 rounded-2xl px-6 py-3 text-xs font-black uppercase tracking-wider transition-all shadow-lg ${
+                conversationMode === 'keyboard'
+                  ? 'bg-emerald-500 text-white border-2 border-emerald-400'
+                  : 'bg-white text-slate-700 border-2 border-slate-200 hover:border-emerald-300'
+              }`}
+            >
+              <Keyboard size={16} />
+              <span>{conversationMode === 'keyboard' ? t('voice.modeTap') : t('voice.typeSymptoms')}</span>
+            </motion.button>
           </section>
 
           {/* Results Area */}
@@ -1076,49 +1317,47 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                   />
 
                   <div className="relative z-10">
-                    <div className="mb-4 flex items-center justify-between">
-                      <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400">{t('voice.triageQuestion')}</span>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          const nextMode = conversationMode === 'keyboard' ? 'voice' : 'keyboard'
-                          conversationModeRef.current = nextMode
-                          setConversationMode(nextMode)
-                          if (nextMode === 'keyboard') stopListening()
-                        }}
-                        className="inline-flex min-h-12 items-center rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white/80 backdrop-blur-sm border border-white/10"
-                      >
-                        {conversationMode === 'keyboard' ? t('voice.modeTap') : t('voice.typeSymptoms')}
-                      </button>
-                    </div>
-                    <h4 className="text-2xl font-black leading-tight mb-8 tracking-tight text-emerald-400">
-                      {activeQuestion.question}
-                    </h4>
-
-                    {/* Response indicator — keyboard or mic depending on conversation mode */}
-                    {conversationMode === 'keyboard' ? (
-                      <div className="rounded-2xl border border-white/20 bg-white/10 px-3 py-3 backdrop-blur-sm">
-                        <div className="flex items-center gap-2">
-                          <Keyboard size={16} className="text-emerald-300" />
-                          <input
-                            value={textInput}
-                            onChange={(e) => setTextInput(e.target.value)}
-                            onKeyDown={(e) => {
-                              if (e.key === 'Enter') submitInlineKeyboardReply()
-                            }}
-                            placeholder={t('voice.inputPlaceholder')}
-                            className="h-12 flex-1 rounded-xl border border-white/20 bg-black/20 px-3 text-sm font-semibold text-white placeholder:text-white/40 outline-none focus:border-emerald-400"
-                          />
-                          <button
-                            type="button"
-                            onClick={submitInlineKeyboardReply}
-                            disabled={!textInput.trim() || sessionStatus === 'processing'}
-                            className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500 text-white disabled:opacity-50"
-                          >
-                            {sessionStatus === 'processing' ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
-                          </button>
-                        </div>
+                    <div className="mb-6">
+                      <div className="flex items-center justify-between mb-3">
+                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400">{t('voice.triageQuestion')}</span>
+                        <motion.button
+                          whileHover={{ scale: 1.05 }}
+                          whileTap={{ scale: 0.95 }}
+                          type="button"
+                          onClick={() => {
+                            const nextMode = conversationMode === 'keyboard' ? 'voice' : 'keyboard'
+                            conversationModeRef.current = nextMode
+                            setConversationMode(nextMode)
+                            if (nextMode === 'keyboard') stopListening()
+                          }}
+                          className={`inline-flex min-h-10 items-center gap-2 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-all shadow-lg ${
+                            conversationMode === 'keyboard'
+                              ? 'bg-emerald-500 text-white border-2 border-emerald-400'
+                              : 'bg-white/15 text-white border-2 border-white/20 hover:bg-white/20'
+                          }`}
+                        >
+                          {conversationMode === 'keyboard' ? <Mic size={14} /> : <Keyboard size={14} />}
+                          <span>{conversationMode === 'keyboard' ? t('voice.modeTap') : t('voice.typeSymptoms')}</span>
+                        </motion.button>
                       </div>
+                      <h4 className="text-2xl font-black leading-tight tracking-tight text-emerald-400">
+                        {activeQuestion.question}
+                      </h4>
+                    </div>
+
+                    {/* Response indicator — keyboard note or mic interface */}
+                    {conversationMode === 'keyboard' ? (
+                      <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="rounded-2xl border-2 border-emerald-400/30 bg-gradient-to-br from-white/15 to-white/5 p-4 backdrop-blur-sm shadow-2xl"
+                      >
+                        <div className="flex items-center gap-2">
+                          <Keyboard size={14} className="text-emerald-300" />
+                          <span className="text-sm font-black text-emerald-300">{t('voice.typeYourAnswer')}</span>
+                        </div>
+                        <p className="mt-2 text-xs font-semibold text-white/60">Use the keyboard panel at the bottom right →</p>
+                      </motion.div>
                     ) : (
                     <div className={`rounded-2xl border px-4 py-3 transition-all ${
                       isListening
@@ -1162,10 +1401,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                       </div>
                     </div>
                     )}
-
-                    <p className="mt-4 text-center text-[10px] font-black uppercase tracking-widest text-white/20">
-                      {t('voice.typeSymptoms')}
-                    </p>
                   </div>
                 </motion.div>
               )}
@@ -1176,7 +1411,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                   animate={{ opacity: 1, y: 0 }}
                   className="space-y-6"
                 >
-                  {/* First Aid Section */}
                   <div className="rounded-[32px] bg-white p-6 sm:p-8 shadow-2xl shadow-slate-200/50 border border-slate-50">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-200">
@@ -1202,13 +1436,9 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                     </div>
                   </div>
 
-                  {/* Hospital Routing Section */}
                   <div className="rounded-[32px] bg-slate-900 p-8 shadow-2xl shadow-slate-900/20 text-white overflow-hidden relative">
                     <motion.div
-                      animate={{
-                        scale: [1, 1.2, 1],
-                        opacity: [0.1, 0.2, 0.1]
-                      }}
+                      animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
                       transition={{ duration: 5, repeat: Infinity }}
                       className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-emerald-500 blur-[80px]"
                     />
@@ -1224,92 +1454,313 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                         </div>
                       </div>
 
-                      {/* Map Preview Interface */}
-                      <div className="relative mb-8 h-48 w-full overflow-hidden rounded-[28px] bg-slate-800 border border-white/5">
-                        {/* Stylized Map SVG/Background */}
-                        <div className="absolute inset-0 opacity-20">
-                          <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-                            <path d="M0,20 L100,20 M0,50 L100,50 M0,80 L100,80 M30,0 L30,100 M70,0 L70,100" stroke="white" strokeWidth="0.5" fill="none" />
-                            <circle cx="50" cy="50" r="40" stroke="white" strokeWidth="0.2" fill="none" />
-                          </svg>
-                        </div>
-
-                        {/* Pulsing User Location */}
-                        <motion.div
-                          animate={{ scale: [1, 1.5, 1], opacity: [1, 0.5, 1] }}
-                          transition={{ duration: 2, repeat: Infinity }}
-                          className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 h-4 w-4 rounded-full bg-blue-500 shadow-[0_0_15px_rgba(59,130,246,0.8)] border-2 border-white z-10"
-                        />
-
-                        {/* Hospital Markers */}
-                        {DUMMY_HOSPITALS.map((h) => (
-                          <motion.div
-                            key={h.id}
-                            initial={{ scale: 0 }}
-                            animate={{ scale: 1 }}
-                            style={{ left: `${h.coordinates.x}%`, top: `${h.coordinates.y}%` }}
-                            className="absolute -translate-x-1/2 -translate-y-1/2 flex flex-col items-center"
-                          >
-                            <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white shadow-lg border-2 border-slate-900">
-                              <HeartPulse size={14} />
-                            </div>
-                            <div className="mt-1 rounded-md bg-slate-900/80 px-1.5 py-0.5 backdrop-blur-sm border border-white/10">
-                              <span className="text-[7px] font-black uppercase whitespace-nowrap">{h.name.split(' ')[0]}</span>
-                            </div>
-                          </motion.div>
-                        ))}
-                      </div>
-
                       <div className="space-y-4">
-                        {DUMMY_HOSPITALS.map((hospital, idx) => (
-                          <motion.div
-                            key={idx}
-                            whileHover={{ y: -4 }}
-                            className="group flex flex-col p-5 rounded-[28px] bg-white/5 border border-white/10 hover:bg-white/10 transition-all cursor-pointer"
-                          >
-                            <div className="flex items-start justify-between mb-4">
-                              <div className="flex items-center gap-4">
-                                <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
-                                  <Navigation size={20} />
+                        {!isHospitalsLoading && locationNotice && (
+                          <div className="rounded-2xl border border-amber-300/20 bg-amber-500/10 px-4 py-3 text-xs font-bold text-amber-100">
+                            {locationNotice}
+                          </div>
+                        )}
+
+                        {!isHospitalsLoading && !hospitalsError && displayHospitals.length > 0 && (
+                          <div className="relative h-64 w-full overflow-hidden rounded-[28px] border border-white/10 shadow-inner">
+                            {/* Realistic map background */}
+                            <div className="absolute inset-0 bg-[#1a2332]">
+                              <svg width="100%" height="100%" viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" className="absolute inset-0">
+                                <defs>
+                                  {/* Water texture gradient */}
+                                  <linearGradient id="waterGrad" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stopColor="#0c4a6e" stopOpacity="0.5" />
+                                    <stop offset="100%" stopColor="#164e63" stopOpacity="0.3" />
+                                  </linearGradient>
+                                  {/* Land fill */}
+                                  <linearGradient id="landGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="#1e3a2f" stopOpacity="0.4" />
+                                    <stop offset="100%" stopColor="#1a2e25" stopOpacity="0.3" />
+                                  </linearGradient>
+                                  {/* Road dash pattern */}
+                                  <pattern id="roadDash" patternUnits="userSpaceOnUse" width="12" height="2">
+                                    <rect width="7" height="1" fill="rgba(255,255,255,0.12)" />
+                                  </pattern>
+                                  {/* Route dash */}
+                                  <filter id="routeGlow">
+                                    <feGaussianBlur stdDeviation="2" result="blur" />
+                                    <feMerge>
+                                      <feMergeNode in="blur" />
+                                      <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                  </filter>
+                                </defs>
+
+                                {/* Water/lagoon areas */}
+                                <path d="M0,200 Q50,180 120,195 Q200,215 280,190 Q350,175 400,200 L400,260 L0,260 Z" fill="url(#waterGrad)" />
+                                <path d="M300,0 Q310,30 305,60 Q295,90 310,120 Q330,90 340,50 Q345,20 350,0 Z" fill="url(#waterGrad)" opacity="0.4" />
+                                <ellipse cx="80" cy="230" rx="60" ry="20" fill="url(#waterGrad)" opacity="0.3" />
+
+                                {/* Land mass */}
+                                <path d="M0,0 L400,0 L400,200 Q350,175 280,190 Q200,215 120,195 Q50,180 0,200 Z" fill="url(#landGrad)" />
+
+                                {/* Terrain patches (parks/green areas) */}
+                                <ellipse cx="60" cy="80" rx="30" ry="18" fill="#166534" opacity="0.15" />
+                                <ellipse cx="240" cy="50" rx="25" ry="15" fill="#166534" opacity="0.12" />
+                                <ellipse cx="160" cy="150" rx="20" ry="12" fill="#166534" opacity="0.1" />
+
+                                {/* Major roads - horizontal */}
+                                <line x1="0" y1="60" x2="400" y2="65" stroke="rgba(255,255,255,0.08)" strokeWidth="4" />
+                                <line x1="0" y1="60" x2="400" y2="65" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
+                                <line x1="0" y1="120" x2="290" y2="115" stroke="rgba(255,255,255,0.08)" strokeWidth="3.5" />
+                                <line x1="0" y1="120" x2="290" y2="115" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+                                <line x1="30" y1="170" x2="350" y2="165" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
+                                <line x1="30" y1="170" x2="350" y2="165" stroke="rgba(255,255,255,0.1)" strokeWidth="0.8" />
+
+                                {/* Major roads - vertical / diagonal */}
+                                <line x1="100" y1="0" x2="110" y2="200" stroke="rgba(255,255,255,0.08)" strokeWidth="4" />
+                                <line x1="100" y1="0" x2="110" y2="200" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
+                                <line x1="200" y1="0" x2="195" y2="200" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
+                                <line x1="200" y1="0" x2="195" y2="200" stroke="rgba(255,255,255,0.1)" strokeWidth="0.8" />
+                                <path d="M260,0 Q270,80 240,170 Q230,200 220,210" stroke="rgba(255,255,255,0.06)" strokeWidth="3" fill="none" />
+
+                                {/* Secondary / minor roads */}
+                                <line x1="50" y1="30" x2="180" y2="35" stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" />
+                                <line x1="140" y1="80" x2="280" y2="85" stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" />
+                                <line x1="60" y1="0" x2="55" y2="130" stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" />
+                                <line x1="150" y1="40" x2="155" y2="170" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                                <line x1="340" y1="30" x2="330" y2="160" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+
+                                {/* Block / neighborhood fills */}
+                                <rect x="105" y="65" width="35" height="45" rx="3" fill="rgba(255,255,255,0.02)" />
+                                <rect x="55" y="65" width="40" height="50" rx="3" fill="rgba(255,255,255,0.015)" />
+                                <rect x="115" y="125" width="30" height="35" rx="3" fill="rgba(255,255,255,0.02)" />
+                                <rect x="202" y="30" width="50" height="30" rx="3" fill="rgba(255,255,255,0.015)" />
+                                <rect x="205" y="70" width="45" height="40" rx="3" fill="rgba(255,255,255,0.02)" />
+
+                                {/* Route lines: user → each hospital (dashed, glowing) */}
+                                {mapPoints.user && mapPoints.hospitals.map((h) => (
+                                  <line
+                                    key={`route-${h.id}`}
+                                    x1={mapPoints.user!.x * 4}
+                                    y1={mapPoints.user!.y * 2.6}
+                                    x2={h.x * 4}
+                                    y2={h.y * 2.6}
+                                    stroke="#10b981"
+                                    strokeWidth="1.5"
+                                    strokeDasharray="6,4"
+                                    opacity="0.4"
+                                    filter="url(#routeGlow)"
+                                  />
+                                ))}
+                              </svg>
+                            </div>
+
+                            {/* User location marker with pulse */}
+                            {mapPoints.user && (
+                              <div
+                                className="absolute -translate-x-1/2 -translate-y-1/2 z-30"
+                                style={{ left: `${mapPoints.user.x}%`, top: `${mapPoints.user.y}%` }}
+                              >
+                                <div className="relative">
+                                  {/* Outer pulse ring */}
+                                  <motion.div
+                                    animate={{ scale: [1, 2.5], opacity: [0.4, 0] }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
+                                    className="absolute inset-0 rounded-full bg-blue-500"
+                                    style={{ width: 16, height: 16, marginLeft: -2, marginTop: -2 }}
+                                  />
+                                  {/* Inner pulse ring */}
+                                  <motion.div
+                                    animate={{ scale: [1, 1.8], opacity: [0.3, 0] }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: 'easeOut', delay: 0.4 }}
+                                    className="absolute inset-0 rounded-full bg-blue-400"
+                                    style={{ width: 16, height: 16, marginLeft: -2, marginTop: -2 }}
+                                  />
+                                  {/* Dot */}
+                                  <div className="relative h-3 w-3 rounded-full bg-blue-500 border-[2.5px] border-white shadow-[0_0_12px_rgba(59,130,246,0.9)]" />
+                                  {/* Label */}
+                                  <span className="absolute left-5 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-blue-500/90 px-2 py-0.5 text-[8px] font-black text-white shadow-lg backdrop-blur-sm">
+                                    You
+                                  </span>
                                 </div>
-                                <div>
-                                  <h5 className="font-black text-base text-white tracking-tight leading-tight">{hospital.name}</h5>
-                                  <div className="flex items-center gap-3 text-[10px] font-bold text-emerald-400 mt-1">
-                                    <span className="flex items-center gap-1 uppercase tracking-wider">{hospital.type}</span>
-                                    <span className="h-1 w-1 rounded-full bg-white/20" />
-                                    <span className="flex items-center gap-1">{hospital.distance} away</span>
+                              </div>
+                            )}
+
+                            {/* Hospital markers with drop-pin style */}
+                            {mapPoints.hospitals.map((marker, idx) => (
+                              <div
+                                key={marker.id}
+                                className="absolute -translate-x-1/2 -translate-y-full z-20"
+                                style={{ left: `${marker.x}%`, top: `${marker.y}%` }}
+                                title={marker.name}
+                              >
+                                <motion.div
+                                  initial={{ y: -20, opacity: 0 }}
+                                  animate={{ y: 0, opacity: 1 }}
+                                  transition={{ delay: idx * 0.12, type: 'spring', stiffness: 300 }}
+                                  className="relative flex flex-col items-center"
+                                >
+                                  {/* Pin head */}
+                                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white border-[2.5px] border-white shadow-[0_2px_12px_rgba(16,185,129,0.6)]">
+                                    <HeartPulse size={13} strokeWidth={2.5} />
+                                  </div>
+                                  {/* Pin tail */}
+                                  <div className="h-2 w-0.5 bg-white/60" />
+                                  <div className="h-1.5 w-1.5 rounded-full bg-white/40" />
+                                  {/* Hospital name tooltip */}
+                                  <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-black/70 px-1.5 py-0.5 text-[7px] font-bold text-white/90 backdrop-blur-sm">
+                                    {marker.name.length > 18 ? marker.name.slice(0, 16) + '…' : marker.name}
+                                  </span>
+                                </motion.div>
+                              </div>
+                            ))}
+
+                            {/* Legend bar */}
+                            <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between z-30">
+                              <div className="flex items-center gap-3 rounded-lg bg-black/50 px-3 py-1.5 backdrop-blur-md border border-white/5">
+                                <div className="flex items-center gap-1.5">
+                                  <div className="h-2 w-2 rounded-full bg-blue-500 border border-white/60" />
+                                  <span className="text-[8px] font-bold text-white/70">You</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  <div className="h-2 w-2 rounded-full bg-emerald-500 border border-white/60" />
+                                  <span className="text-[8px] font-bold text-white/70">Hospital</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  <div className="h-0.5 w-4 border-t border-dashed border-emerald-400/60" />
+                                  <span className="text-[8px] font-bold text-white/70">Route</span>
+                                </div>
+                              </div>
+                              <span className="rounded-lg bg-black/50 px-2 py-1 text-[7px] font-bold text-white/40 backdrop-blur-md border border-white/5">
+                                Lagos, NG
+                              </span>
+                            </div>
+                          </div>
+                        )}
+
+                        {isHospitalsLoading && (
+                          <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-sm font-bold text-white/70">
+                            {t('voice.status.processing')}
+                          </div>
+                        )}
+
+                        {!isHospitalsLoading && hospitalsError && (
+                          <div className="rounded-2xl border border-red-300/20 bg-red-500/10 px-4 py-5 text-sm font-bold text-red-200">
+                            {hospitalsError}
+                          </div>
+                        )}
+
+                        {!isHospitalsLoading && !hospitalsError && displayHospitals.length === 0 && (
+                          <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-sm font-bold text-white/70">
+                            No hospital results available right now.
+                          </div>
+                        )}
+
+                        {!isHospitalsLoading && !hospitalsError && displayHospitals.map((hospital, index) => {
+                          const distanceLabel = hospital.effectiveDistanceKm != null
+                            ? `${hospital.effectiveDistanceKm} km away`
+                            : 'Distance unavailable'
+
+                          return (
+                            <motion.div
+                              key={hospital.id}
+                              whileHover={{ y: -4 }}
+                              className="group flex flex-col p-5 rounded-[28px] bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                            >
+                              <div className="flex items-start justify-between mb-4 gap-3">
+                                <div className="flex items-center gap-4">
+                                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
+                                    <Navigation size={20} />
+                                  </div>
+                                  <div>
+                                    <h5 className="font-black text-base text-white tracking-tight leading-tight">{hospital.name}</h5>
+                                    <div className="flex items-center gap-3 text-[10px] font-bold text-emerald-400 mt-1 flex-wrap">
+                                      <span className="uppercase tracking-wider">
+                                        {hospital.is_public ? t('voice.hospitals.public') : t('voice.hospitals.private')}
+                                      </span>
+                                      <span className="h-1 w-1 rounded-full bg-white/20" />
+                                      <span>{distanceLabel}</span>
+                                      {index === 0 && hospital.effectiveDistanceKm != null && (
+                                        <>
+                                          <span className="h-1 w-1 rounded-full bg-white/20" />
+                                            <span>{t('voice.hospitals.closestToYou')}</span>
+                                        </>
+                                      )}
+                                    </div>
                                   </div>
                                 </div>
-                              </div>
-                              <div className="rounded-full bg-emerald-500/10 px-3 py-1 text-[8px] font-black text-emerald-400 border border-emerald-500/20 uppercase">
-                                {hospital.level}
-                              </div>
-                            </div>
-
-                            <div className="flex flex-wrap gap-2 mb-4">
-                              {hospital.specialties.slice(0, 3).map((s, i) => (
-                                <span key={i} className="text-[9px] font-bold text-white/60 bg-white/5 px-2.5 py-1 rounded-lg border border-white/5">{s}</span>
-                              ))}
-                              {hospital.specialties.length > 3 && (
-                                <span className="text-[9px] font-bold text-emerald-400 bg-emerald-500/10 px-2 py-1 rounded-lg">+{hospital.specialties.length - 3} more</span>
-                              )}
-                            </div>
-
-                            <div className="grid grid-cols-2 gap-2 mt-auto">
-                              {hospital.tags.map((tag, i) => (
-                                <div key={i} className="flex items-center gap-2 text-[9px] font-bold text-white/40">
-                                  <div className="h-1 w-1 rounded-full bg-emerald-500" />
-                                  {tag}
+                                <div className="rounded-full bg-emerald-500/10 px-3 py-1 text-[8px] font-black text-emerald-400 border border-emerald-500/20 uppercase whitespace-nowrap">
+                                  {hospital.emergency_ready ? t('voice.hospitals.emergencyReady') : t('voice.hospitals.generalCare')}
                                 </div>
-                              ))}
-                            </div>
-                          </motion.div>
-                        ))}
+                              </div>
+
+                              <div className="grid grid-cols-2 gap-2 mt-auto text-[9px] font-bold text-white/60">
+                                <div className="flex items-center gap-2">
+                                  <div className="h-1 w-1 rounded-full bg-emerald-500" />
+                                  <span>{hospital.is_24_hours ? t('voice.hospitals.hours24') : t('voice.hospitals.hoursNon24')}</span>
+                                </div>
+                                <div className="flex items-center gap-2">
+                                  <div className="h-1 w-1 rounded-full bg-emerald-500" />
+                                  <span>
+                                    {hospital.rating != null
+                                      ? t('voice.hospitals.rating', { rating: hospital.rating })
+                                      : t('voice.hospitals.noRating')}
+                                  </span>
+                                </div>
+                              </div>
+
+                              {hospital.specialties && hospital.specialties.length > 0 && (
+                                <div className="mt-3 flex flex-wrap gap-1.5">
+                                  {hospital.specialties.slice(0, 4).map((specialty, idx) => (
+                                    <span
+                                      key={idx}
+                                      className="inline-flex items-center gap-1 rounded-full bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 text-[9px] font-black text-blue-300 uppercase tracking-wider"
+                                    >
+                                      {specialty}
+                                    </span>
+                                  ))}
+                                  {hospital.specialties.length > 4 && (
+                                    <span className="inline-flex items-center rounded-full bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 text-[9px] font-black text-blue-300">
+                                      +{hospital.specialties.length - 4}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+
+                              {hospital.facilities && hospital.facilities.length > 0 && (
+                                <div className="mt-2 flex flex-wrap gap-1.5">
+                                  {hospital.facilities.slice(0, 3).map((facility, idx) => (
+                                    <span
+                                      key={idx}
+                                      className="inline-flex items-center gap-1 rounded-full bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 text-[9px] font-black text-purple-300 uppercase tracking-wider"
+                                    >
+                                      {facility}
+                                    </span>
+                                  ))}
+                                  {hospital.facilities.length > 3 && (
+                                    <span className="inline-flex items-center rounded-full bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 text-[9px] font-black text-purple-300">
+                                      +{hospital.facilities.length - 3}
+                                    </span>
+                                  )}
+                                </div>
+                              )}
+
+                              {hospital.address && (
+                                <p className="mt-3 text-[11px] font-semibold text-white/50">{hospital.address}</p>
+                              )}
+                            </motion.div>
+                          )
+                        })}
                       </div>
 
-                      <button className="w-full mt-8 flex items-center justify-center gap-3 rounded-2xl bg-emerald-500 py-5 text-xs font-black text-white shadow-2xl shadow-emerald-500/40 transition-all hover:bg-emerald-400 uppercase tracking-widest border border-emerald-400/20">
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const first = routedHospitals[0]
+                          if (!first?.lat || !first?.lng) return
+                          window.open(`https://www.google.com/maps/search/?api=1&query=${first.lat},${first.lng}`, '_blank')
+                        }}
+                        disabled={!routedHospitals[0]?.lat || !routedHospitals[0]?.lng}
+                        className="w-full mt-8 flex items-center justify-center gap-3 rounded-2xl bg-emerald-500 py-5 text-xs font-black text-white shadow-2xl shadow-emerald-500/40 transition-all hover:bg-emerald-400 uppercase tracking-widest border border-emerald-400/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                      >
                         <MapIcon size={18} />
-                        <span>Navigate in Full Maps</span>
+                        <span>{t('voice.hospitals.openTopHospital')}</span>
                       </button>
                     </div>
                   </div>
@@ -1350,7 +1801,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                         onLanguageChange(lang.code)
                         setIsChangingLanguage(false)
                         setShowLanguagePanel(false)
-                      }, 800)
+                      }, 200)
                     }}
                     className={`flex items-center justify-between rounded-xl px-4 py-3 text-sm font-bold transition-all ${selectedLanguage === lang.code
                       ? 'bg-emerald-600 text-white shadow-lg shadow-emerald-200'
@@ -1387,8 +1838,8 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
               className="absolute right-4 top-20 w-56 overflow-hidden rounded-[24px] bg-white p-2 shadow-2xl border border-slate-100"
             >
               <div className="px-4 py-4 border-b border-slate-50 mb-1">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">Logged in as</p>
-                <p className="text-sm font-black text-slate-900 truncate">{userName || 'User'}</p>
+                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{t('common.loggedInAs')}</p>
+                <p className="text-sm font-black text-slate-900 truncate">{userName || t('common.user')}</p>
               </div>
 
               <button
@@ -1449,6 +1900,65 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                 onLanguageChange(code)
               }}
             />
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Floating Keyboard Panel - Bottom Right */}
+      <AnimatePresence>
+        {conversationMode === 'keyboard' && (
+          <motion.div
+            initial={{ opacity: 0, y: 100, x: 100 }}
+            animate={{ opacity: 1, y: 0, x: 0 }}
+            exit={{ opacity: 0, y: 100, x: 100 }}
+            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+            className="fixed bottom-20 right-6 z-50 w-[400px] max-w-[calc(100vw-3rem)]"
+          >
+            <div className="rounded-2xl border-2 border-emerald-500/50 bg-slate-900 p-5 shadow-2xl shadow-emerald-500/20">
+              <div className="mb-3 flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Keyboard size={16} className="text-emerald-400" />
+                  <span className="text-xs font-black uppercase tracking-widest text-emerald-400">{t('voice.typeYourAnswer')}</span>
+                </div>
+                <motion.button
+                  whileHover={{ scale: 1.1 }}
+                  whileTap={{ scale: 0.9 }}
+                  type="button"
+                  onClick={() => {
+                    setConversationMode('voice')
+                    conversationModeRef.current = 'voice'
+                    setTextInput('')
+                  }}
+                  className="flex h-6 w-6 items-center justify-center rounded-lg bg-white/10 text-white/60 hover:bg-white/20 transition-all"
+                >
+                  ×
+                </motion.button>
+              </div>
+              <div className="flex items-center gap-3">
+                <input
+                  value={textInput}
+                  onChange={(e) => setTextInput(e.target.value)}
+                  onKeyDown={(e) => {
+                    if (e.key === 'Enter' && textInput.trim() && sessionStatus !== 'processing') {
+                      submitInlineKeyboardReply()
+                    }
+                  }}
+                  placeholder={t('voice.inputPlaceholder')}
+                  autoFocus
+                  className="h-12 flex-1 rounded-xl border-2 border-emerald-500/30 bg-black/40 px-4 text-sm font-semibold text-white placeholder:text-white/40 outline-none focus:border-emerald-400 focus:bg-black/50 transition-all"
+                />
+                <motion.button
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  type="button"
+                  onClick={submitInlineKeyboardReply}
+                  disabled={!textInput.trim() || sessionStatus === 'processing'}
+                  className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-emerald-600 transition-all"
+                >
+                  {sessionStatus === 'processing' ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+                </motion.button>
+              </div>
+            </div>
           </motion.div>
         )}
       </AnimatePresence>

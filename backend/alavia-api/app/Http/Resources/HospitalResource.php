@@ -30,6 +30,8 @@ class HospitalResource extends JsonResource
             'is_24_hours' => $this->is_24_hours,
             'emergency_ready' => $this->emergency_ready,
             'distance_km' => $this->distance_km ?? null,
+            'specialties' => $this->specialties->pluck('specialty_name')->toArray(),
+            'facilities' => $this->facilities->pluck('facility_name')->toArray(),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

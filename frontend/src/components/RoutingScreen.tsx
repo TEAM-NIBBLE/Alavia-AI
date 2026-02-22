@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { hospitalsApi, type HospitalListItem } from '../api/services'
 import { mockHospitals, type ComplaintCategory } from '../data/hospitals'
 import { FilterPills } from './postTriage/FilterPills'
@@ -20,7 +21,13 @@ function toStringArray(value: unknown): string[] {
   return []
 }
 
-function toRankedHospital(item: HospitalListItem, category: ComplaintCategory, location: { lat: number; lng: number } | null, index: number): RankedHospital {
+function toRankedHospital(
+  item: HospitalListItem,
+  category: ComplaintCategory,
+  location: { lat: number; lng: number } | null,
+  index: number,
+  t: (key: string, options?: Record<string, unknown>) => string
+): RankedHospital {
   const specialtyList = toStringArray(item.specialties)
   const facilityList = toStringArray(item.facilities)
   const isEmergencyReady = Boolean(item.isEmergencyReady ?? item.emergency_ready)
@@ -34,23 +41,28 @@ function toRankedHospital(item: HospitalListItem, category: ComplaintCategory, l
     name: item.name,
     lat: item.lat,
     lng: item.lng,
-    address: item.address ?? 'Address unavailable',
-    phone: item.phone ?? '112',
+    address: item.address ?? t('routing.addressUnavailable'),
+    phone: item.phone ?? t('routing.defaultPhone'),
     isPublic,
     isEmergencyReady,
     specialties: specialtyList.length > 0 ? specialtyList : ['general'],
     facilities: facilityList,
     openHours: item.openHours ?? item.open_hours,
-    city: item.city ?? 'Unknown',
-    area: item.area ?? 'Unknown',
+    city: item.city ?? t('routing.unknown'),
+    area: item.area ?? t('routing.unknown'),
     distanceKm: resolvedDistance,
     travelMinutes,
     matchScore: Math.max(1, 100 - Math.round(resolvedDistance * 2)),
-    matchReason: specialtyList.includes(category) ? `Best for ${category}` : isEmergencyReady ? 'Has emergency unit' : 'General care available',
+    matchReason: specialtyList.includes(category)
+      ? t('routing.match.bestFor', { category })
+      : isEmergencyReady
+        ? t('routing.match.emergencyUnit')
+        : t('routing.match.generalCare'),
   }
 }
 
 export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingScreenProps) {
+  const { t } = useTranslation()
   const [viewMode, setViewMode] = useState<'list' | 'map'>('list')
   const [sortMode, setSortMode] = useState('best')
   const [locationStatus, setLocationStatus] = useState<'loading' | 'granted' | 'denied' | 'manual'>('loading')
@@ -98,11 +110,11 @@ export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingSc
           is_public: sortMode === 'public' ? true : sortMode === 'private' ? false : undefined,
         })
         if (cancelled) return
-        const mapped = response.data.map((item, index) => toRankedHospital(item, complaintCategory, location, index))
+        const mapped = response.data.map((item, index) => toRankedHospital(item, complaintCategory, location, index, t))
         setApiHospitals(mapped)
       } catch (error) {
         if (cancelled) return
-        setHospitalsError(error instanceof Error ? error.message : 'Could not load hospitals from API.')
+        setHospitalsError(error instanceof Error ? error.message : t('routing.error'))
         setApiHospitals([])
       } finally {
         if (!cancelled) setHospitalsLoading(false)
@@ -162,15 +174,15 @@ export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingSc
           <div className="mb-2 h-1.5 rounded-full bg-[linear-gradient(90deg,#0f9f62_0%,#ffffff_50%,#0f9f62_100%)]" />
           <div className="flex items-center justify-between gap-3">
             <button type="button" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm font-semibold" onClick={onBack}>
-              Back
+              {t('routing.back')}
             </button>
-            <h1 className="text-xl font-bold">Hospital Routing</h1>
+            <h1 className="text-xl font-bold">{t('routing.title')}</h1>
             <div className="flex items-center gap-2">
               <span className="inline-flex min-h-12 items-center rounded-full border border-emerald-200 bg-emerald-50 px-4 text-sm font-semibold text-emerald-800">
                 {complaintCategory.toUpperCase()}
               </span>
               <button type="button" className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-full border border-red-200 bg-red-50 text-red-700">
-                SOS
+                {t('routing.sos')}
               </button>
             </div>
           </div>
@@ -182,13 +194,17 @@ export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingSc
           <div className="mb-3 flex flex-wrap items-center gap-2">
             <SeverityBadge severity={severity} />
             <span className="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">
-              {locationStatus === 'granted' ? 'Using your location' : locationStatus === 'loading' ? 'Checking location...' : 'Enter your area'}
+              {locationStatus === 'granted'
+                ? t('routing.location.using')
+                : locationStatus === 'loading'
+                  ? t('routing.location.checking')
+                  : t('routing.location.manual')}
             </span>
             <button type="button" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm font-semibold" onClick={() => setLargeTextMode((value) => !value)}>
-              {largeTextMode ? 'Standard Text' : 'Large Text'}
+              {largeTextMode ? t('routing.standardText') : t('routing.largeText')}
             </button>
             <button type="button" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm font-semibold" onClick={() => setDarkMode((value) => !value)}>
-              {darkMode ? 'Light' : 'Dark'}
+              {darkMode ? t('routing.light') : t('routing.dark')}
             </button>
           </div>
 
@@ -200,7 +216,7 @@ export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingSc
                 if (locationStatus !== 'granted') setLocationStatus('manual')
               }}
               className="min-h-12 rounded-xl border border-slate-300 px-4 text-sm text-slate-900 outline-none focus:ring-2 focus:ring-emerald-200"
-              placeholder="Search area or landmark"
+              placeholder={t('routing.searchPlaceholder')}
             />
             <ListMapToggle mode={viewMode} onChange={setViewMode} />
           </div>
@@ -210,43 +226,43 @@ export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingSc
               active={sortMode}
               onChange={setSortMode}
               options={[
-                { key: 'nearest', label: 'Nearest' },
-                { key: 'best', label: 'Best match' },
-                { key: 'public', label: 'Public' },
-                { key: 'private', label: 'Private' },
-                { key: 'emergency', label: 'Emergency ready' },
+                { key: 'nearest', label: t('routing.filters.nearest') },
+                { key: 'best', label: t('routing.filters.best') },
+                { key: 'public', label: t('routing.filters.public') },
+                { key: 'private', label: t('routing.filters.private') },
+                { key: 'emergency', label: t('routing.filters.emergency') },
               ]}
             />
           </div>
         </section>
 
         <section className="rounded-2xl border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-900 shadow-sm">
-          We ranked hospitals by specialty and urgency, then distance.
+          {t('routing.rankInfo')}
         </section>
 
         {hospitalsLoading ? (
           <section className="rounded-2xl border border-slate-200 bg-white p-4 text-sm text-slate-700 shadow-sm">
-            Loading hospitals from API...
+            {t('routing.loading')}
           </section>
         ) : null}
 
         {hospitalsError ? (
           <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 shadow-sm">
-            {hospitalsError} Showing fallback list.
+            {`${hospitalsError} ${t('routing.showingFallback')}`}
           </section>
         ) : null}
 
         {locationStatus === 'denied' ? (
           <section className="rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm text-amber-900 shadow-sm">
-            Location access is denied. Enable location in browser settings or search by your area manually.
+            {t('routing.locationDenied')}
           </section>
         ) : null}
 
         {visibleHospitals.length === 0 && !hospitalsLoading ? (
           <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:bg-slate-900">
-            <h3 className="text-lg font-bold">No exact matches found</h3>
+            <h3 className="text-lg font-bold">{t('routing.noMatchesTitle')}</h3>
             <p className="mt-1 text-sm text-slate-600 dark:text-slate-300">
-              Try another area, or call emergency services if symptoms are severe.
+              {t('routing.noMatchesBody')}
             </p>
           </section>
         ) : null}
@@ -267,11 +283,11 @@ export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingSc
           <section className="grid gap-3 lg:grid-cols-[2fr_1fr]">
             <div className="rounded-2xl border border-slate-200 bg-white p-4 shadow-sm dark:bg-slate-900">
               <div className="mb-3 flex items-center justify-between">
-                <h3 className="text-lg font-bold">Map View (MVP Placeholder)</h3>
-                <span className="text-xs text-slate-500">Pins shown as list</span>
+                <h3 className="text-lg font-bold">{t('routing.mapTitle')}</h3>
+                <span className="text-xs text-slate-500">{t('routing.mapHint')}</span>
               </div>
               <div className="grid h-72 place-items-center rounded-2xl border border-dashed border-slate-300 bg-slate-50 text-sm text-slate-500">
-                Map container placeholder
+                {t('routing.mapPlaceholder')}
               </div>
             </div>
 
@@ -284,7 +300,7 @@ export function RoutingScreen({ severity, complaintCategory, onBack }: RoutingSc
                   onClick={() => setSelectedHospital(hospital)}
                 >
                   <span>{hospital.name}</span>
-                  <span className="text-xs text-slate-500">{hospital.distanceKm} km</span>
+                  <span className="text-xs text-slate-500">{t('routing.kmAway', { km: hospital.distanceKm })}</span>
                 </button>
               ))}
             </div>

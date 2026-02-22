@@ -25,6 +25,18 @@ const resources = {
         ha: { name: 'Hausa', nativeName: 'Hausa' },
         ig: { name: 'Igbo', nativeName: 'Igbo' }
       },
+      common: {
+        empty: '?',
+        loggedInAs: 'Logged in as',
+        user: 'User',
+        appName: 'Alavia AI',
+      },
+      severity: {
+        low: 'Low',
+        medium: 'Medium',
+        high: 'High',
+        critical: 'Critical',
+      },
       auth: {
         signupTitle: 'Create your account',
         signupSubtitle: 'Join Alavia AI - health guidance in your language',
@@ -57,7 +69,27 @@ const resources = {
         logout: 'Log Out',
         profile: 'Profile & Settings',
         step2Label: 'Step 2 of 2',
-        back: 'Back'
+        back: 'Back',
+        errors: {
+          signupConflict: 'An account with this email or phone already exists. Please sign in.',
+          signupInvalid: 'Some signup details are invalid. Please review and try again.',
+          signupDefault: 'Unable to create account right now.',
+          signupNetwork: 'Cannot reach server. Check your internet or API base URL.',
+          signInInvalid: 'Invalid email or phone number, or password.',
+          signInNotFound: 'User account not found. Please sign up first.',
+          signInInvalidDetails: 'Please check your login details and try again.',
+          signInDefault: 'Unable to sign in right now.',
+          signInNetwork: 'Cannot reach server. Check your internet or API base URL.',
+          forgotPasswordFailed: 'Could not send password reset.'
+        },
+        validation: {
+          fullNameRequired: 'Full name is required',
+          emailRequired: 'Valid email is required',
+          phoneRequired: 'Valid phone number is required',
+          passwordMin: 'Password must be at least 6 characters',
+          emailOrPhoneRequired: 'Email or phone number is required',
+          passwordRequired: 'Password is required'
+        }
       },
       voice: {
         sessionStatusLabel: 'Session Status',
@@ -66,6 +98,13 @@ const resources = {
           listening: 'Listening',
           processing: 'Processing'
         },
+        emergencyActive: 'Emergency Mode Active',
+        emergencyCallContact: 'Call contact',
+        emergencySmsContact: 'SMS contact',
+        browserUnsupported: 'Browser Unsupported',
+        micBlocked: 'Mic Blocked',
+        typeYourAnswer: 'Type your answer',
+        greeting: 'Hi,',
         healthSession: 'Health Session',
         emergencyHelp: 'Emergency help',
         micDisabledTitle: 'Microphone access is disabled',
@@ -130,7 +169,23 @@ const resources = {
           ]
         },
         routingTitle: 'Hospitals Near You',
-        routingDesc: 'We found the following facilities based on your location.'
+        routingDesc: 'We found the following facilities based on your location.',
+        hospitals: {
+          public: 'Public',
+          private: 'Private',
+          closestToYou: 'Closest to you',
+          emergencyReady: 'Emergency Ready',
+          generalCare: 'General Care',
+          hours24: '24 hours',
+          hoursNon24: 'Non-24 hours',
+          rating: 'Rating {{rating}}',
+          noRating: 'No rating',
+          openTopHospital: 'Open Top Hospital in Maps'
+        },
+        navigateFullMaps: 'Navigate in Full Maps',
+        distanceAway: '{{distance}} away',
+        moreSpecialties: '+{{count}} more',
+        emergencyModeActivated: 'Emergency mode activated. Call or send SMS to your emergency contact now.'
       },
       profile: {
         title: 'Profile & Settings',
@@ -221,7 +276,18 @@ const resources = {
         confirmClear: 'Yes, Clear All Data',
         cancel: 'Cancel',
         saveChanges: 'Save Changes',
-        savedToast: 'Settings saved'
+        savedToast: 'Settings saved',
+        passwordMin: 'Minimum 6 characters',
+        aiVoiceLabel: 'AI Voice',
+        aiVoiceHint: 'Choose the voice used for spoken replies',
+        accessibilityLargeText: 'Large text',
+        accessibilityDark: 'Dark',
+        accessibilityContrast: 'Contrast',
+        accessibilityAudioOn: 'Audio on',
+        accessibilityReading: 'Reading',
+        emergencyCallLabel: 'Call',
+        emergencySmsLabel: 'SMS',
+        emergencyAppLabel: 'App'
       }
     }
   },
@@ -247,6 +313,18 @@ const resources = {
         yo: { name: 'Yoruba', nativeName: 'Yoruba' },
         ha: { name: 'Hausa', nativeName: 'Hausa' },
         ig: { name: 'Igbo', nativeName: 'Igbo' }
+      },
+      common: {
+        empty: '?',
+        loggedInAs: 'Logged in as',
+        user: 'User',
+        appName: 'Alavia AI',
+      },
+      severity: {
+        low: 'Low',
+        medium: 'Medium',
+        high: 'High',
+        critical: 'Critical',
       },
       auth: {
         signupTitle: 'Create your account',
@@ -280,7 +358,27 @@ const resources = {
         logout: 'Log Out',
         profile: 'Ma Profile',
         step2Label: 'Step 2 of 2',
-        back: 'Go back'
+        back: 'Go back',
+        errors: {
+          signupConflict: 'Account with this email or phone dey already. Abeg sign in.',
+          signupInvalid: 'Some signup details no correct. Abeg check am and try again.',
+          signupDefault: 'We no fit create account now.',
+          signupNetwork: 'We no fit reach server. Check your internet or API base URL.',
+          signInInvalid: 'Email/phone or password no correct.',
+          signInNotFound: 'Account no dey. Abeg sign up first.',
+          signInInvalidDetails: 'Abeg check your login details and try again.',
+          signInDefault: 'We no fit sign in now.',
+          signInNetwork: 'We no fit reach server. Check your internet or API base URL.',
+          forgotPasswordFailed: 'No fit send password reset.'
+        },
+        validation: {
+          fullNameRequired: 'Full name dey required',
+          emailRequired: 'Valid email dey required',
+          phoneRequired: 'Valid phone number dey required',
+          passwordMin: 'Password must be at least 6 characters',
+          emailOrPhoneRequired: 'Email or phone dey required',
+          passwordRequired: 'Password dey required'
+        }
       },
       voice: {
         sessionStatusLabel: 'Session status',
@@ -289,6 +387,13 @@ const resources = {
           listening: 'Listening',
           processing: 'Processing'
         },
+        emergencyActive: 'Emergency Mode Active',
+        emergencyCallContact: 'Call contact',
+        emergencySmsContact: 'SMS contact',
+        browserUnsupported: 'Browser Unsupported',
+        micBlocked: 'Mic Blocked',
+        typeYourAnswer: 'Type your answer',
+        greeting: 'How far,',
         healthSession: 'Health session',
         emergencyHelp: 'Emergency help',
         micDisabledTitle: 'Microphone no dey active',
@@ -327,6 +432,7 @@ const resources = {
           critical: 'Your symptoms fit need urgent help. Abeg go emergency care now now.',
           high: 'You suppose go hospital today for checkup.',
           medium: 'Monitor am well and plan same-day clinic visit if e continue.',
+          low: 'E look like say e mild for now. Rest and continue to monitor.'
         },
         firstAidTitle: 'First Aid Wetin You Go Do',
         firstAid: {
@@ -352,7 +458,23 @@ const resources = {
           ]
         },
         routingTitle: 'Hospital Wey Near You',
-        routingDesc: 'We find these places follow where you dey.'
+        routingDesc: 'We find these places follow where you dey.',
+        hospitals: {
+          public: 'Government',
+          private: 'Private',
+          closestToYou: 'E dey closest to you',
+          emergencyReady: 'Emergency Ready',
+          generalCare: 'General Care',
+          hours24: '24 hours',
+          hoursNon24: 'No be 24 hours',
+          rating: 'Rating {{rating}}',
+          noRating: 'No rating',
+          openTopHospital: 'Open Top Hospital for Maps'
+        },
+        navigateFullMaps: 'Open full map',
+        distanceAway: '{{distance}} away',
+        moreSpecialties: '+{{count}} more',
+        emergencyModeActivated: 'Emergency mode don activate. Call or send SMS to your emergency person now.'
       },
       profile: {
         title: 'Profile & Settings',
@@ -443,7 +565,120 @@ const resources = {
         confirmClear: 'Yes, Clear All',
         cancel: 'Cancel',
         saveChanges: 'Save Changes',
-        savedToast: 'Settings don save'
+        savedToast: 'Settings don save',
+        passwordMin: 'Minimum 6 characters',
+        aiVoiceLabel: 'AI Voice',
+        aiVoiceHint: 'Choose the voice wey go read replies',
+        accessibilityLargeText: 'Big text',
+        accessibilityDark: 'Dark',
+        accessibilityContrast: 'Contrast',
+        accessibilityAudioOn: 'Audio on',
+        accessibilityReading: 'Reading',
+        emergencyCallLabel: 'Call',
+        emergencySmsLabel: 'SMS',
+        emergencyAppLabel: 'App'
+      },
+      firstAidScreen: {
+        title: 'First Aid Guidance',
+        back: 'Back',
+        standardText: 'Standard Text',
+        largeText: 'Large Text',
+        lightMode: 'Light Mode',
+        darkMode: 'Dark Mode',
+        keepSimple: 'Keep it simple',
+        understoodTitle: 'What I understood',
+        playAudio: 'Play audio summary',
+        translate: 'Translate',
+        doNow: 'Do this now',
+        avoidTitle: 'Avoid this',
+        nextStepsTitle: 'Next steps',
+        viewHospitals: 'View hospitals',
+        endSave: 'End & save',
+        emergencyTitle: 'Emergency signs detected',
+        emergencyBody: 'Stay with someone if possible, avoid exertion, and route to the nearest emergency-ready hospital now.',
+        routeNow: 'Route now',
+        close: 'Close',
+        readAloud: 'Read Aloud',
+        timerRunning: 'Timer Running',
+        startTimer: 'Start {{minutes}} min timer',
+        timerCompleted: '{{title}}. Timer completed.',
+        redFlagsTitle: 'Watch for these signs',
+        redFlagsCta: 'I have one of these signs',
+        call: 'Call',
+        directions: 'Directions',
+        save: 'Save',
+        nextSteps: {
+          primary: {
+            low: 'Continue self care',
+            medium: 'Book a clinic visit',
+            high: 'Go to a hospital now',
+            critical: 'Emergency actions'
+          },
+          secondary: {
+            low: 'Find clinic near me',
+            medium: 'Find hospital near me',
+            high: 'Call emergency contact',
+            critical: 'Route to nearest emergency hospital'
+          }
+        },
+        avoid: {
+          low: ['Do not ignore new breathing issues.', 'Do not self-medicate with unknown drugs.'],
+          medium: ['Do not drive if you feel weak or dizzy.', 'Do not delay care beyond today if symptoms persist.'],
+          high: ['Do not stay alone if symptoms are worsening.', 'Do not do heavy activity right now.'],
+          critical: ['Do not wait at home for symptoms to pass.', 'Do not eat or drink if choking risk is present.']
+        }
+      },
+      routing: {
+        sos: 'SOS',
+        title: 'Hospital Routing',
+        back: 'Back',
+        location: {
+          using: 'Using your location',
+          checking: 'Checking location...',
+          manual: 'Enter your area'
+        },
+        standardText: 'Standard Text',
+        largeText: 'Large Text',
+        light: 'Light',
+        dark: 'Dark',
+        searchPlaceholder: 'Search area or landmark',
+        filters: {
+          nearest: 'Nearest',
+          best: 'Best match',
+          public: 'Public',
+          private: 'Private',
+          emergency: 'Emergency ready'
+        },
+        rankInfo: 'We ranked hospitals by specialty and urgency, then distance.',
+        loading: 'Loading hospitals from API...',
+        error: 'Could not load hospitals from API.',
+        showingFallback: 'Showing fallback list.',
+        locationDenied: 'Location access is denied. Enable location in browser settings or search by your area manually.',
+        noMatchesTitle: 'No exact matches found',
+        noMatchesBody: 'Try another area, or call emergency services if symptoms are severe.',
+        mapTitle: 'Map View (MVP Placeholder)',
+        mapHint: 'Pins shown as list',
+        mapPlaceholder: 'Map container placeholder',
+        listView: 'List view',
+        mapView: 'Map view',
+        kmAway: '{{km}} km',
+        addressUnavailable: 'Address unavailable',
+        defaultPhone: '112',
+        unknown: 'Unknown',
+        match: {
+          bestFor: 'Best for {{category}}',
+          emergencyUnit: 'Has emergency unit',
+          generalCare: 'General care available'
+        },
+        card: {
+          distance: '{{km}} km ? ~{{minutes}} min',
+          public: 'Public',
+          private: 'Private',
+          emergencyReady: 'Emergency Ready',
+          call: 'Call',
+          directions: 'Directions',
+          details: 'Details'
+        }
       }
     }
   },
@@ -469,6 +704,18 @@ const resources = {
         yo: { name: 'Yoruba', nativeName: 'Yoruba' },
         ha: { name: 'Hausa', nativeName: 'Hausa' },
         ig: { name: 'Igbo', nativeName: 'Igbo' }
+      },
+      common: {
+        empty: '?',
+        loggedInAs: 'Logged in as',
+        user: 'User',
+        appName: 'Alavia AI',
+      },
+      severity: {
+        low: 'Low',
+        medium: 'Medium',
+        high: 'High',
+        critical: 'Critical',
       },
       auth: {
         signupTitle: 'Create your account',
@@ -502,7 +749,27 @@ const resources = {
         logout: 'Jade',
         profile: 'Ìró mi',
         step2Label: 'Igbese 2 ninu 2',
-        back: 'Pada'
+        back: 'Pada',
+        errors: {
+          signupConflict: 'Akọọlẹ pẹlu imeeli/tabi foonu yi wa tẹlẹ. Jọwọ wọlé.',
+          signupInvalid: 'Diẹ ninu alaye forukọsilẹ ko tọ. Jọwọ ṣayẹwo ki o tun gbiyanju.',
+          signupDefault: 'A ko le ṣẹda akọọlẹ ni bayi.',
+          signupNetwork: 'A ko le de ọdọ olupin. Ṣayẹwo intanẹẹti rẹ tabi API base URL.',
+          signInInvalid: 'Imeeli/fọọnu tabi ọrọigbaniwọle ko tọ.',
+          signInNotFound: 'Akọọlẹ olumulo ko ri. Jọwọ forukọsilẹ.',
+          signInInvalidDetails: 'Jọwọ ṣayẹwo alaye wọlé rẹ ki o tun gbiyanju.',
+          signInDefault: 'A ko le wọlé ni bayi.',
+          signInNetwork: 'A ko le de ọdọ olupin. Ṣayẹwo intanẹẹti rẹ tabi API base URL.',
+          forgotPasswordFailed: 'A ko le fi ọrọigbaniwọle tuntun ranṣẹ.'
+        },
+        validation: {
+          fullNameRequired: 'Orukọ kikun jẹ dandan',
+          emailRequired: 'Imeeli to peye jẹ dandan',
+          phoneRequired: 'Nọmba foonu to peye jẹ dandan',
+          passwordMin: 'Ọrọigbaniwọle gbọdọ jẹ o kere ju awọn aami 6',
+          emailOrPhoneRequired: 'Imeeli tabi foonu jẹ dandan',
+          passwordRequired: 'Ọrọigbaniwọle jẹ dandan'
+        }
       },
       voice: {
         sessionStatusLabel: 'Ipo akoko',
@@ -511,6 +778,13 @@ const resources = {
           listening: 'N gbo',
           processing: 'N sise'
         },
+        emergencyActive: 'Emergency Mode Active',
+        emergencyCallContact: 'Call contact',
+        emergencySmsContact: 'SMS contact',
+        browserUnsupported: 'Browser Unsupported',
+        micBlocked: 'Mic Blocked',
+        typeYourAnswer: 'Type your answer',
+        greeting: 'Bawo,',
         healthSession: 'Ibaraenisoro ilera',
         emergencyHelp: 'Iranlowo pajawiri',
         micDisabledTitle: 'A ko fun microphone ni ase',
@@ -533,7 +807,7 @@ const resources = {
         severityResult: 'Esi ipo ewu',
         currentLevel: 'Ipele isiyi',
         findHospital: 'Wa ile iwosan to sun mo',
-        openKeyboard: 'Si tit? keyboard',
+        openKeyboard: 'Ṣí títẹ̀ keyboard',
         typeSymptoms: 'Bawo ni o se n rilara?',
         closeKeyboard: 'Pa panel keyboard',
         inputPlaceholder: 'Apeere: Ori mi n dun gan...',
@@ -549,6 +823,7 @@ const resources = {
           critical: 'Ami aisan yi le nilo iranlowo pajawiri. Lo si ile iwosan pajawiri bayii.',
           high: 'O ye ki o lo si ile iwosan loni fun ayewo.',
           medium: 'Tele e peki ki o si gbero ibewo ile iwosan loni bi o ba tesiwaju.',
+          low: 'Awọn ami aisan rẹ ko buru pupọ lọwọlọwọ. Sinmi ki o si tẹsiwaju lati bojuto.',
         },
         firstAidTitle: 'Awọn Igbese Akọkọ',
         firstAid: {
@@ -574,7 +849,23 @@ const resources = {
           ]
         },
         routingTitle: 'Awọn Ile-Iwosan Nitosi Rẹ',
-        routingDesc: 'A ri awọn ile-iwosan wọnyi gẹgẹbi ibi ti o wa.'
+        routingDesc: 'A ri awọn ile-iwosan wọnyi gẹgẹbi ibi ti o wa.',
+        hospitals: {
+          public: 'Ti Ijọba',
+          private: 'Aladani',
+          closestToYou: 'Ó sún mọ́ ọ jù',
+          emergencyReady: 'Ṣetán fún Pàjáwìrì',
+          generalCare: 'Ìtọ́jú Gbogbogbò',
+          hours24: 'Wákàtí 24',
+          hoursNon24: 'Kìí ṣe wákàtí 24',
+          rating: 'Ìgbéléwọ̀n {{rating}}',
+          noRating: 'Kò sí ìgbéléwọ̀n',
+          openTopHospital: 'Ṣí Ilé-Ìwòsàn Tó Dára Jù ní Máàpù'
+        },
+        navigateFullMaps: 'Ṣí máàpù gbogbo',
+        distanceAway: '{{distance}} jìnnà',
+        moreSpecialties: '+{{count}} síi',
+        emergencyModeActivated: 'Ọ̀pọ̀yàní pàjáwìrì ti ṣíṣẹ́. Pe tàbí ran SMS sí ẹni ọ̀pọ̀yàní pàjáwìrì rẹ báyìí.'
       },
       profile: {
         title: 'Profaili & Eto',
@@ -665,7 +956,120 @@ const resources = {
         confirmClear: 'Beeni, Pa Gbogbo Data',
         cancel: 'Fagilee',
         saveChanges: 'Fipamo Awon Ayipada',
-        savedToast: 'Eto ti fipamo'
+        savedToast: 'Eto ti fipamo',
+        passwordMin: 'O kere ju aw?n aami 6',
+        aiVoiceLabel: 'Oh?n AI',
+        aiVoiceHint: 'Yan oh?n t? a ? lo f?n ?d?h?n ohun',
+        accessibilityLargeText: '?r? nla',
+        accessibilityDark: 'D?d?',
+        accessibilityContrast: '?t??s?',
+        accessibilityAudioOn: 'Oh?n ?i??',
+        accessibilityReading: 'K?k?',
+        emergencyCallLabel: 'Pe',
+        emergencySmsLabel: 'SMS',
+        emergencyAppLabel: 'App'
+      },
+      firstAidScreen: {
+        title: 'First Aid Guidance',
+        back: 'Back',
+        standardText: 'Standard Text',
+        largeText: 'Large Text',
+        lightMode: 'Light Mode',
+        darkMode: 'Dark Mode',
+        keepSimple: 'Keep it simple',
+        understoodTitle: 'What I understood',
+        playAudio: 'Play audio summary',
+        translate: 'Translate',
+        doNow: 'Do this now',
+        avoidTitle: 'Avoid this',
+        nextStepsTitle: 'Next steps',
+        viewHospitals: 'View hospitals',
+        endSave: 'End & save',
+        emergencyTitle: 'Emergency signs detected',
+        emergencyBody: 'Stay with someone if possible, avoid exertion, and route to the nearest emergency-ready hospital now.',
+        routeNow: 'Route now',
+        close: 'Close',
+        readAloud: 'Read Aloud',
+        timerRunning: 'Timer Running',
+        startTimer: 'Start {{minutes}} min timer',
+        timerCompleted: '{{title}}. Timer completed.',
+        redFlagsTitle: 'Watch for these signs',
+        redFlagsCta: 'I have one of these signs',
+        call: 'Call',
+        directions: 'Directions',
+        save: 'Save',
+        nextSteps: {
+          primary: {
+            low: 'Continue self care',
+            medium: 'Book a clinic visit',
+            high: 'Go to a hospital now',
+            critical: 'Emergency actions'
+          },
+          secondary: {
+            low: 'Find clinic near me',
+            medium: 'Find hospital near me',
+            high: 'Call emergency contact',
+            critical: 'Route to nearest emergency hospital'
+          }
+        },
+        avoid: {
+          low: ['Do not ignore new breathing issues.', 'Do not self-medicate with unknown drugs.'],
+          medium: ['Do not drive if you feel weak or dizzy.', 'Do not delay care beyond today if symptoms persist.'],
+          high: ['Do not stay alone if symptoms are worsening.', 'Do not do heavy activity right now.'],
+          critical: ['Do not wait at home for symptoms to pass.', 'Do not eat or drink if choking risk is present.']
+        }
+      },
+      routing: {
+        sos: 'SOS',
+        title: 'Hospital Routing',
+        back: 'Back',
+        location: {
+          using: 'Using your location',
+          checking: 'Checking location...',
+          manual: 'Enter your area'
+        },
+        standardText: 'Standard Text',
+        largeText: 'Large Text',
+        light: 'Light',
+        dark: 'Dark',
+        searchPlaceholder: 'Search area or landmark',
+        filters: {
+          nearest: 'Nearest',
+          best: 'Best match',
+          public: 'Public',
+          private: 'Private',
+          emergency: 'Emergency ready'
+        },
+        rankInfo: 'We ranked hospitals by specialty and urgency, then distance.',
+        loading: 'Loading hospitals from API...',
+        error: 'Could not load hospitals from API.',
+        showingFallback: 'Showing fallback list.',
+        locationDenied: 'Location access is denied. Enable location in browser settings or search by your area manually.',
+        noMatchesTitle: 'No exact matches found',
+        noMatchesBody: 'Try another area, or call emergency services if symptoms are severe.',
+        mapTitle: 'Map View (MVP Placeholder)',
+        mapHint: 'Pins shown as list',
+        mapPlaceholder: 'Map container placeholder',
+        listView: 'List view',
+        mapView: 'Map view',
+        kmAway: '{{km}} km',
+        addressUnavailable: 'Address unavailable',
+        defaultPhone: '112',
+        unknown: 'Unknown',
+        match: {
+          bestFor: 'Best for {{category}}',
+          emergencyUnit: 'Has emergency unit',
+          generalCare: 'General care available'
+        },
+        card: {
+          distance: '{{km}} km ? ~{{minutes}} min',
+          public: 'Public',
+          private: 'Private',
+          emergencyReady: 'Emergency Ready',
+          call: 'Call',
+          directions: 'Directions',
+          details: 'Details'
+        }
       }
     }
   },
@@ -691,6 +1095,18 @@ const resources = {
         yo: { name: 'Yarbanci', nativeName: 'Yoruba' },
         ha: { name: 'Hausa', nativeName: 'Hausa' },
         ig: { name: 'Igbo', nativeName: 'Igbo' }
+      },
+      common: {
+        empty: '?',
+        loggedInAs: 'Logged in as',
+        user: 'User',
+        appName: 'Alavia AI',
+      },
+      severity: {
+        low: 'Low',
+        medium: 'Medium',
+        high: 'High',
+        critical: 'Critical',
       },
       auth: {
         signupTitle: 'Kirkiro asusun ku',
@@ -733,6 +1149,13 @@ const resources = {
           listening: 'Ina sauraro',
           processing: 'Ana nazari'
         },
+        emergencyActive: 'Emergency Mode Active',
+        emergencyCallContact: 'Call contact',
+        emergencySmsContact: 'SMS contact',
+        browserUnsupported: 'Browser Unsupported',
+        micBlocked: 'Mic Blocked',
+        typeYourAnswer: 'Type your answer',
+        greeting: 'Sannu,',
         healthSession: 'Zaman lafiya',
         emergencyHelp: 'Taimakon gaggawa',
         micDisabledTitle: 'An kashe izinin microphone',
@@ -797,7 +1220,23 @@ const resources = {
           ]
         },
         routingTitle: 'Asibitoci Kusa Da Kai',
-        routingDesc: 'Mun sami wadannan wuraren dangane da inda kake.'
+        routingDesc: 'Mun sami wadannan wuraren dangane da inda kake.',
+        hospitals: {
+          public: 'Na Gwamnati',
+          private: 'Mai Zaman Kansa',
+          closestToYou: 'Mafi kusa da kai',
+          emergencyReady: 'Shirye na Gaggawa',
+          generalCare: 'Kulawa ta Gabaɗaya',
+          hours24: 'Awanni 24',
+          hoursNon24: 'Ba awanni 24 ba',
+          rating: 'Kimantawa {{rating}}',
+          noRating: 'Babu kimantawa',
+          openTopHospital: 'Buɗe Asibiti Mafi Kyau a Taswira'
+        },
+        navigateFullMaps: 'Buɗe cikakken taswira',
+        distanceAway: '{{distance}} nesa',
+        moreSpecialties: '+{{count}} ƙari',
+        emergencyModeActivated: 'An kunna yanayin gaggawa. Kira ko aika SMS ga lambar gaggawa yanzu.'
       },
       profile: {
         title: 'Bayani & Saituna',
@@ -888,7 +1327,18 @@ const resources = {
         confirmClear: 'Ee, Share Dukkan Bayanai',
         cancel: 'Soke',
         saveChanges: 'Adana Canje-canje',
-        savedToast: 'An adana saituna'
+        savedToast: 'An adana saituna',
+        passwordMin: 'A kalla haruffa 6',
+        aiVoiceLabel: 'Muryar AI',
+        aiVoiceHint: 'Za?i muryar da za a yi amfani da ita',
+        accessibilityLargeText: 'Babban rubutu',
+        accessibilityDark: 'Duhu',
+        accessibilityContrast: 'Bambanci',
+        accessibilityAudioOn: 'Sauti a kunne',
+        accessibilityReading: 'Karatu',
+        emergencyCallLabel: 'Kira',
+        emergencySmsLabel: 'SMS',
+        emergencyAppLabel: 'App'
       }
     }
   },
@@ -914,6 +1364,18 @@ const resources = {
         yo: { name: 'Yoruba', nativeName: 'Yoruba' },
         ha: { name: 'Hausa', nativeName: 'Hausa' },
         ig: { name: 'Igbo', nativeName: 'Igbo' }
+      },
+      common: {
+        empty: '?',
+        loggedInAs: 'Logged in as',
+        user: 'User',
+        appName: 'Alavia AI',
+      },
+      severity: {
+        low: 'Low',
+        medium: 'Medium',
+        high: 'High',
+        critical: 'Critical',
       },
       auth: {
         signupTitle: 'Mep?ta aka?nt? gi',
@@ -947,7 +1409,27 @@ const resources = {
         logout: 'Puputa',
         profile: 'Profaịlụ m',
         step2Label: 'Nzo 2 nime 2',
-        back: 'Laghachi'
+        back: 'Laghachi',
+        errors: {
+          signupConflict: 'Aka?nt? nwere email/ekwenti a d?r?. Biko banye.',
+          signupInvalid: '?f?d? ozi ndebanye ad?gh? mma. Biko lelee ma nwalee ?z?.',
+          signupDefault: 'Agagh? emep?ta aka?nt? ugbu a.',
+          signupNetwork: 'Enwegh? ike iru sava. Lelee ?ntanet? g? ma ? b? API base URL.',
+          signInInvalid: 'Email/ekwenti ma ? b? okwuntughe ezighi ezi.',
+          signInNotFound: 'Aka?nt? ad?gh?. Biko debanye aha.',
+          signInInvalidDetails: 'Biko lelee nk?wa nbanye ma nwalee ?z?.',
+          signInDefault: 'Enwegh? ike ibanye ugbu a.',
+          signInNetwork: 'Enwegh? ike iru sava. Lelee ?ntanet? g? ma ? b? API base URL.',
+          forgotPasswordFailed: 'Enwegh? ike izipu nkwughachi okwuntughe.'
+        },
+        validation: {
+          fullNameRequired: 'Aha zuru oke d? mkpa',
+          emailRequired: 'A ch?r? email ziri ezi',
+          phoneRequired: 'A ch?r? n?mba ekwenti ziri ezi',
+          passwordMin: 'Okwuntughe ga-ad?kar?a ala mkp?r?edemede 6',
+          emailOrPhoneRequired: 'Email ma ? b? ekwenti d? mkpa',
+          passwordRequired: 'Okwuntughe d? mkpa'
+        }
       },
       voice: {
         sessionStatusLabel: 'Onodu oge',
@@ -956,7 +1438,14 @@ const resources = {
           listening: 'Ana m anu',
           processing: 'Ana nyochaa'
         },
-        healthSession: 'Nzuk? ahuike',
+        emergencyActive: 'Emergency Mode Active',
+        emergencyCallContact: 'Call contact',
+        emergencySmsContact: 'SMS contact',
+        browserUnsupported: 'Browser Unsupported',
+        micBlocked: 'Mic Blocked',
+        typeYourAnswer: 'Type your answer',
+        greeting: 'Kedu,',
+        healthSession: 'Nzukọ ahụike',
         emergencyHelp: 'Enyemaka mberede',
         micDisabledTitle: 'A machibidoro microphone',
         micDisabledText: 'Kwe ka browser jiri microphone ka voice triage nwee ike iru oru.',
@@ -969,7 +1458,7 @@ const resources = {
         standardText: 'Nha nkewa',
         enableLargeText: 'Mkpuruokwu buru ibu',
         transcript: 'Ihe i kwuru',
-        responseHeading: 'Nke a bu ihe m gh?tara',
+        responseHeading: 'Nke a bụ ihe m ghọtara',
         playAudio: 'Kpoo aziza olu ozo',
         triageQuestion: 'Ajuju triage',
         yes: 'Ee',
@@ -987,7 +1476,7 @@ const resources = {
         questions: {
           breathing: 'I nwere nsogbu iku ume?',
           fainting: 'I dara mba ma obu nwee mgbagwoju anya ozugbo?',
-          worse: 'Mgbaama ahu na-aka nj? ngwa ngwa?',
+          worse: 'Mgbaama ahụ na-aka njọ ngwa ngwa?',
           weakness: 'I nwere adighi ike n otu akuku ma obu okwu na-aputa ihe isi ike?'
         },
         summaries: {
@@ -1020,7 +1509,23 @@ const resources = {
           ]
         },
         routingTitle: 'Ụlọ Ọgwụ Dị Gị Nso',
-        routingDesc: 'Anyị hụrụ ebe ndị a dabere n’ebe ị nọ.'
+        routingDesc: 'Anyị hụrụ ebe ndị a dabere n’ebe ị nọ.',
+        hospitals: {
+          public: 'Nke Gọọmentị',
+          private: 'Nke Onwe',
+          closestToYou: 'Nke kacha nso',
+          emergencyReady: 'Njikere Maka Mberede',
+          generalCare: 'Nlekọta Izugbe',
+          hours24: 'Awa 24',
+          hoursNon24: 'Ọ bụghị awa 24',
+          rating: 'Ọkwa {{rating}}',
+          noRating: 'Enweghị ọkwa',
+          openTopHospital: 'Mepee Ụlọ Ọgwụ Kacha Mma na Maapụ'
+        },
+        navigateFullMaps: 'Mepee maapụ zuru ezu',
+        distanceAway: '{{distance}} dị anya',
+        moreSpecialties: '+{{count}} ọzọ',
+        emergencyModeActivated: 'Akpalitela ọnọdụ mberede. Kpọọ ma ọ bụ zipu SMS nye onye mberede gị ugbu a.'
       },
       profile: {
         title: 'Profailụ & Ntọala',
@@ -1111,7 +1616,18 @@ const resources = {
         confirmClear: 'Ee, Hichapụ Data Niile',
         cancel: 'Kagbuo',
         saveChanges: 'Chekwaa Mgbanwe',
-        savedToast: 'Ntọala echekwara'
+        savedToast: 'Ntọala echekwara',
+        passwordMin: 'Opekata mpe mkp?r?edemede 6',
+        aiVoiceLabel: '?da AI',
+        aiVoiceHint: 'H?r? ?da a ga-eji zaa',
+        accessibilityLargeText: 'Okwu buru ibu',
+        accessibilityDark: '?ch?ch?r?',
+        accessibilityContrast: 'Nkewa',
+        accessibilityAudioOn: 'Audio d? n??r?',
+        accessibilityReading: '?g?',
+        emergencyCallLabel: 'Kp??',
+        emergencySmsLabel: 'SMS',
+        emergencyAppLabel: 'App'
       }
     }
   }
