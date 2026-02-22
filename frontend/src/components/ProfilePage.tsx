@@ -23,7 +23,7 @@ interface Settings {
   darkMode: boolean
   audioAutoplay: boolean
   voiceSpeed: 'slow' | 'normal' | 'fast'
-  ttsVoice: 'alloy' | 'nova' | 'verse'
+  ttsVoice: 'Idera'
   readPrompts: boolean
   ageBand: string
   gender: string
@@ -48,7 +48,7 @@ interface Settings {
 const getDefaults = (): Settings => ({
   appLanguage: (localStorage.getItem('alavia.selectedLanguage') as LanguageCode) || 'en',
   largeText: false, highContrast: false, darkMode: false,
-  audioAutoplay: true, voiceSpeed: 'normal', ttsVoice: 'alloy', readPrompts: false,
+  audioAutoplay: true, voiceSpeed: 'normal', ttsVoice: 'Idera', readPrompts: false,
   ageBand: '', gender: '', pregnancyStatus: false,
   condAsthma: false, condDiabetes: false, condHypertension: false,
   condSickleCell: false, condHeart: false, condNone: false,
@@ -60,7 +60,10 @@ const getDefaults = (): Settings => ({
 function loadSettings(): Settings {
   try {
     const stored = localStorage.getItem('alavia.profileSettings')
-    return stored ? { ...getDefaults(), ...JSON.parse(stored) } : getDefaults()
+    if (!stored) return getDefaults()
+    const merged = { ...getDefaults(), ...JSON.parse(stored) } as Settings & { ttsVoice?: string }
+    if (merged.ttsVoice !== 'Idera') merged.ttsVoice = 'Idera'
+    return merged
   } catch { return getDefaults() }
 }
 
@@ -430,9 +433,7 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
               onChange={e => set('ttsVoice', e.target.value as Settings['ttsVoice'])}
               className={selectCls(dark)}
             >
-              <option value="alloy">Alloy</option>
-              <option value="nova">Nova</option>
-              <option value="verse">Verse</option>
+              <option value="Idera">Idera</option>
             </select>
           </Row>
 

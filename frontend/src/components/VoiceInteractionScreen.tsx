@@ -159,17 +159,17 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     setTextInput('')
   }
 
-  const getPreferredTtsVoice = (): 'alloy' | 'nova' | 'verse' => {
+  const getPreferredTtsVoice = (): 'Idera' => {
     try {
       const raw = localStorage.getItem('alavia.profileSettings')
-      if (!raw) return 'alloy'
+      if (!raw) return 'Idera'
       const parsed = JSON.parse(raw) as { ttsVoice?: string }
-      if (parsed.ttsVoice === 'nova' || parsed.ttsVoice === 'verse' || parsed.ttsVoice === 'alloy') {
+      if (parsed.ttsVoice === 'Idera') {
         return parsed.ttsVoice
       }
-      return 'alloy'
+      return 'Idera'
     } catch {
-      return 'alloy'
+      return 'Idera'
     }
   }
 

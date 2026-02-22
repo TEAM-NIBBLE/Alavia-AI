@@ -1,7 +1,9 @@
-import { apiRequest, authTokenStorage } from './client'
+import { ApiError, apiRequest, authTokenStorage } from './client'
 import { API } from './endpoints'
 
 const getToken = () => authTokenStorage.get()
+const YARN_TTS_ENDPOINT = import.meta.env.VITE_YARNGPT_TTS_ENDPOINT || 'https://yarngpt.ai/api/v1/tts'
+const YARN_TTS_API_KEY = import.meta.env.VITE_VOICE_MODEL_API || import.meta.env.VITE_VOICE_MODEL_API_KEY || ''
 
 function toQueryString(params: Record<string, string | number | boolean | undefined>) {
   const search = new URLSearchParams()
@@ -167,6 +169,7 @@ export interface TtsPayload {
   text: string
   language?: string
   voice?: string
+  response_format?: 'mp3' | 'wav' | 'opus' | 'flac'
 }
 
 export interface TtsResponse {
@@ -331,7 +334,47 @@ export const speechApi = {
     })
   },
 
-  tts(payload: TtsPayload) {
+  async tts(payload: TtsPayload) {
+    if (YARN_TTS_API_KEY) {
+      const response = await fetch(YARN_TTS_ENDPOINT, {
+        method: 'POST',
+        headers: {
+          Accept: 'application/json, audio/*',
+          'Content-Type': 'application/json',
+          Authorization: `Bearer ${YARN_TTS_API_KEY}`,
+          'x-api-key': YARN_TTS_API_KEY,
+        },
+        body: JSON.stringify({
+          text: payload.text.slice(0, 2000),
+          voice: payload.voice || 'Idera',
+          response_format: payload.response_format || 'mp3',
+        }),
+      })
+
+      if (!response.ok) {
+        let message = `TTS request failed with status ${response.status}`
+        try {
+          const body = await response.json() as { message?: string }
+          if (body?.message) message = body.message
+        } catch {
+          // ignore non-json error payload
+        }
+        throw new ApiError(message, response.status)
+      }
+
+      const contentType = response.headers.get('content-type') ?? ''
+      if (contentType.includes('application/json')) {
+        const data = await response.json() as { audio_url?: string; url?: string; audio?: string }
+        if (data.audio_url) return { audio_url: data.audio_url }
+        if (data.url) return { audio_url: data.url }
+        if (data.audio) return { audio_url: `data:audio/${payload.response_format || 'mp3'};base64,${data.audio}` }
+        throw new ApiError('Invalid TTS JSON response.', 500)
+      }
+
+      const blob = await response.blob()
+      return { audio_url: URL.createObjectURL(blob) }
+    }
+
     return apiRequest<TtsResponse>(API.speech.tts, {
       method: 'POST',
       body: payload,
