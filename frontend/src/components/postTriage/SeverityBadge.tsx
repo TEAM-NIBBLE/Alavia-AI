@@ -1,3 +1,5 @@
+import { useTranslation } from 'react-i18next'
+
 interface SeverityBadgeProps {
   severity: 'low' | 'medium' | 'high' | 'critical'
 }
@@ -10,9 +12,10 @@ const styleMap: Record<SeverityBadgeProps['severity'], string> = {
 }
 
 export function SeverityBadge({ severity }: SeverityBadgeProps) {
+  const { t } = useTranslation()
   return (
     <span className={`inline-flex min-h-12 items-center rounded-full border px-4 text-sm font-bold uppercase ${styleMap[severity]}`}>
-      {severity}
+      {t(`severity.${severity}`)}
     </span>
   )
 }

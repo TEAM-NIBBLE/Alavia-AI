@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Eye, EyeOff } from 'lucide-react'
 import alaviaLogo from '../assets/alavia-ai_logo.png'
 import { authApi } from '../api/services'
+import { ApiError } from '../api/client'
 
 interface SignInPageProps {
   onSuccess: () => void
@@ -19,10 +20,24 @@ export default function SignInPage({ onSuccess, onSwitchToSignUp, onBack }: Sign
   const [forgotSent, setForgotSent] = useState(false)
   const [apiError, setApiError] = useState('')
 
+  const formatSignInError = (error: unknown) => {
+    if (error instanceof ApiError) {
+      if (error.status === 401) return t('auth.errors.signInInvalid')
+      if (error.status === 404) return t('auth.errors.signInNotFound')
+      if (error.status === 422) return t('auth.errors.signInInvalidDetails')
+      return error.message || t('auth.errors.signInDefault')
+    }
+    if (error instanceof Error) {
+      if (/fetch|network|timeout/i.test(error.message)) return t('auth.errors.signInNetwork')
+      return error.message
+    }
+    return t('auth.errors.signInDefault')
+  }
+
   const validate = () => {
     const newErrors: Partial<typeof form> = {}
-    if (!form.emailOrPhone.trim()) newErrors.emailOrPhone = 'Email or phone is required'
-    if (!form.password) newErrors.password = 'Password is required'
+    if (!form.emailOrPhone.trim()) newErrors.emailOrPhone = t('auth.validation.emailOrPhoneRequired')
+    if (!form.password) newErrors.password = t('auth.validation.passwordRequired')
     return newErrors
   }
 
@@ -53,9 +68,8 @@ export default function SignInPage({ onSuccess, onSwitchToSignUp, onBack }: Sign
       setIsLoading(false)
       onSuccess()
     } catch (error) {
-      setApiError(error instanceof Error ? error.message : 'Unable to sign in with server, using demo mode.')
+      setApiError(formatSignInError(error))
       setIsLoading(false)
-      onSuccess()
     }
   }
 
@@ -68,7 +82,7 @@ export default function SignInPage({ onSuccess, onSwitchToSignUp, onBack }: Sign
   const handleForgotPassword = async () => {
     const value = form.emailOrPhone.trim()
     if (!value) {
-      setErrors(prev => ({ ...prev, emailOrPhone: 'Email or phone is required' }))
+      setErrors(prev => ({ ...prev, emailOrPhone: t('auth.validation.emailOrPhoneRequired') }))
       return
     }
 
@@ -77,7 +91,7 @@ export default function SignInPage({ onSuccess, onSwitchToSignUp, onBack }: Sign
       setForgotSent(true)
       setTimeout(() => setForgotSent(false), 4000)
     } catch (error) {
-      setApiError(error instanceof Error ? error.message : 'Could not send password reset.')
+      setApiError(error instanceof Error ? error.message : t('auth.errors.forgotPasswordFailed'))
     }
   }
 

@@ -2,6 +2,7 @@ import { useState, type ChangeEvent, type FormEvent } from 'react'
 import { useTranslation } from 'react-i18next'
 import alaviaLogo from '../assets/alavia-ai_logo.png'
 import { authApi } from '../api/services'
+import { ApiError } from '../api/client'
 
 interface SignUpPageProps {
   onSuccess: (user: { name: string; email: string; phone: string }) => void
@@ -17,6 +18,19 @@ export default function SignUpPage({ onSuccess, onSwitchToSignIn, onBack }: Sign
   const [errors, setErrors] = useState<Partial<typeof form>>({})
   const [apiError, setApiError] = useState('')
 
+  const formatSignUpError = (error: unknown) => {
+    if (error instanceof ApiError) {
+      if (error.status === 409) return t('auth.errors.signupConflict')
+      if (error.status === 422) return t('auth.errors.signupInvalid')
+      return error.message || t('auth.errors.signupDefault')
+    }
+    if (error instanceof Error) {
+      if (/fetch|network|timeout/i.test(error.message)) return t('auth.errors.signupNetwork')
+      return error.message
+    }
+    return t('auth.errors.signupDefault')
+  }
+
   const mapLanguageCode = (value: string) => {
     const input = value.toLowerCase()
     if (input === 'pcm') return 'PIDGIN'
@@ -28,13 +42,13 @@ export default function SignUpPage({ onSuccess, onSwitchToSignIn, onBack }: Sign
 
   const validate = () => {
     const newErrors: Partial<typeof form> = {}
-    if (!form.name.trim()) newErrors.name = 'Full name is required'
+    if (!form.name.trim()) newErrors.name = t('auth.validation.fullNameRequired')
     if (!form.email.trim() || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(form.email))
-      newErrors.email = 'Valid email is required'
+      newErrors.email = t('auth.validation.emailRequired')
     if (!form.phone.trim() || !/^\+?[\d\s\-()]{7,15}$/.test(form.phone))
-      newErrors.phone = 'Valid phone number is required'
+      newErrors.phone = t('auth.validation.phoneRequired')
     if (!form.password || form.password.length < 6)
-      newErrors.password = 'Password must be at least 6 characters'
+      newErrors.password = t('auth.validation.passwordMin')
     return newErrors
   }
 
@@ -71,12 +85,8 @@ export default function SignUpPage({ onSuccess, onSwitchToSignIn, onBack }: Sign
       setIsLoading(false)
       onSuccess(user)
     } catch (error) {
-      // Fallback keeps prototype usable even when backend is offline.
-      const user = { name: form.name.trim(), email: form.email.trim(), phone: form.phone.trim() }
-      localStorage.setItem('alavia.user', JSON.stringify(user))
-      setApiError(error instanceof Error ? error.message : 'Unable to reach server, continued in offline mode.')
+      setApiError(formatSignUpError(error))
       setIsLoading(false)
-      onSuccess(user)
     }
   }
 

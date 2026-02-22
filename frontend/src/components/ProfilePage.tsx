@@ -3,9 +3,9 @@ import { useTranslation } from 'react-i18next'
 import { userApi } from '../api/services'
 import { AnimatePresence, motion } from 'framer-motion'
 import {
-  ArrowLeft, User, Globe, Heart, MapPin, ShieldCheck, AlertTriangle,
+  ArrowLeft, User, Globe, Heart, MapPin, AlertTriangle,
   Trash2, LogOut, Eye, EyeOff, CheckCircle2, Volume2, Moon, Type,
-  RefreshCcw, Download, ChevronRight, Save, Sun, Mic, Bell
+  ChevronRight, Save, Sun, Mic, Bell
 } from 'lucide-react'
 
 type LanguageCode = 'en' | 'pcm' | 'yo' | 'ha' | 'ig'
@@ -23,6 +23,7 @@ interface Settings {
   darkMode: boolean
   audioAutoplay: boolean
   voiceSpeed: 'slow' | 'normal' | 'fast'
+  ttsVoice: 'Idera'
   readPrompts: boolean
   ageBand: string
   gender: string
@@ -39,7 +40,6 @@ interface Settings {
   emergencyRelation: string
   useLocation: boolean
   homeArea: string
-  saveChatHistory: boolean
   showRedFlag: boolean
   emergencyButtonBehavior: 'call' | 'sms' | 'app'
 }
@@ -47,19 +47,22 @@ interface Settings {
 const getDefaults = (): Settings => ({
   appLanguage: (localStorage.getItem('alavia.selectedLanguage') as LanguageCode) || 'en',
   largeText: false, highContrast: false, darkMode: false,
-  audioAutoplay: true, voiceSpeed: 'normal', readPrompts: false,
+  audioAutoplay: true, voiceSpeed: 'normal', ttsVoice: 'Idera', readPrompts: false,
   ageBand: '', gender: '', pregnancyStatus: false,
   condAsthma: false, condDiabetes: false, condHypertension: false,
   condSickleCell: false, condHeart: false, condNone: false,
   allergies: '', emergencyName: '', emergencyPhone: '', emergencyRelation: '',
-  useLocation: false, homeArea: '', saveChatHistory: true, showRedFlag: true,
+  useLocation: false, homeArea: '', showRedFlag: true,
   emergencyButtonBehavior: 'call',
 })
 
 function loadSettings(): Settings {
   try {
     const stored = localStorage.getItem('alavia.profileSettings')
-    return stored ? { ...getDefaults(), ...JSON.parse(stored) } : getDefaults()
+    if (!stored) return getDefaults()
+    const merged = { ...getDefaults(), ...JSON.parse(stored) } as Settings & { ttsVoice?: string }
+    if (merged.ttsVoice !== 'Idera') merged.ttsVoice = 'Idera'
+    return merged
   } catch { return getDefaults() }
 }
 
@@ -163,7 +166,7 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
   const [pw, setPw] = useState({ current: '', newPw: '', confirm: '' })
   const [showPwEye, setShowPwEye] = useState(false)
   const [pwError, setPwError] = useState('')
-  const [modal, setModal] = useState<'delete' | 'clear' | null>(null)
+  const [modal, setModal] = useState<'delete' | null>(null)
   const [toast, setToast] = useState(false)
   const [locPermission, setLocPermission] = useState<'granted' | 'denied' | 'unknown'>('unknown')
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
@@ -240,7 +243,7 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
 
   const handleSavePw = () => {
     if (pw.newPw !== pw.confirm) { setPwError(t('profile.passwordMismatch')); return }
-    if (pw.newPw.length < 6) { setPwError('Minimum 6 characters'); return }
+    if (pw.newPw.length < 6) { setPwError(t('profile.passwordMin')); return }
     setPwError('')
     setPw({ current: '', newPw: '', confirm: '' })
     setShowPwForm(false)
@@ -252,13 +255,6 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
     localStorage.removeItem('alavia.profileSettings')
     setModal(null)
     onLogout()
-  }
-
-  const handleClearData = () => {
-    localStorage.removeItem('alavia.chatHistory')
-    localStorage.removeItem('alavia.summaries')
-    setModal(null)
-    showToast()
   }
 
   const permLabel =
@@ -324,7 +320,7 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
           {/* Email */}
           <Row label={t('profile.email')} dark={dark}>
             <span className={`max-w-[160px] truncate text-right text-sm ${dark ? 'text-slate-400' : 'text-slate-500'}`}>
-              {user.email || '—'}
+              {user.email || t('common.empty')}
             </span>
           </Row>
 
@@ -423,6 +419,16 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
             </div>
           </div>
 
+          <Row label={t('profile.aiVoiceLabel')} hint={t('profile.aiVoiceHint')} dark={dark}>
+            <select
+              value={settings.ttsVoice}
+              onChange={e => set('ttsVoice', e.target.value as Settings['ttsVoice'])}
+              className={selectCls(dark)}
+            >
+              <option value="Idera">Idera</option>
+            </select>
+          </Row>
+
           {/* Read Prompts */}
           <Row label={t('profile.readPrompts')} hint={t('profile.readPromptsHint')} dark={dark}>
             <Toggle checked={settings.readPrompts} onChange={v => set('readPrompts', v)} />
@@ -434,7 +440,7 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
           {/* Age Band */}
           <Row label={t('profile.ageBand')} dark={dark}>
             <select value={settings.ageBand} onChange={e => set('ageBand', e.target.value)} className={selectCls(dark)}>
-              <option value="">—</option>
+              <option value="">{t('common.empty')}</option>
               {(['ageBandUnder18', 'ageBand18', 'ageBand31', 'ageBand46', 'ageBand60'] as const).map(k => (
                 <option key={k} value={k}>{t(`profile.${k}`)}</option>
               ))}
@@ -444,7 +450,7 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
           {/* Gender */}
           <Row label={t('profile.genderLabel')} dark={dark}>
             <select value={settings.gender} onChange={e => set('gender', e.target.value)} className={selectCls(dark)}>
-              <option value="">—</option>
+              <option value="">{t('common.empty')}</option>
               <option value="male">{t('profile.genderMale')}</option>
               <option value="female">{t('profile.genderFemale')}</option>
               <option value="none">{t('profile.genderNone')}</option>
@@ -541,23 +547,6 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
         </SectionCard>
 
         {/* ── 5 · PRIVACY & DATA ───────────────────────────────────── */}
-        <SectionCard icon={<ShieldCheck size={18} />} title={t('profile.sectionPrivacy')} dark={dark}>
-          <Row label={t('profile.saveChatHistory')} hint={t('profile.saveChatHistoryHint')} dark={dark}>
-            <Toggle checked={settings.saveChatHistory} onChange={v => set('saveChatHistory', v)} />
-          </Row>
-          {[
-            { label: t('profile.clearChat'), icon: <RefreshCcw size={14} />, action: () => setModal('clear') },
-            { label: t('profile.clearSummaries'), icon: <RefreshCcw size={14} />, action: () => setModal('clear') },
-            { label: t('profile.downloadData'), icon: <Download size={14} />, action: () => {} },
-            { label: t('profile.consentLink'), icon: <ChevronRight size={14} />, action: () => {} },
-          ].map(({ label, icon, action }) => (
-            <button key={label} onClick={action} className={btnRowCls}>
-              <span>{label}</span>
-              <span className="text-slate-400">{icon}</span>
-            </button>
-          ))}
-        </SectionCard>
-
         {/* ── 6 · SAFETY ───────────────────────────────────────────── */}
         <SectionCard icon={<AlertTriangle size={18} />} title={t('profile.sectionSafety')} dark={dark}>
           {/* Red Flag Warnings */}
@@ -579,7 +568,11 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
                   className={`flex-1 rounded-xl py-2.5 text-xs font-bold capitalize transition-all ${settings.emergencyButtonBehavior === mode
                     ? 'bg-red-600 text-white shadow-md shadow-red-200/60'
                     : dark ? 'border border-slate-600 bg-slate-700 text-slate-300 hover:border-red-500' : 'border border-slate-200 bg-slate-50 text-slate-600 hover:border-red-300 hover:text-red-600'}`}>
-                  {mode === 'call' ? '📞 ' : mode === 'sms' ? '💬 ' : '🚨 '}{mode.toUpperCase()}
+                  {mode === 'call'
+                    ? t('profile.emergencyCallLabel')
+                    : mode === 'sms'
+                      ? t('profile.emergencySmsLabel')
+                      : t('profile.emergencyAppLabel')}
                 </button>
               ))}
             </div>
@@ -590,7 +583,7 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
             <div>
               <p className="text-sm font-semibold">{t('profile.emergencyContact')}</p>
               <p className={`text-xs ${dark ? 'text-slate-500' : 'text-slate-400'}`}>
-                {settings.emergencyName ? settings.emergencyName : '—'}
+                {settings.emergencyName ? settings.emergencyName : t('common.empty')}
                 {settings.emergencyPhone ? ` · ${settings.emergencyPhone}` : ''}
               </p>
             </div>
@@ -600,11 +593,6 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
 
         {/* ── 7 · DANGER ZONE ──────────────────────────────────────── */}
         <SectionCard icon={<Trash2 size={18} />} title={t('profile.sectionDanger')} accent="red" dark={dark}>
-          <button onClick={() => setModal('clear')}
-            className="flex w-full items-center justify-between px-5 py-4 text-sm font-bold text-amber-500 transition-all hover:bg-amber-50 active:opacity-70">
-            <span>{t('profile.clearData')}</span>
-            <RefreshCcw size={15} />
-          </button>
           <button onClick={() => setModal('delete')}
             className="flex w-full items-center justify-between px-5 py-4 text-sm font-bold text-red-600 transition-all hover:bg-red-50 active:opacity-70">
             <span>{t('profile.deleteAccount')}</span>
@@ -616,11 +604,11 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
 
       {/* ── Active accessibility hints (bottom-right corner) ───────── */}
       <div className="pointer-events-none fixed bottom-6 right-4 z-10 flex flex-col items-end gap-1 opacity-40">
-        {settings.largeText && <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700"><Type size={12} /> Large text</div>}
-        {settings.darkMode && <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700"><Moon size={12} /> Dark</div>}
-        {settings.highContrast && <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700"><Sun size={12} /> Contrast</div>}
-        {settings.audioAutoplay && <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700"><Volume2 size={12} /> Audio on</div>}
-        {settings.readPrompts && <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700"><Mic size={12} /> Reading</div>}
+        {settings.largeText && <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700"><Type size={12} /> {t('profile.accessibilityLargeText')}</div>}
+        {settings.darkMode && <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700"><Moon size={12} /> {t('profile.accessibilityDark')}</div>}
+        {settings.highContrast && <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700"><Sun size={12} /> {t('profile.accessibilityContrast')}</div>}
+        {settings.audioAutoplay && <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700"><Volume2 size={12} /> {t('profile.accessibilityAudioOn')}</div>}
+        {settings.readPrompts && <div className="flex items-center gap-1 text-[10px] font-bold text-emerald-700"><Mic size={12} /> {t('profile.accessibilityReading')}</div>}
       </div>
 
       {/* ── Saved Toast ──────────────────────────────────────────────── */}
@@ -649,17 +637,6 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
             onConfirm={handleDeleteAccount}
             onCancel={() => setModal(null)}
             danger
-          />
-        )}
-        {modal === 'clear' && (
-          <ConfirmModal
-            title={t('profile.clearData')}
-            body={t('profile.clearWarning')}
-            confirmLabel={t('profile.confirmClear')}
-            cancelLabel={t('profile.cancel')}
-            onConfirm={handleClearData}
-            onCancel={() => setModal(null)}
-            danger={false}
           />
         )}
       </AnimatePresence>

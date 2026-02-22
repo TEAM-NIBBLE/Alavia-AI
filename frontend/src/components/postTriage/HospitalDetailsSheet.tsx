@@ -1,3 +1,4 @@
+import { useTranslation } from 'react-i18next'
 import { type RankedHospital } from '../../utils/hospitalRouting'
 
 interface HospitalDetailsSheetProps {
@@ -8,6 +9,7 @@ interface HospitalDetailsSheetProps {
 }
 
 export function HospitalDetailsSheet({ hospital, onClose, onCall, onDirections }: HospitalDetailsSheetProps) {
+  const { t } = useTranslation()
   return (
     <div className={`fixed inset-0 z-40 transition ${hospital ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}>
       <div className="absolute inset-0 bg-slate-900/40" onClick={onClose} />
@@ -20,8 +22,13 @@ export function HospitalDetailsSheet({ hospital, onClose, onCall, onDirections }
                 <p className="text-sm text-slate-600">{hospital.address}</p>
                 <p className="text-sm text-slate-600">{hospital.phone}</p>
               </div>
-              <button type="button" className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-full border border-slate-200" onClick={onClose}>
-                ✕
+              <button
+                type="button"
+                className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-full border border-slate-200"
+                onClick={onClose}
+                aria-label={t('firstAidScreen.close')}
+              >
+                �
               </button>
             </div>
 
@@ -34,14 +41,25 @@ export function HospitalDetailsSheet({ hospital, onClose, onCall, onDirections }
             </div>
 
             <div className="grid grid-cols-3 gap-2">
-              <button type="button" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700" onClick={() => onCall(hospital.phone)}>
-                📞 Call
+              <button
+                type="button"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700"
+                onClick={() => onCall(hospital.phone)}
+              >
+                {t('firstAidScreen.call')}
               </button>
-              <button type="button" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700" onClick={() => onDirections(hospital)}>
-                🧭 Directions
+              <button
+                type="button"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 text-sm font-semibold text-slate-700"
+                onClick={() => onDirections(hospital)}
+              >
+                {t('firstAidScreen.directions')}
               </button>
-              <button type="button" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-600 text-sm font-semibold text-white">
-                ⭐ Save
+              <button
+                type="button"
+                className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-600 text-sm font-semibold text-white"
+              >
+                {t('firstAidScreen.save')}
               </button>
             </div>
           </>
@@ -50,4 +68,3 @@ export function HospitalDetailsSheet({ hospital, onClose, onCall, onDirections }
     </div>
   )
 }
-

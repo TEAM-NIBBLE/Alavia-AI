@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 
 export interface FirstAidAction {
   id: string
@@ -16,6 +17,7 @@ interface ActionCardAccordionProps {
 }
 
 export function ActionCardAccordion({ action, simpleMode, onSpeak }: ActionCardAccordionProps) {
+  const { t } = useTranslation()
   const [open, setOpen] = useState(!simpleMode)
   const [timerActive, setTimerActive] = useState(false)
 
@@ -24,7 +26,7 @@ export function ActionCardAccordion({ action, simpleMode, onSpeak }: ActionCardA
     setTimerActive(true)
     window.setTimeout(() => {
       setTimerActive(false)
-      onSpeak(`${action.title}. Timer completed.`)
+      onSpeak(t('firstAidScreen.timerCompleted', { title: action.title }))
     }, action.timerMinutes * 60 * 1000)
   }
 
@@ -55,7 +57,7 @@ export function ActionCardAccordion({ action, simpleMode, onSpeak }: ActionCardA
               onClick={() => onSpeak(`${action.title}. ${action.instruction}. ${action.details ?? ''}`)}
             >
               <span>🔊</span>
-              <span>Read Aloud</span>
+              <span>{t('firstAidScreen.readAloud')}</span>
             </button>
             {action.timerMinutes ? (
               <button
@@ -64,7 +66,7 @@ export function ActionCardAccordion({ action, simpleMode, onSpeak }: ActionCardA
                 onClick={startTimer}
               >
                 <span>⏱️</span>
-                <span>{timerActive ? 'Timer Running' : `Start ${action.timerMinutes} min timer`}</span>
+                <span>{timerActive ? t('firstAidScreen.timerRunning') : t('firstAidScreen.startTimer', { minutes: action.timerMinutes })}</span>
               </button>
             ) : null}
           </div>

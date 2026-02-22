@@ -1,9 +1,12 @@
+import { useTranslation } from 'react-i18next'
+
 interface ListMapToggleProps {
   mode: 'list' | 'map'
   onChange: (mode: 'list' | 'map') => void
 }
 
 export function ListMapToggle({ mode, onChange }: ListMapToggleProps) {
+  const { t } = useTranslation()
   return (
     <div className="inline-flex rounded-full border border-slate-200 bg-white p-1">
       <button
