@@ -132,7 +132,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const inputModeRef = useRef<InputMode>('tap')
   const silenceTimeoutRef = useRef<number | null>(null)
   const restartTimeoutRef = useRef<number | null>(null)
-  const voicesRef = useRef<SpeechSynthesisVoice[]>([])
   const conversationModeRef = useRef<'voice' | 'keyboard' | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
@@ -147,6 +146,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const consultationIdRef = useRef<number | null>(null)
   const consultationLanguageRef = useRef<LanguageCode>(normalizeLanguageCode(i18n.language || 'en'))
   const [currentAIMessage, setCurrentAIMessage] = useState<string | null>(null)
+  const rawAIMessageRef = useRef<string | null>(null)
   const [currentAIMessageSeq, setCurrentAIMessageSeq] = useState(0)
   const [consultationDetail, setConsultationDetail] = useState<ConsultationDetailResponse['consultation'] | null>(null)
   const [routedHospitals, setRoutedHospitals] = useState<HospitalListItem[]>([])
@@ -207,18 +207,186 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
   const localizeServerQuestion = (message: string) => {
     if (consultationLanguage === 'en') return message
+
+    // Detect if this message is already in a non-English language by checking
+    // for non-ASCII characters common in Yoruba/Hausa/Igbo/Pidgin loanwords.
+    // If the AI actually responded in the correct language, pass it through.
+    const nonAsciiRatio = (message.match(/[^\x00-\x7F]/g) || []).length / message.length
+    if (nonAsciiRatio > 0.05) return message // likely already in target language
+
     const msg = message.toLowerCase()
+
     // Client-side fallback localization for common triage questions
     // when the AI model responds in English despite language instructions
-    if (msg.includes('breath') || msg.includes('breathing')) return triageT('voice.questions.breathing')
-    if (msg.includes('faint') || msg.includes('confusion') || msg.includes('dizz')) return triageT('voice.questions.fainting')
-    if (msg.includes('worse') || msg.includes('getting worse') || msg.includes('worsen')) return triageT('voice.questions.worse')
-    if (msg.includes('weakness') || msg.includes('one sided') || msg.includes('slur')) return triageT('voice.questions.weakness')
+
+    // Breathing
+    if (msg.includes('breath') || msg.includes('breathing') || msg.includes('difficulty breathing'))
+      return triageT('voice.questions.breathing')
+    // Fainting / confusion / dizziness
+    if (msg.includes('faint') || msg.includes('confusion') || msg.includes('dizz') || msg.includes('lightheaded'))
+      return triageT('voice.questions.fainting')
+    // Getting worse
+    if (msg.includes('getting worse') || msg.includes('worsen') || msg.includes('progressing') || (msg.includes('worse') && msg.includes('symptom')))
+      return triageT('voice.questions.worse')
+    // Weakness / slurred speech / stroke
+    if (msg.includes('one-sided') || msg.includes('one sided') || msg.includes('slur') || (msg.includes('weakness') && (msg.includes('side') || msg.includes('arm') || msg.includes('leg'))))
+      return triageT('voice.questions.weakness')
+    // How long / duration
+    if (msg.includes('how long') || msg.includes('duration') || msg.includes('how many days') || msg.includes('how many hours') || msg.includes('since when'))
+      return triageT('voice.questions.howLong')
+    // Describe pain
+    if ((msg.includes('describe') && msg.includes('pain')) || (msg.includes('describe') && msg.includes('symptom')) || msg.includes('tell me about the pain'))
+      return triageT('voice.questions.describePain')
+    // Where is the pain
+    if ((msg.includes('where') && msg.includes('pain')) || (msg.includes('location') && msg.includes('pain')) || msg.includes('where does it hurt') || msg.includes('where exactly'))
+      return triageT('voice.questions.wherePain')
+    // Fever / temperature
+    if (msg.includes('fever') || msg.includes('temperature') || msg.includes('feeling hot'))
+      return triageT('voice.questions.fever')
+    // Allergies
+    if (msg.includes('allerg'))
+      return triageT('voice.questions.allergies')
+    // Current medication
+    if ((msg.includes('taking') && msg.includes('medication')) || (msg.includes('taking') && msg.includes('medicine')) || (msg.includes('currently') && msg.includes('medic')) || msg.includes('on any medication'))
+      return triageT('voice.questions.medication')
+    // Age
+    if (msg.includes('how old') || msg.includes('your age') || (msg.includes('age') && msg.includes('?')))
+      return triageT('voice.questions.age')
+    // Pain scale
+    if (msg.includes('scale') || msg.includes('1 to 10') || msg.includes('rate the pain') || msg.includes('rate your pain') || msg.includes('severity of'))
+      return triageT('voice.questions.painScale')
+    // Had before / previous
+    if (msg.includes('experienced this before') || msg.includes('happened before') || msg.includes('had this before') || msg.includes('first time'))
+      return triageT('voice.questions.hadBefore')
+    // Swelling
+    if (msg.includes('swell') || msg.includes('swollen'))
+      return triageT('voice.questions.swelling')
+    // Headache
+    if (msg.includes('headache') || msg.includes('head pain') || msg.includes('head ache'))
+      return triageT('voice.questions.headache')
+    // Nausea / vomiting
+    if (msg.includes('nausea') || msg.includes('nauseous') || msg.includes('vomit') || msg.includes('throwing up'))
+      return triageT('voice.questions.nausea')
+    // Eaten today
+    if (msg.includes('eaten') || (msg.includes('eat') && msg.includes('today')) || msg.includes('food today') || msg.includes('last meal'))
+      return triageT('voice.questions.eaten')
+    // Existing conditions / medical history
+    if (msg.includes('existing') || msg.includes('medical condition') || msg.includes('medical history') || msg.includes('pre-existing') || msg.includes('underlying'))
+      return triageT('voice.questions.conditions')
+    // When did symptoms start
+    if ((msg.includes('when') && msg.includes('start')) || msg.includes('when did') || msg.includes('onset'))
+      return triageT('voice.questions.whenStart')
+    // Pregnant
+    if (msg.includes('pregnant') || msg.includes('pregnancy'))
+      return triageT('voice.questions.pregnant')
+    // Chest pain
+    if (msg.includes('chest') && (msg.includes('pain') || msg.includes('tight') || msg.includes('pressure') || msg.includes('discomfort')))
+      return triageT('voice.questions.chestPain')
+    // Tell me more
+    if (msg.includes('tell me more') || msg.includes('more detail') || msg.includes('more about') || msg.includes('elaborate') || msg.includes('explain more') || msg.includes('provide more'))
+      return triageT('voice.questions.tellMore')
+    // Anyone with you
+    if (msg.includes('anyone with you') || msg.includes('someone with you') || msg.includes('alone') || msg.includes('somebody near'))
+      return triageT('voice.questions.anyoneWith')
+    // Taken medication for this
+    if ((msg.includes('taken') && msg.includes('medic')) || (msg.includes('taken') && msg.includes('anything for')) || msg.includes('self-medicated') || msg.includes('tried any'))
+      return triageT('voice.questions.takenMeds')
+    // Diarrhea
+    if (msg.includes('diarr') || msg.includes('loose stool') || msg.includes('watery stool') || msg.includes('running stomach'))
+      return triageT('voice.questions.diarrhea')
+    // Rash / skin
+    if (msg.includes('rash') || (msg.includes('skin') && (msg.includes('change') || msg.includes('itch') || msg.includes('bump'))))
+      return triageT('voice.questions.rash')
+    // Injury / accident
+    if (msg.includes('injur') || msg.includes('accident') || msg.includes('fell') || msg.includes('trauma') || msg.includes('hit your'))
+      return triageT('voice.questions.injury')
+    // Vision changes
+    if (msg.includes('vision') || msg.includes('blurr') || (msg.includes('eye') && (msg.includes('change') || msg.includes('problem'))) || msg.includes('seeing well'))
+      return triageT('voice.questions.visionChange')
+    // Bleeding
+    if (msg.includes('bleed') || msg.includes('blood'))
+      return triageT('voice.questions.bleeding')
+    // Appetite
+    if (msg.includes('appetite') || msg.includes('hungry') || msg.includes('loss of appetite'))
+      return triageT('voice.questions.appetite')
+    // Sleep
+    if (msg.includes('sleep') || msg.includes('insomnia') || msg.includes('rest well'))
+      return triageT('voice.questions.sleep')
+    // Urination
+    if (msg.includes('urinat') || msg.includes('urine') || msg.includes('peeing') || msg.includes('urinary'))
+      return triageT('voice.questions.urination')
+    // Cough
+    if (msg.includes('cough') || msg.includes('coughing'))
+      return triageT('voice.questions.cough')
+    // Soreness / body aches
+    if (msg.includes('sore') || msg.includes('body ache') || msg.includes('body pain') || msg.includes('muscle pain') || msg.includes('aching'))
+      return triageT('voice.questions.soreness')
+    // Chronic illness
+    if (msg.includes('diabet') || msg.includes('hypertension') || msg.includes('chronic') || msg.includes('blood pressure') || msg.includes('sugar level'))
+      return triageT('voice.questions.chronicIllness')
+    // Pain type (sharp, dull, burning, throbbing)
+    if ((msg.includes('type') && msg.includes('pain')) || msg.includes('sharp') || msg.includes('throbbing') || (msg.includes('burning') && msg.includes('pain')) || msg.includes('nature of'))
+      return triageT('voice.questions.painType')
+    // Thank you / acknowledgment
+    if (msg.includes('thank you') || msg.includes('thanks'))
+      return triageT('voice.questions.thankYou')
+    // Understood / I see
+    if (msg.includes('i understand') || msg.includes('i see') || msg.includes('understood') || msg.includes('got it'))
+      return triageT('voice.questions.understood')
+    // Noted
+    if (msg.includes('noted') || msg.includes('i have noted') || msg.includes('alright'))
+      return triageT('voice.questions.noted')
+    // Sorry / empathy
+    if (msg.includes('sorry to hear') || msg.includes('i\'m sorry') || msg.includes('that must'))
+      return triageT('voice.questions.sorry')
+    // Emergency warning
+    if (msg.includes('emergency') || msg.includes('seek help immediately') || msg.includes('call emergency') || msg.includes('urgent'))
+      return triageT('voice.questions.emergency')
+    // Follow up / more detail
+    if (msg.includes('more detail') || msg.includes('elaborate') || msg.includes('bit more') || msg.includes('explain further'))
+      return triageT('voice.questions.followUp')
+    // Weight
+    if (msg.includes('weight') || msg.includes('how much do you weigh') || msg.includes('how heavy'))
+      return triageT('voice.questions.weight')
+    // Gender
+    if (msg.includes('gender') || msg.includes('male or female') || msg.includes('man or woman') || msg.includes('sex'))
+      return triageT('voice.questions.gender')
+    // Water / hydration
+    if (msg.includes('water') || msg.includes('hydrat') || msg.includes('fluid') || msg.includes('drinking enough'))
+      return triageT('voice.questions.water')
+    // Travel
+    if (msg.includes('travel') || msg.includes('trip') || msg.includes('journey') || msg.includes('been abroad'))
+      return triageT('voice.questions.travel')
+    // Contact with sick person
+    if (msg.includes('contact') && (msg.includes('sick') || msg.includes('ill') || msg.includes('infected')))
+      return triageT('voice.questions.contactSick')
+    // Stress
+    if (msg.includes('stress') || msg.includes('anxi') || msg.includes('worried') || msg.includes('mental'))
+      return triageT('voice.questions.stress')
+    // Surgery
+    if (msg.includes('surgery') || msg.includes('operation') || msg.includes('surgical'))
+      return triageT('voice.questions.surgery')
+    // Smoking / alcohol
+    if (msg.includes('smok') || msg.includes('alcohol') || msg.includes('drink') || msg.includes('tobacco'))
+      return triageT('voice.questions.smoking')
+    // Family history
+    if (msg.includes('family') && (msg.includes('history') || msg.includes('condition') || msg.includes('similar') || msg.includes('anyone')))
+      return triageT('voice.questions.familyHistory')
+
+    // ===== CATCH-ALL =====
+    // If we got here, the message is in English and didn't match any pattern.
+    // Detect English by checking that text is mostly ASCII with question-like structure.
+    const asciiRatio = (msg.match(/[a-z]/g) || []).length / msg.length
+    if (asciiRatio > 0.7) {
+      // This is clearly English — replace with a generic translated "tell me more" 
+      return triageT('voice.questions.fallbackAsk')
+    }
+
     return message
   }
 
   const activeQuestion: TriageQuestion | null = currentAIMessage && !consultationComplete
-    ? { id: String(currentAIMessageSeq), question: localizeServerQuestion(currentAIMessage) }
+    ? { id: String(currentAIMessageSeq), question: localizeServerQuestion(rawAIMessageRef.current ?? currentAIMessage) }
     : null
 
   const speakText = async (text: string, onEnd?: () => void, languageOverride?: LanguageCode) => {
@@ -230,26 +398,14 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     const speechLanguage = languageOverride ?? consultationLanguageRef.current
     const speechLangConfig = LANGUAGE_CONFIG[speechLanguage] ?? LANGUAGE_CONFIG.en
 
-    // Race the backend TTS against a tight timeout so the user never waits long.
-    // If the API responds fast we play the high-quality audio; otherwise we
-    // instantly fall through to the browser's built-in speech synthesis.
-    const TTS_TIMEOUT_MS = 2500
-
     try {
-      const ttsPromise = speechApi.tts({
+      const tts = await speechApi.tts({
         text,
         language: speechLangConfig.apiLanguage,
         voice: getPreferredTtsVoice(),
       })
 
-      // Timeout sentinel – resolves to null after TTS_TIMEOUT_MS
-      const timeoutPromise = new Promise<null>((resolve) =>
-        setTimeout(() => resolve(null), TTS_TIMEOUT_MS)
-      )
-
-      const tts = await Promise.race([ttsPromise, timeoutPromise])
-
-      if (tts && tts.audio_url) {
+      if (tts.audio_url) {
         audioRef.current?.pause()
         if (audioRef.current && audioRef.current.src.startsWith('blob:')) {
           URL.revokeObjectURL(audioRef.current.src)
@@ -264,84 +420,20 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
         }
 
         audio.onerror = () => {
-          if ('speechSynthesis' in window) {
-            fallbackToSpeechSynthesis()
-          } else {
-            onEnd?.()
-          }
+          onEnd?.()
         }
 
         audio.play().catch(() => {
-          if ('speechSynthesis' in window) {
-            fallbackToSpeechSynthesis()
-          } else {
-            onEnd?.()
-          }
+          onEnd?.()
         })
         return
       }
-      // tts was null (timeout) or had no audio_url — fall through
     } catch {
-      // Network / API error — fall through to browser synthesis
+      // YarnGPT request failed — silently continue without voice
     }
 
-    // Instant zero-latency fallback
-    fallbackToSpeechSynthesis()
-
-    function fallbackToSpeechSynthesis() {
-      if (!('speechSynthesis' in window)) {
-        onEnd?.()
-        return
-      }
-
-      // Map app language codes → BCP47 tags (priority order per language)
-      const LANG_BCP47: Record<string, string[]> = {
-        en:  ['en-NG', 'en-GB', 'en-US', 'en'],
-        pcm: ['en-NG', 'en-GB', 'en-US', 'en'],   // Nigerian Pidgin – closest TTS is NG English
-        yo:  ['yo', 'yo-NG', 'en-NG', 'en'],        // Yoruba (rare – falls back to NG English)
-        ha:  ['ha', 'ha-NE', 'en-NG', 'en'],        // Hausa
-        ig:  ['ig', 'ig-NG', 'en-NG', 'en'],        // Igbo
-      }
-      const bcp47List = [speechLangConfig.speechLocale, ...(LANG_BCP47[speechLanguage] ?? ['en-NG', 'en'])]
-
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = bcp47List[0]   // primary preference
-      utterance.rate = 1.12  // Faster for reduced delay perception
-      utterance.pitch = 1.08  // warmer female pitch
-
-      // Female voice name fragments
-      const FEMALE_NAMES = [
-        'zira', 'samantha', 'victoria', 'karen', 'fiona', 'susan', 'moira',
-        'veena', 'tessa', 'female', 'woman', 'serena', 'siri', 'ava', 'allison',
-        'joanna', 'ivy', 'kimberly', 'kendra', 'salli', 'olivia', 'aria', 'hazel',
-      ]
-      const isFemale = (v: SpeechSynthesisVoice) =>
-        FEMALE_NAMES.some(n => v.name.toLowerCase().includes(n))
-
-      const voices = voicesRef.current
-      let chosen: SpeechSynthesisVoice | undefined
-
-      // 1. Female voice matching any of the preferred BCP47 tags (in priority order)
-      for (const tag of bcp47List) {
-        chosen = voices.find(v => isFemale(v) && v.lang.startsWith(tag.split('-')[0]))
-        if (chosen) break
-      }
-      // 2. Any voice (not necessarily female) matching the language
-      if (!chosen) {
-        for (const tag of bcp47List) {
-          chosen = voices.find(v => v.lang.startsWith(tag.split('-')[0]))
-          if (chosen) break
-        }
-      }
-      // 3. Any female English voice as last resort
-      if (!chosen) chosen = voices.find(v => isFemale(v) && v.lang.startsWith('en'))
-
-      if (chosen) utterance.voice = chosen
-
-      if (onEnd) utterance.onend = onEnd
-      window.speechSynthesis.cancel()
-      window.speechSynthesis.speak(utterance)
-    }
+    // If YarnGPT didn't return audio, just fire onEnd so the flow continues
+    onEnd?.()
   }
 
   const triggerHaptics = (pattern: number | number[]) => {
@@ -407,7 +499,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const langInstruction = (langName: string, langCode: LanguageCode) =>
     langCode === 'en'
       ? ''  // no prefix needed for English
-      : `[SYSTEM: You MUST respond ONLY in ${langName}. Do NOT use English in your response. The user speaks ${langName}.] `
+      : `[IMPORTANT SYSTEM INSTRUCTION: You are a medical triage assistant. You MUST respond ENTIRELY and ONLY in ${langName}. Every single word of your response must be in ${langName}. NEVER use English words, phrases, or sentences. The patient ONLY understands ${langName}. Translate everything including medical terms into ${langName}. This is mandatory.]\n`
 
   const startConsultation = (message: string) => {
     console.debug('[VoiceInteraction] startConsultation called', { message, mode: conversationModeRef.current })
@@ -424,10 +516,14 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       console.debug('[VoiceInteraction] consultationsApi.start response', res)
         const id = res.consultation_id
         updateConsultationId(id)
-        setCurrentAIMessage(res.message.content)
+        rawAIMessageRef.current = res.message.content
+        const localizedMsg = localizeServerQuestion(res.message.content)
+        // Brief pause so the "thinking" indicator is visible before the first question
+        await new Promise(r => setTimeout(r, 1200))
+        setCurrentAIMessage(localizedMsg)
         setCurrentAIMessageSeq(1)
         setAIResponse({ heading: t('voice.responseHeading'), summary: stripSystemPrefix(message) })
-        void speakText(res.message.content, undefined, startLang)
+        void speakText(localizedMsg, undefined, startLang)
       } catch (err) {
         setApiError(err instanceof Error ? err.message : 'Request failed')
       } finally {
@@ -458,11 +554,13 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       const isComplete = ['complete', 'completed', 'closed', 'ended'].includes(normalizedStatus)
       
       if (!isComplete && res.message.content) {
-        // Start audio playback immediately - don't wait
-        void speakText(res.message.content, undefined, sessionLang)
+        // Translate and start audio playback immediately
+        const localizedMsg = localizeServerQuestion(res.message.content)
+        void speakText(localizedMsg, undefined, sessionLang)
       }
       
-      setCurrentAIMessage(res.message.content)
+      rawAIMessageRef.current = res.message.content
+      setCurrentAIMessage(localizeServerQuestion(res.message.content))
       setCurrentAIMessageSeq(prev => prev + 1)
       if (res.severity) {
         const normalized = normalizeSeverity(res.severity)
@@ -485,12 +583,21 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
               summary: stripSystemPrefix(detail.consultation.summary),
             })
           }
+          const completeLang = consultationLanguageRef.current
+          const completeLangT = i18n.getFixedT(completeLang)
+          let sev: Severity | undefined
           if (detail.consultation.severity) {
-            const sev = normalizeSeverity(detail.consultation.severity)
+            sev = normalizeSeverity(detail.consultation.severity)
             if (sev) {
               setAIResponse(prev => prev ? { ...prev, severity: sev } : prev)
             }
           }
+          // Speak translated summary + first aid steps
+          const sevKey = sev ?? 'medium'
+          const summaryText = completeLangT(`voice.summaries.${sevKey}`) as string
+          const firstAidSteps = completeLangT(`voice.firstAid.${sevKey}`, { returnObjects: true }) as string[]
+          const spokenText = [summaryText, ...firstAidSteps].join('. ')
+          void speakText(spokenText, undefined, completeLang)
         } catch {
           // detail fetch failed — first aid will be empty
         }
@@ -522,6 +629,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
         consultationLanguageRef.current = nextLang
         setConsultationLanguage(nextLang)
         setCurrentAIMessage(null)
+        rawAIMessageRef.current = null
         setCurrentAIMessageSeq(0)
         setConsultationDetail(null)
         updateConsultationComplete(false)
@@ -784,10 +892,21 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   }, [sessionStatus])
 
   useEffect(() => {
-    if (consultationIdRef.current !== null && !consultationCompleteRef.current) return
+    // Always keep consultationLanguage in sync with the user's selected language,
+    // even during an active consultation, so switching languages mid-triage works.
     const nextLang = normalizeLanguageCode(localStorage.getItem('alavia.selectedLanguage') || i18n.language || selectedLanguage)
+    const prevLang = consultationLanguageRef.current
     consultationLanguageRef.current = nextLang
     setConsultationLanguage(nextLang)
+
+    // If language changed during an active consultation with a displayed question,
+    // re-translate the current question and re-speak it in the new language.
+    if (prevLang !== nextLang && rawAIMessageRef.current && consultationIdRef.current !== null && !consultationCompleteRef.current) {
+      const reTranslated = localizeServerQuestion(rawAIMessageRef.current)
+      setCurrentAIMessage(reTranslated)
+      setCurrentAIMessageSeq(prev => prev + 1) // bump seq to trigger re-speak
+      void speakText(reTranslated, undefined, nextLang)
+    }
   }, [i18n.language, selectedLanguage])
 
   useEffect(() => {
@@ -894,17 +1013,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       }
     }
     void queryPermission()
-  }, [])
-
-  // Load TTS voices (browsers fire voiceschanged when the list is ready)
-  useEffect(() => {
-    if (!('speechSynthesis' in window)) return
-    const loadVoices = () => {
-      voicesRef.current = window.speechSynthesis.getVoices()
-    }
-    loadVoices()
-    window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
-    return () => window.speechSynthesis.removeEventListener('voiceschanged', loadVoices)
   }, [])
 
   useEffect(() => {
@@ -1040,7 +1148,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                 }}
                 className="min-h-12 rounded-xl border border-red-300 bg-white px-4 text-xs font-bold uppercase tracking-wide text-red-700"
               >
-                Exit mode
+                {t('voice.exitMode')}
               </button>
             </div>
             {showEmergencyPanel && (
@@ -1068,8 +1176,8 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-xl px-6 pt-8 pb-32 relative z-10">
-        <div className="flex flex-col items-center gap-10 text-center">
+      <main className="mx-auto max-w-xl px-4 sm:px-6 pt-6 sm:pt-8 pb-28 sm:pb-32 relative z-10">
+        <div className="flex flex-col items-center gap-10 sm:gap-10 text-center">
 
           {/* Status Badge */}
           <motion.div
@@ -1107,7 +1215,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
           </motion.div>
 
           {/* Hero Section */}
-          <section className="relative flex flex-col items-center gap-10">
+          <section className="relative flex flex-col items-center gap-6 sm:gap-10">
             <div className="relative">
               <AnimatePresence>
                 {isListening && (
@@ -1269,7 +1377,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                   key="ai-response"
                   initial={{ opacity: 0, scale: 0.95, y: 20 }}
                   animate={{ opacity: 1, scale: 1, y: 0 }}
-                  className="triage-card border-none p-8 shadow-emerald-200/40 bg-gradient-to-br from-white to-emerald-50/30"
+                  className="triage-card border-none p-5 sm:p-8 shadow-emerald-200/40 bg-gradient-to-br from-white to-emerald-50/30"
                 >
                   <div className="mb-4 flex items-center justify-between">
                     <h3 className="text-2xl font-black text-slate-900 tracking-tighter">{aiResponse.heading}</h3>
@@ -1283,11 +1391,11 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                           const SeverityIcon = severityStyle[aiResponse.severity!].icon
                           return <SeverityIcon size={12} strokeWidth={3} />
                         })()}
-                        {aiResponse.severity}
+                        {t(`severity.${aiResponse.severity}`)}
                       </motion.span>
                     )}
                   </div>
-                  <p className="text-xl font-bold leading-snug text-slate-600 mb-8 tracking-tight">{aiResponse.summary}</p>
+                  <p className="text-lg sm:text-xl font-bold leading-snug text-slate-600 mb-6 sm:mb-8 tracking-tight">{aiResponse.summary}</p>
                   <motion.button
                     whileHover={{ scale: 1.02, translateY: -2 }}
                     whileTap={{ scale: 0.98 }}
@@ -1300,12 +1408,47 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                 </motion.div>
               )}
 
+              {/* Thinking indicator — shows while waiting for AI response / YarnGPT */}
+              <AnimatePresence>
+                {sessionStatus === 'processing' && consultationIdRef.current && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 16, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.3, ease: 'easeOut' }}
+                    className="flex items-center gap-4 rounded-2xl bg-slate-900 px-6 py-5 shadow-xl border border-white/10"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
+                      >
+                        <Loader2 size={20} className="text-emerald-400" />
+                      </motion.div>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-black text-white/90 tracking-tight">{t('voice.thinking')}</p>
+                      <div className="mt-1.5 flex gap-1.5">
+                        {[0, 1, 2].map((i) => (
+                          <motion.div
+                            key={i}
+                            animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.1, 0.8] }}
+                            transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
+                            className="h-2 w-2 rounded-full bg-emerald-400"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
               {aiResponse && activeQuestion && (
                 <motion.div
                   key={activeQuestion.id}
                   initial={{ opacity: 0, x: 40 }}
                   animate={{ opacity: 1, x: 0 }}
-                  className="triage-card bg-slate-900 p-8 text-white shadow-2xl shadow-slate-900/30 border-none relative overflow-hidden"
+                  className="triage-card bg-slate-900 p-5 sm:p-8 text-white shadow-2xl shadow-slate-900/30 border-none relative overflow-hidden"
                 >
                   <motion.div
                     animate={{
@@ -1340,7 +1483,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                           <span>{conversationMode === 'keyboard' ? t('voice.modeTap') : t('voice.typeSymptoms')}</span>
                         </motion.button>
                       </div>
-                      <h4 className="text-2xl font-black leading-tight tracking-tight text-emerald-400">
+                      <h4 className="text-xl sm:text-2xl font-black leading-tight tracking-tight text-emerald-400">
                         {activeQuestion.question}
                       </h4>
                     </div>
@@ -1356,7 +1499,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                           <Keyboard size={14} className="text-emerald-300" />
                           <span className="text-sm font-black text-emerald-300">{t('voice.typeYourAnswer')}</span>
                         </div>
-                        <p className="mt-2 text-xs font-semibold text-white/60">Use the keyboard panel at the bottom right →</p>
+                        <p className="mt-2 text-xs font-semibold text-white/60">{t('voice.keyboardPanelHint')}</p>
                       </motion.div>
                     ) : (
                     <div className={`rounded-2xl border px-4 py-3 transition-all ${
@@ -1411,7 +1554,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                   animate={{ opacity: 1, y: 0 }}
                   className="space-y-6"
                 >
-                  <div className="rounded-[32px] bg-white p-6 sm:p-8 shadow-2xl shadow-slate-200/50 border border-slate-50">
+                  <div className="rounded-[32px] bg-white p-5 sm:p-8 shadow-2xl shadow-slate-200/50 border border-slate-50">
                     <div className="flex items-center gap-3 mb-6">
                       <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-200">
                         <Activity size={20} />
@@ -1419,24 +1562,28 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                       <h3 className="text-xl font-black text-slate-800 tracking-tight">{t('voice.firstAidTitle')}</h3>
                     </div>
                     <div className="space-y-4">
-                      {(consultationDetail?.first_aid ?? []).map((step, idx) => (
-                        <motion.div
-                          key={idx}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: idx * 0.1 }}
-                          className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100/50"
-                        >
-                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-black text-white">
-                            {idx + 1}
-                          </span>
-                          <p className="text-sm font-bold text-slate-600 leading-relaxed">{step}</p>
-                        </motion.div>
-                      ))}
+                      {(() => {
+                        const sevKey = aiResponse?.severity ?? 'medium'
+                        const steps = t(`voice.firstAid.${sevKey}`, { returnObjects: true }) as string[]
+                        return (Array.isArray(steps) ? steps : []).map((step, idx) => (
+                          <motion.div
+                            key={idx}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: idx * 0.1 }}
+                            className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100/50"
+                          >
+                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-black text-white">
+                              {idx + 1}
+                            </span>
+                            <p className="text-sm font-bold text-slate-600 leading-relaxed">{step}</p>
+                          </motion.div>
+                        ))
+                      })()}
                     </div>
                   </div>
 
-                  <div className="rounded-[32px] bg-slate-900 p-8 shadow-2xl shadow-slate-900/20 text-white overflow-hidden relative">
+                  <div className="rounded-[32px] bg-slate-900 p-5 sm:p-8 shadow-2xl shadow-slate-900/20 text-white overflow-hidden relative">
                     <motion.div
                       animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
                       transition={{ duration: 5, repeat: Infinity }}
@@ -1446,7 +1593,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                     <div className="relative z-10">
                       <div className="flex items-center justify-between mb-4">
                         <div>
-                          <h3 className="text-2xl font-black mb-1 tracking-tight">{t('voice.routingTitle')}</h3>
+                          <h3 className="text-lg sm:text-2xl font-black mb-1 tracking-tight">{t('voice.routingTitle')}</h3>
                           <p className="text-sm font-bold text-white/50">{t('voice.routingDesc')}</p>
                         </div>
                         <div className="h-12 w-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
@@ -1576,7 +1723,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                                   <div className="relative h-3 w-3 rounded-full bg-blue-500 border-[2.5px] border-white shadow-[0_0_12px_rgba(59,130,246,0.9)]" />
                                   {/* Label */}
                                   <span className="absolute left-5 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-blue-500/90 px-2 py-0.5 text-[8px] font-black text-white shadow-lg backdrop-blur-sm">
-                                    You
+                                    {t('voice.mapYou')}
                                   </span>
                                 </div>
                               </div>
@@ -1616,15 +1763,15 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                               <div className="flex items-center gap-3 rounded-lg bg-black/50 px-3 py-1.5 backdrop-blur-md border border-white/5">
                                 <div className="flex items-center gap-1.5">
                                   <div className="h-2 w-2 rounded-full bg-blue-500 border border-white/60" />
-                                  <span className="text-[8px] font-bold text-white/70">You</span>
+                                  <span className="text-[8px] font-bold text-white/70">{t('voice.mapYou')}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                   <div className="h-2 w-2 rounded-full bg-emerald-500 border border-white/60" />
-                                  <span className="text-[8px] font-bold text-white/70">Hospital</span>
+                                  <span className="text-[8px] font-bold text-white/70">{t('voice.mapHospital')}</span>
                                 </div>
                                 <div className="flex items-center gap-1.5">
                                   <div className="h-0.5 w-4 border-t border-dashed border-emerald-400/60" />
-                                  <span className="text-[8px] font-bold text-white/70">Route</span>
+                                  <span className="text-[8px] font-bold text-white/70">{t('voice.mapRoute')}</span>
                                 </div>
                               </div>
                               <span className="rounded-lg bg-black/50 px-2 py-1 text-[7px] font-bold text-white/40 backdrop-blur-md border border-white/5">
@@ -1648,28 +1795,28 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
                         {!isHospitalsLoading && !hospitalsError && displayHospitals.length === 0 && (
                           <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-sm font-bold text-white/70">
-                            No hospital results available right now.
+                            {t('voice.noHospitals')}
                           </div>
                         )}
 
                         {!isHospitalsLoading && !hospitalsError && displayHospitals.map((hospital, index) => {
                           const distanceLabel = hospital.effectiveDistanceKm != null
                             ? `${hospital.effectiveDistanceKm} km away`
-                            : 'Distance unavailable'
+                            : t('voice.distanceUnavailable')
 
                           return (
                             <motion.div
                               key={hospital.id}
                               whileHover={{ y: -4 }}
-                              className="group flex flex-col p-5 rounded-[28px] bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
+                              className="group flex flex-col p-4 sm:p-5 rounded-[28px] bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
                             >
-                              <div className="flex items-start justify-between mb-4 gap-3">
+                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-3">
                                 <div className="flex items-center gap-4">
-                                  <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
+                                  <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
                                     <Navigation size={20} />
                                   </div>
                                   <div>
-                                    <h5 className="font-black text-base text-white tracking-tight leading-tight">{hospital.name}</h5>
+                                    <h5 className="font-black text-sm sm:text-base text-white tracking-tight leading-tight">{hospital.name}</h5>
                                     <div className="flex items-center gap-3 text-[10px] font-bold text-emerald-400 mt-1 flex-wrap">
                                       <span className="uppercase tracking-wider">
                                         {hospital.is_public ? t('voice.hospitals.public') : t('voice.hospitals.private')}
@@ -1744,6 +1891,26 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                               {hospital.address && (
                                 <p className="mt-3 text-[11px] font-semibold text-white/50">{hospital.address}</p>
                               )}
+
+                              {/* Get Directions button */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (!hospital.lat || !hospital.lng) return
+                                  const origin = userLocation
+                                    ? `&origin=${userLocation.lat},${userLocation.lng}`
+                                    : ''
+                                  window.open(
+                                    `https://www.google.com/maps/dir/?api=1${origin}&destination=${hospital.lat},${hospital.lng}&destination_place_id=&travelmode=driving`,
+                                    '_blank'
+                                  )
+                                }}
+                                disabled={!hospital.lat || !hospital.lng}
+                                className="mt-4 w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 py-3 text-[11px] font-black text-emerald-400 uppercase tracking-widest transition-all hover:bg-emerald-500/30 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                              >
+                                <Navigation size={14} />
+                                <span>{t('voice.hospitals.getDirections')}</span>
+                              </button>
                             </motion.div>
                           )
                         })}
@@ -1754,7 +1921,13 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                         onClick={() => {
                           const first = routedHospitals[0]
                           if (!first?.lat || !first?.lng) return
-                          window.open(`https://www.google.com/maps/search/?api=1&query=${first.lat},${first.lng}`, '_blank')
+                          const origin = userLocation
+                            ? `&origin=${userLocation.lat},${userLocation.lng}`
+                            : ''
+                          window.open(
+                            `https://www.google.com/maps/dir/?api=1${origin}&destination=${first.lat},${first.lng}&travelmode=driving`,
+                            '_blank'
+                          )
                         }}
                         disabled={!routedHospitals[0]?.lat || !routedHospitals[0]?.lng}
                         className="w-full mt-8 flex items-center justify-center gap-3 rounded-2xl bg-emerald-500 py-5 text-xs font-black text-white shadow-2xl shadow-emerald-500/40 transition-all hover:bg-emerald-400 uppercase tracking-widest border border-emerald-400/20 disabled:opacity-50 disabled:cursor-not-allowed"
@@ -1873,7 +2046,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       </AnimatePresence>
 
       {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-white/50 bg-white/40 py-5 backdrop-blur-xl">
+      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-white/50 bg-white/40 py-3 sm:py-5 backdrop-blur-xl">
         <div className="flex flex-col items-center justify-center gap-1.5">
           <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400">
             {t('voice.footer')}
@@ -1912,7 +2085,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
             animate={{ opacity: 1, y: 0, x: 0 }}
             exit={{ opacity: 0, y: 100, x: 100 }}
             transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed bottom-20 right-6 z-50 w-[400px] max-w-[calc(100vw-3rem)]"
+            className="fixed bottom-20 right-4 left-4 sm:left-auto sm:right-6 z-50 sm:w-[400px] sm:max-w-[calc(100vw-3rem)]"
           >
             <div className="rounded-2xl border-2 border-emerald-500/50 bg-slate-900 p-5 shadow-2xl shadow-emerald-500/20">
               <div className="mb-3 flex items-center justify-between">
