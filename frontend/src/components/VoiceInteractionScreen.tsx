@@ -5,7 +5,6 @@ import {
   Mic,
   Keyboard,
   Send,
-  X,
   AlertTriangle,
   PhoneCall,
   MessageCircle,
@@ -146,7 +145,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const [consultationComplete, setConsultationComplete] = useState(false)
   const consultationCompleteRef = useRef(false)
   const [apiError, setApiError] = useState<string | null>(null)
-  const [showKeyboardPanel, setShowKeyboardPanel] = useState(false)
   const [showLanguagePanel, setShowLanguagePanel] = useState(false)
   const [showUserDropdown, setShowUserDropdown] = useState(false)
   const [showProfile, setShowProfile] = useState(false)
@@ -154,6 +152,12 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const [showEmergencyPanel, setShowEmergencyPanel] = useState(false)
   const [isChangingLanguage, setIsChangingLanguage] = useState(false)
   const [textInput, setTextInput] = useState('')
+
+  const submitInlineKeyboardReply = () => {
+    if (!textInput.trim()) return
+    submitInputIntoFlow(textInput, 'keyboard')
+    setTextInput('')
+  }
 
   const selectedLanguage = (i18n.language || 'en').toLowerCase()
 
@@ -645,10 +649,9 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     if (aiResponse && activeQuestion && lastSpokenQuestionRef.current !== activeQuestion.id) {
       lastSpokenQuestionRef.current = activeQuestion.id
       if (conversationModeRef.current === 'keyboard') {
-        // keyboard mode: speak question then reopen keyboard panel
+        // keyboard mode: speak question only; typing happens inline in triage card
         setTimeout(() => {
-          speakText(activeQuestion.question)
-          setShowKeyboardPanel(true)
+          void speakText(activeQuestion.question)
         }, 800)
       } else {
         // voice mode: speak question then auto-start mic
@@ -1038,9 +1041,18 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                   <div className="relative z-10">
                     <div className="mb-4 flex items-center justify-between">
                       <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400">{t('voice.triageQuestion')}</span>
-                      <span className="rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-bold text-white/80 backdrop-blur-sm border border-white/10">
-                        {t('voice.triageQuestion')}
-                      </span>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          const nextMode = conversationMode === 'keyboard' ? 'voice' : 'keyboard'
+                          conversationModeRef.current = nextMode
+                          setConversationMode(nextMode)
+                          if (nextMode === 'keyboard') stopListening()
+                        }}
+                        className="inline-flex min-h-12 items-center rounded-full bg-white/10 px-3 py-1.5 text-[10px] font-bold uppercase tracking-wider text-white/80 backdrop-blur-sm border border-white/10"
+                      >
+                        {conversationMode === 'keyboard' ? t('voice.modeTap') : t('voice.typeSymptoms')}
+                      </button>
                     </div>
                     <h4 className="text-2xl font-black leading-tight mb-8 tracking-tight text-emerald-400">
                       {activeQuestion.question}
@@ -1048,93 +1060,69 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
                     {/* Response indicator — keyboard or mic depending on conversation mode */}
                     {conversationMode === 'keyboard' ? (
-                      <div
-                        onClick={() => setShowKeyboardPanel(true)}
-                        className={`flex items-center gap-3 rounded-2xl px-5 py-4 transition-all cursor-pointer ${
-                          showKeyboardPanel
-                            ? 'bg-emerald-500/20 border border-emerald-500/40'
-                            : sessionStatus === 'processing'
-                              ? 'bg-white/5 border border-white/10'
-                              : 'bg-white/10 border border-white/20 hover:bg-white/15'
-                        }`}
-                      >
+                      <div className="rounded-2xl border border-white/20 bg-white/10 px-3 py-3 backdrop-blur-sm">
+                        <div className="flex items-center gap-2">
+                          <Keyboard size={16} className="text-emerald-300" />
+                          <input
+                            value={textInput}
+                            onChange={(e) => setTextInput(e.target.value)}
+                            onKeyDown={(e) => {
+                              if (e.key === 'Enter') submitInlineKeyboardReply()
+                            }}
+                            placeholder={t('voice.inputPlaceholder')}
+                            className="h-12 flex-1 rounded-xl border border-white/20 bg-black/20 px-3 text-sm font-semibold text-white placeholder:text-white/40 outline-none focus:border-emerald-400"
+                          />
+                          <button
+                            type="button"
+                            onClick={submitInlineKeyboardReply}
+                            disabled={!textInput.trim() || sessionStatus === 'processing'}
+                            className="inline-flex h-12 w-12 items-center justify-center rounded-xl bg-emerald-500 text-white disabled:opacity-50"
+                          >
+                            {sessionStatus === 'processing' ? <Loader2 size={16} className="animate-spin" /> : <Send size={16} />}
+                          </button>
+                        </div>
+                      </div>
+                    ) : (
+                    <div className={`rounded-2xl border px-4 py-3 transition-all ${
+                      isListening
+                        ? 'bg-emerald-500/20 border-emerald-500/40'
+                        : sessionStatus === 'processing'
+                          ? 'bg-white/5 border-white/10'
+                          : 'bg-white/10 border-white/20'
+                    }`}>
+                      <div className="flex items-center gap-3">
                         <motion.div
-                          animate={showKeyboardPanel ? { scale: [1, 1.15, 1] } : {}}
-                          transition={{ repeat: Infinity, duration: 1.4 }}
+                          animate={isListening ? { scale: [1, 1.25, 1] } : {}}
+                          transition={{ repeat: Infinity, duration: 1.2 }}
                         >
                           {sessionStatus === 'processing'
                             ? <Loader2 size={18} className="animate-spin text-white/40" />
-                            : <Keyboard size={18} className={showKeyboardPanel ? 'text-emerald-400' : 'text-white/30'} />
+                            : isListening
+                              ? <Mic size={18} className="text-emerald-400" />
+                              : <MicOff size={18} className="text-white/30" />
                           }
                         </motion.div>
-                        <span className={`flex-1 text-sm font-bold truncate ${
-                          showKeyboardPanel && textInput ? 'text-white' : showKeyboardPanel ? 'text-emerald-300' : 'text-white/40'
+                        <span className={`flex-1 text-sm font-bold ${
+                          isListening ? 'text-emerald-300' : 'text-white/40'
                         }`}>
                           {sessionStatus === 'processing'
                             ? t('voice.status.processing')
-                            : showKeyboardPanel && textInput
-                              ? textInput
-                              : showKeyboardPanel
-                                ? t('voice.inputPlaceholder')
-                                : t('voice.typeSymptoms')
+                            : isListening
+                              ? t('voice.status.listening')
+                              : t('voice.listeningHint')
                           }
                         </span>
-                        {showKeyboardPanel && textInput && (
-                          <div className="flex items-end gap-0.5">
-                            {[0, 1, 2].map(i => (
-                              <motion.span
-                                key={i}
-                                className="w-1 rounded-full bg-emerald-400"
-                                animate={{ height: ['4px', '14px', '4px'] }}
-                                transition={{ repeat: Infinity, duration: 0.6, delay: i * 0.18 }}
-                                style={{ display: 'inline-block' }}
-                              />
-                            ))}
-                          </div>
-                        )}
+                        {isListening ? (
+                          <button
+                            type="button"
+                            onClick={stopListening}
+                            className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-red-300/50 bg-red-500/20 px-3 text-xs font-black uppercase tracking-wider text-red-100"
+                          >
+                            <MicOff size={14} />
+                            <span>{t('voice.stop')}</span>
+                          </button>
+                        ) : null}
                       </div>
-                    ) : (
-                    <div className={`flex items-center gap-3 rounded-2xl px-5 py-4 transition-all ${
-                      isListening
-                        ? 'bg-emerald-500/20 border border-emerald-500/40'
-                        : sessionStatus === 'processing'
-                          ? 'bg-white/5 border border-white/10'
-                          : 'bg-white/10 border border-white/20'
-                    }`}>
-                      <motion.div
-                        animate={isListening ? { scale: [1, 1.25, 1] } : {}}
-                        transition={{ repeat: Infinity, duration: 1.2 }}
-                      >
-                        {sessionStatus === 'processing'
-                          ? <Loader2 size={18} className="animate-spin text-white/40" />
-                          : isListening
-                            ? <Mic size={18} className="text-emerald-400" />
-                            : <MicOff size={18} className="text-white/30" />
-                        }
-                      </motion.div>
-                      <span className={`flex-1 text-sm font-bold ${
-                        isListening ? 'text-emerald-300' : 'text-white/40'
-                      }`}>
-                        {sessionStatus === 'processing'
-                          ? t('voice.status.processing')
-                          : isListening
-                            ? t('voice.status.listening')
-                            : t('voice.listeningHint')
-                        }
-                      </span>
-                      {isListening && (
-                        <div className="flex items-end gap-0.5">
-                          {[0, 1, 2, 3].map(i => (
-                            <motion.span
-                              key={i}
-                              className="w-1 rounded-full bg-emerald-400"
-                              animate={{ height: ['5px', '16px', '5px'] }}
-                              transition={{ repeat: Infinity, duration: 0.7, delay: i * 0.15 }}
-                              style={{ display: 'inline-block' }}
-                            />
-                          ))}
-                        </div>
-                      )}
                     </div>
                     )}
 
@@ -1295,19 +1283,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
         </div>
       </main>
 
-      {/* Action Buttons */}
-      <div className="fixed bottom-20 right-4 z-40 flex flex-col gap-5">
-        <motion.button
-          whileHover={{ scale: 1.1, rotate: -5 }}
-          whileTap={{ scale: 0.9 }}
-          onClick={() => setShowKeyboardPanel(true)}
-          className="flex h-16 w-16 items-center justify-center rounded-[24px] bg-white text-slate-800 shadow-2xl shadow-slate-200/80 transition-all border border-slate-50"
-        >
-          <Keyboard size={30} strokeWidth={2.5} />
-        </motion.button>
-      </div>
-
-      {/* Keyboard Panel */}
       <AnimatePresence>
         {showLanguagePanel && (
           <div className="fixed inset-0 z-[110]">
@@ -1405,69 +1380,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                 {t('auth.logout')}
               </button>
             </motion.div>
-          </div>
-        )}
-      </AnimatePresence>
-
-      <AnimatePresence>
-        {showKeyboardPanel && (
-          <div className="fixed inset-0 z-[100] flex items-end">
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              onClick={() => setShowKeyboardPanel(false)}
-              className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl"
-            />
-            <motion.section
-              initial={{ y: "100%" }}
-              animate={{ y: 0 }}
-              exit={{ y: "100%" }}
-              transition={{ type: "spring", damping: 28, stiffness: 220 }}
-              className="relative w-full rounded-t-[48px] bg-white p-12 pb-20 shadow-[0_-30px_60px_-15px_rgba(0,0,0,0.4)]"
-            >
-              <div className="mx-auto mb-10 h-1.5 w-20 rounded-full bg-slate-100" />
-              <div className="mb-10 flex items-center justify-between px-2">
-                <h3 className="text-3xl font-black text-slate-900 tracking-tight">{t('voice.typeSymptoms')}</h3>
-                <motion.button
-                  whileTap={{ scale: 0.9 }}
-                  onClick={() => setShowKeyboardPanel(false)}
-                  className="rounded-2xl bg-slate-50 p-4 text-slate-400 hover:text-slate-800 hover:bg-slate-100 transition-colors"
-                >
-                  <X size={28} />
-                </motion.button>
-              </div>
-              <div className="flex gap-5">
-                <div className="relative flex-1">
-                  <input
-                    autoFocus
-                    placeholder={t('voice.inputPlaceholder')}
-                    className="h-[80px] w-full rounded-3xl border-4 border-slate-50 bg-slate-50 px-8 text-2xl font-bold text-slate-900 outline-none transition-all placeholder:text-slate-300 focus:border-emerald-500/20 focus:bg-white focus:ring-4 focus:ring-emerald-500/5"
-                    value={textInput}
-                    onChange={(e) => setTextInput(e.target.value)}
-                    onKeyDown={(e) => {
-                      if (e.key === 'Enter') {
-                        submitInputIntoFlow(textInput, 'keyboard')
-                        setTextInput('')
-                        setShowKeyboardPanel(false)
-                      }
-                    }}
-                  />
-                </div>
-                <motion.button
-                  whileTap={{ scale: 0.95 }}
-                  disabled={!textInput.trim()}
-                  onClick={() => {
-                    submitInputIntoFlow(textInput, 'keyboard')
-                    setTextInput('')
-                    setShowKeyboardPanel(false)
-                  }}
-                  className="flex h-[80px] w-24 items-center justify-center rounded-3xl bg-emerald-600 font-black text-white shadow-2xl shadow-emerald-200 transition-all hover:bg-emerald-700 disabled:opacity-40 disabled:grayscale"
-                >
-                  <Send size={32} />
-                </motion.button>
-              </div>
-            </motion.section>
           </div>
         )}
       </AnimatePresence>
