@@ -132,7 +132,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const inputModeRef = useRef<InputMode>('tap')
   const silenceTimeoutRef = useRef<number | null>(null)
   const restartTimeoutRef = useRef<number | null>(null)
-  const voicesRef = useRef<SpeechSynthesisVoice[]>([])
   const conversationModeRef = useRef<'voice' | 'keyboard' | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
 
@@ -231,26 +230,14 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     const speechLanguage = languageOverride ?? consultationLanguageRef.current
     const speechLangConfig = LANGUAGE_CONFIG[speechLanguage] ?? LANGUAGE_CONFIG.en
 
-    // Race the backend TTS against a tight timeout so the user never waits long.
-    // If the API responds fast we play the high-quality audio; otherwise we
-    // instantly fall through to the browser's built-in speech synthesis.
-    const TTS_TIMEOUT_MS = 2500
-
     try {
-      const ttsPromise = speechApi.tts({
+      const tts = await speechApi.tts({
         text,
         language: speechLangConfig.apiLanguage,
         voice: getPreferredTtsVoice(),
       })
 
-      // Timeout sentinel – resolves to null after TTS_TIMEOUT_MS
-      const timeoutPromise = new Promise<null>((resolve) =>
-        setTimeout(() => resolve(null), TTS_TIMEOUT_MS)
-      )
-
-      const tts = await Promise.race([ttsPromise, timeoutPromise])
-
-      if (tts && tts.audio_url) {
+      if (tts.audio_url) {
         audioRef.current?.pause()
         if (audioRef.current && audioRef.current.src.startsWith('blob:')) {
           URL.revokeObjectURL(audioRef.current.src)
@@ -265,84 +252,20 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
         }
 
         audio.onerror = () => {
-          if ('speechSynthesis' in window) {
-            fallbackToSpeechSynthesis()
-          } else {
-            onEnd?.()
-          }
+          onEnd?.()
         }
 
         audio.play().catch(() => {
-          if ('speechSynthesis' in window) {
-            fallbackToSpeechSynthesis()
-          } else {
-            onEnd?.()
-          }
+          onEnd?.()
         })
         return
       }
-      // tts was null (timeout) or had no audio_url — fall through
     } catch {
-      // Network / API error — fall through to browser synthesis
+      // YarnGPT request failed — silently continue without voice
     }
 
-    // Instant zero-latency fallback
-    fallbackToSpeechSynthesis()
-
-    function fallbackToSpeechSynthesis() {
-      if (!('speechSynthesis' in window)) {
-        onEnd?.()
-        return
-      }
-
-      // Map app language codes → BCP47 tags (priority order per language)
-      const LANG_BCP47: Record<string, string[]> = {
-        en:  ['en-NG', 'en-GB', 'en-US', 'en'],
-        pcm: ['en-NG', 'en-GB', 'en-US', 'en'],   // Nigerian Pidgin – closest TTS is NG English
-        yo:  ['yo', 'yo-NG', 'en-NG', 'en'],        // Yoruba (rare – falls back to NG English)
-        ha:  ['ha', 'ha-NE', 'en-NG', 'en'],        // Hausa
-        ig:  ['ig', 'ig-NG', 'en-NG', 'en'],        // Igbo
-      }
-      const bcp47List = [speechLangConfig.speechLocale, ...(LANG_BCP47[speechLanguage] ?? ['en-NG', 'en'])]
-
-      const utterance = new SpeechSynthesisUtterance(text)
-      utterance.lang = bcp47List[0]   // primary preference
-      utterance.rate = 1.12  // Faster for reduced delay perception
-      utterance.pitch = 1.08  // warmer female pitch
-
-      // Female voice name fragments
-      const FEMALE_NAMES = [
-        'zira', 'samantha', 'victoria', 'karen', 'fiona', 'susan', 'moira',
-        'veena', 'tessa', 'female', 'woman', 'serena', 'siri', 'ava', 'allison',
-        'joanna', 'ivy', 'kimberly', 'kendra', 'salli', 'olivia', 'aria', 'hazel',
-      ]
-      const isFemale = (v: SpeechSynthesisVoice) =>
-        FEMALE_NAMES.some(n => v.name.toLowerCase().includes(n))
-
-      const voices = voicesRef.current
-      let chosen: SpeechSynthesisVoice | undefined
-
-      // 1. Female voice matching any of the preferred BCP47 tags (in priority order)
-      for (const tag of bcp47List) {
-        chosen = voices.find(v => isFemale(v) && v.lang.startsWith(tag.split('-')[0]))
-        if (chosen) break
-      }
-      // 2. Any voice (not necessarily female) matching the language
-      if (!chosen) {
-        for (const tag of bcp47List) {
-          chosen = voices.find(v => v.lang.startsWith(tag.split('-')[0]))
-          if (chosen) break
-        }
-      }
-      // 3. Any female English voice as last resort
-      if (!chosen) chosen = voices.find(v => isFemale(v) && v.lang.startsWith('en'))
-
-      if (chosen) utterance.voice = chosen
-
-      if (onEnd) utterance.onend = onEnd
-      window.speechSynthesis.cancel()
-      window.speechSynthesis.speak(utterance)
-    }
+    // If YarnGPT didn't return audio, just fire onEnd so the flow continues
+    onEnd?.()
   }
 
   const triggerHaptics = (pattern: number | number[]) => {
@@ -897,17 +820,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     void queryPermission()
   }, [])
 
-  // Load TTS voices (browsers fire voiceschanged when the list is ready)
-  useEffect(() => {
-    if (!('speechSynthesis' in window)) return
-    const loadVoices = () => {
-      voicesRef.current = window.speechSynthesis.getVoices()
-    }
-    loadVoices()
-    window.speechSynthesis.addEventListener('voiceschanged', loadVoices)
-    return () => window.speechSynthesis.removeEventListener('voiceschanged', loadVoices)
-  }, [])
-
   useEffect(() => {
     if (aiResponse && activeQuestion && lastSpokenQuestionRef.current !== activeQuestion.id) {
       lastSpokenQuestionRef.current = activeQuestion.id
@@ -1300,6 +1212,41 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                   </motion.button>
                 </motion.div>
               )}
+
+              {/* Thinking indicator — shows while waiting for AI response / YarnGPT */}
+              <AnimatePresence>
+                {sessionStatus === 'processing' && consultationIdRef.current && (
+                  <motion.div
+                    initial={{ opacity: 0, y: 16, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                    transition={{ duration: 0.3, ease: 'easeOut' }}
+                    className="flex items-center gap-4 rounded-2xl bg-slate-900 px-6 py-5 shadow-xl border border-white/10"
+                  >
+                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20">
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
+                      >
+                        <Loader2 size={20} className="text-emerald-400" />
+                      </motion.div>
+                    </div>
+                    <div className="flex-1">
+                      <p className="text-sm font-black text-white/90 tracking-tight">Alavia is thinking</p>
+                      <div className="mt-1.5 flex gap-1.5">
+                        {[0, 1, 2].map((i) => (
+                          <motion.div
+                            key={i}
+                            animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.1, 0.8] }}
+                            transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
+                            className="h-2 w-2 rounded-full bg-emerald-400"
+                          />
+                        ))}
+                      </div>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
 
               {aiResponse && activeQuestion && (
                 <motion.div
