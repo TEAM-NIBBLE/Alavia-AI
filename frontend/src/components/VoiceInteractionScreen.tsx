@@ -206,18 +206,186 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
   const localizeServerQuestion = (message: string) => {
     if (consultationLanguage === 'en') return message
+
+    // Detect if this message is already in a non-English language by checking
+    // for non-ASCII characters common in Yoruba/Hausa/Igbo/Pidgin loanwords.
+    // If the AI actually responded in the correct language, pass it through.
+    const nonAsciiRatio = (message.match(/[^\x00-\x7F]/g) || []).length / message.length
+    if (nonAsciiRatio > 0.05) return message // likely already in target language
+
     const msg = message.toLowerCase()
+
     // Client-side fallback localization for common triage questions
     // when the AI model responds in English despite language instructions
-    if (msg.includes('breath') || msg.includes('breathing')) return triageT('voice.questions.breathing')
-    if (msg.includes('faint') || msg.includes('confusion') || msg.includes('dizz')) return triageT('voice.questions.fainting')
-    if (msg.includes('worse') || msg.includes('getting worse') || msg.includes('worsen')) return triageT('voice.questions.worse')
-    if (msg.includes('weakness') || msg.includes('one sided') || msg.includes('slur')) return triageT('voice.questions.weakness')
+
+    // Breathing
+    if (msg.includes('breath') || msg.includes('breathing') || msg.includes('difficulty breathing'))
+      return triageT('voice.questions.breathing')
+    // Fainting / confusion / dizziness
+    if (msg.includes('faint') || msg.includes('confusion') || msg.includes('dizz') || msg.includes('lightheaded'))
+      return triageT('voice.questions.fainting')
+    // Getting worse
+    if (msg.includes('getting worse') || msg.includes('worsen') || msg.includes('progressing') || (msg.includes('worse') && msg.includes('symptom')))
+      return triageT('voice.questions.worse')
+    // Weakness / slurred speech / stroke
+    if (msg.includes('one-sided') || msg.includes('one sided') || msg.includes('slur') || (msg.includes('weakness') && (msg.includes('side') || msg.includes('arm') || msg.includes('leg'))))
+      return triageT('voice.questions.weakness')
+    // How long / duration
+    if (msg.includes('how long') || msg.includes('duration') || msg.includes('how many days') || msg.includes('how many hours') || msg.includes('since when'))
+      return triageT('voice.questions.howLong')
+    // Describe pain
+    if ((msg.includes('describe') && msg.includes('pain')) || (msg.includes('describe') && msg.includes('symptom')) || msg.includes('tell me about the pain'))
+      return triageT('voice.questions.describePain')
+    // Where is the pain
+    if ((msg.includes('where') && msg.includes('pain')) || (msg.includes('location') && msg.includes('pain')) || msg.includes('where does it hurt') || msg.includes('where exactly'))
+      return triageT('voice.questions.wherePain')
+    // Fever / temperature
+    if (msg.includes('fever') || msg.includes('temperature') || msg.includes('feeling hot'))
+      return triageT('voice.questions.fever')
+    // Allergies
+    if (msg.includes('allerg'))
+      return triageT('voice.questions.allergies')
+    // Current medication
+    if ((msg.includes('taking') && msg.includes('medication')) || (msg.includes('taking') && msg.includes('medicine')) || (msg.includes('currently') && msg.includes('medic')) || msg.includes('on any medication'))
+      return triageT('voice.questions.medication')
+    // Age
+    if (msg.includes('how old') || msg.includes('your age') || (msg.includes('age') && msg.includes('?')))
+      return triageT('voice.questions.age')
+    // Pain scale
+    if (msg.includes('scale') || msg.includes('1 to 10') || msg.includes('rate the pain') || msg.includes('rate your pain') || msg.includes('severity of'))
+      return triageT('voice.questions.painScale')
+    // Had before / previous
+    if (msg.includes('experienced this before') || msg.includes('happened before') || msg.includes('had this before') || msg.includes('first time'))
+      return triageT('voice.questions.hadBefore')
+    // Swelling
+    if (msg.includes('swell') || msg.includes('swollen'))
+      return triageT('voice.questions.swelling')
+    // Headache
+    if (msg.includes('headache') || msg.includes('head pain') || msg.includes('head ache'))
+      return triageT('voice.questions.headache')
+    // Nausea / vomiting
+    if (msg.includes('nausea') || msg.includes('nauseous') || msg.includes('vomit') || msg.includes('throwing up'))
+      return triageT('voice.questions.nausea')
+    // Eaten today
+    if (msg.includes('eaten') || (msg.includes('eat') && msg.includes('today')) || msg.includes('food today') || msg.includes('last meal'))
+      return triageT('voice.questions.eaten')
+    // Existing conditions / medical history
+    if (msg.includes('existing') || msg.includes('medical condition') || msg.includes('medical history') || msg.includes('pre-existing') || msg.includes('underlying'))
+      return triageT('voice.questions.conditions')
+    // When did symptoms start
+    if ((msg.includes('when') && msg.includes('start')) || msg.includes('when did') || msg.includes('onset'))
+      return triageT('voice.questions.whenStart')
+    // Pregnant
+    if (msg.includes('pregnant') || msg.includes('pregnancy'))
+      return triageT('voice.questions.pregnant')
+    // Chest pain
+    if (msg.includes('chest') && (msg.includes('pain') || msg.includes('tight') || msg.includes('pressure') || msg.includes('discomfort')))
+      return triageT('voice.questions.chestPain')
+    // Tell me more
+    if (msg.includes('tell me more') || msg.includes('more detail') || msg.includes('more about') || msg.includes('elaborate') || msg.includes('explain more') || msg.includes('provide more'))
+      return triageT('voice.questions.tellMore')
+    // Anyone with you
+    if (msg.includes('anyone with you') || msg.includes('someone with you') || msg.includes('alone') || msg.includes('somebody near'))
+      return triageT('voice.questions.anyoneWith')
+    // Taken medication for this
+    if ((msg.includes('taken') && msg.includes('medic')) || (msg.includes('taken') && msg.includes('anything for')) || msg.includes('self-medicated') || msg.includes('tried any'))
+      return triageT('voice.questions.takenMeds')
+    // Diarrhea
+    if (msg.includes('diarr') || msg.includes('loose stool') || msg.includes('watery stool') || msg.includes('running stomach'))
+      return triageT('voice.questions.diarrhea')
+    // Rash / skin
+    if (msg.includes('rash') || (msg.includes('skin') && (msg.includes('change') || msg.includes('itch') || msg.includes('bump'))))
+      return triageT('voice.questions.rash')
+    // Injury / accident
+    if (msg.includes('injur') || msg.includes('accident') || msg.includes('fell') || msg.includes('trauma') || msg.includes('hit your'))
+      return triageT('voice.questions.injury')
+    // Vision changes
+    if (msg.includes('vision') || msg.includes('blurr') || (msg.includes('eye') && (msg.includes('change') || msg.includes('problem'))) || msg.includes('seeing well'))
+      return triageT('voice.questions.visionChange')
+    // Bleeding
+    if (msg.includes('bleed') || msg.includes('blood'))
+      return triageT('voice.questions.bleeding')
+    // Appetite
+    if (msg.includes('appetite') || msg.includes('hungry') || msg.includes('loss of appetite'))
+      return triageT('voice.questions.appetite')
+    // Sleep
+    if (msg.includes('sleep') || msg.includes('insomnia') || msg.includes('rest well'))
+      return triageT('voice.questions.sleep')
+    // Urination
+    if (msg.includes('urinat') || msg.includes('urine') || msg.includes('peeing') || msg.includes('urinary'))
+      return triageT('voice.questions.urination')
+    // Cough
+    if (msg.includes('cough') || msg.includes('coughing'))
+      return triageT('voice.questions.cough')
+    // Soreness / body aches
+    if (msg.includes('sore') || msg.includes('body ache') || msg.includes('body pain') || msg.includes('muscle pain') || msg.includes('aching'))
+      return triageT('voice.questions.soreness')
+    // Chronic illness
+    if (msg.includes('diabet') || msg.includes('hypertension') || msg.includes('chronic') || msg.includes('blood pressure') || msg.includes('sugar level'))
+      return triageT('voice.questions.chronicIllness')
+    // Pain type (sharp, dull, burning, throbbing)
+    if ((msg.includes('type') && msg.includes('pain')) || msg.includes('sharp') || msg.includes('throbbing') || (msg.includes('burning') && msg.includes('pain')) || msg.includes('nature of'))
+      return triageT('voice.questions.painType')
+    // Thank you / acknowledgment
+    if (msg.includes('thank you') || msg.includes('thanks'))
+      return triageT('voice.questions.thankYou')
+    // Understood / I see
+    if (msg.includes('i understand') || msg.includes('i see') || msg.includes('understood') || msg.includes('got it'))
+      return triageT('voice.questions.understood')
+    // Noted
+    if (msg.includes('noted') || msg.includes('i have noted') || msg.includes('alright'))
+      return triageT('voice.questions.noted')
+    // Sorry / empathy
+    if (msg.includes('sorry to hear') || msg.includes('i\'m sorry') || msg.includes('that must'))
+      return triageT('voice.questions.sorry')
+    // Emergency warning
+    if (msg.includes('emergency') || msg.includes('seek help immediately') || msg.includes('call emergency') || msg.includes('urgent'))
+      return triageT('voice.questions.emergency')
+    // Follow up / more detail
+    if (msg.includes('more detail') || msg.includes('elaborate') || msg.includes('bit more') || msg.includes('explain further'))
+      return triageT('voice.questions.followUp')
+    // Weight
+    if (msg.includes('weight') || msg.includes('how much do you weigh') || msg.includes('how heavy'))
+      return triageT('voice.questions.weight')
+    // Gender
+    if (msg.includes('gender') || msg.includes('male or female') || msg.includes('man or woman') || msg.includes('sex'))
+      return triageT('voice.questions.gender')
+    // Water / hydration
+    if (msg.includes('water') || msg.includes('hydrat') || msg.includes('fluid') || msg.includes('drinking enough'))
+      return triageT('voice.questions.water')
+    // Travel
+    if (msg.includes('travel') || msg.includes('trip') || msg.includes('journey') || msg.includes('been abroad'))
+      return triageT('voice.questions.travel')
+    // Contact with sick person
+    if (msg.includes('contact') && (msg.includes('sick') || msg.includes('ill') || msg.includes('infected')))
+      return triageT('voice.questions.contactSick')
+    // Stress
+    if (msg.includes('stress') || msg.includes('anxi') || msg.includes('worried') || msg.includes('mental'))
+      return triageT('voice.questions.stress')
+    // Surgery
+    if (msg.includes('surgery') || msg.includes('operation') || msg.includes('surgical'))
+      return triageT('voice.questions.surgery')
+    // Smoking / alcohol
+    if (msg.includes('smok') || msg.includes('alcohol') || msg.includes('drink') || msg.includes('tobacco'))
+      return triageT('voice.questions.smoking')
+    // Family history
+    if (msg.includes('family') && (msg.includes('history') || msg.includes('condition') || msg.includes('similar') || msg.includes('anyone')))
+      return triageT('voice.questions.familyHistory')
+
+    // ===== CATCH-ALL =====
+    // If we got here, the message is in English and didn't match any pattern.
+    // Detect English by checking that text is mostly ASCII with question-like structure.
+    const asciiRatio = (msg.match(/[a-z]/g) || []).length / msg.length
+    if (asciiRatio > 0.7) {
+      // This is clearly English — replace with a generic translated "tell me more" 
+      return triageT('voice.questions.fallbackAsk')
+    }
+
     return message
   }
 
   const activeQuestion: TriageQuestion | null = currentAIMessage && !consultationComplete
-    ? { id: String(currentAIMessageSeq), question: localizeServerQuestion(currentAIMessage) }
+    ? { id: String(currentAIMessageSeq), question: currentAIMessage }
     : null
 
   const speakText = async (text: string, onEnd?: () => void, languageOverride?: LanguageCode) => {
@@ -330,7 +498,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const langInstruction = (langName: string, langCode: LanguageCode) =>
     langCode === 'en'
       ? ''  // no prefix needed for English
-      : `[SYSTEM: You MUST respond ONLY in ${langName}. Do NOT use English in your response. The user speaks ${langName}.] `
+      : `[IMPORTANT SYSTEM INSTRUCTION: You are a medical triage assistant. You MUST respond ENTIRELY and ONLY in ${langName}. Every single word of your response must be in ${langName}. NEVER use English words, phrases, or sentences. The patient ONLY understands ${langName}. Translate everything including medical terms into ${langName}. This is mandatory.]\n`
 
   const startConsultation = (message: string) => {
     console.debug('[VoiceInteraction] startConsultation called', { message, mode: conversationModeRef.current })
@@ -347,10 +515,11 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       console.debug('[VoiceInteraction] consultationsApi.start response', res)
         const id = res.consultation_id
         updateConsultationId(id)
-        setCurrentAIMessage(res.message.content)
+        const localizedMsg = localizeServerQuestion(res.message.content)
+        setCurrentAIMessage(localizedMsg)
         setCurrentAIMessageSeq(1)
         setAIResponse({ heading: t('voice.responseHeading'), summary: stripSystemPrefix(message) })
-        void speakText(res.message.content, undefined, startLang)
+        void speakText(localizedMsg, undefined, startLang)
       } catch (err) {
         setApiError(err instanceof Error ? err.message : 'Request failed')
       } finally {
@@ -381,11 +550,12 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       const isComplete = ['complete', 'completed', 'closed', 'ended'].includes(normalizedStatus)
       
       if (!isComplete && res.message.content) {
-        // Start audio playback immediately - don't wait
-        void speakText(res.message.content, undefined, sessionLang)
+        // Translate and start audio playback immediately
+        const localizedMsg = localizeServerQuestion(res.message.content)
+        void speakText(localizedMsg, undefined, sessionLang)
       }
       
-      setCurrentAIMessage(res.message.content)
+      setCurrentAIMessage(localizeServerQuestion(res.message.content))
       setCurrentAIMessageSeq(prev => prev + 1)
       if (res.severity) {
         const normalized = normalizeSeverity(res.severity)
@@ -1691,6 +1861,26 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                               {hospital.address && (
                                 <p className="mt-3 text-[11px] font-semibold text-white/50">{hospital.address}</p>
                               )}
+
+                              {/* Get Directions button */}
+                              <button
+                                type="button"
+                                onClick={() => {
+                                  if (!hospital.lat || !hospital.lng) return
+                                  const origin = userLocation
+                                    ? `&origin=${userLocation.lat},${userLocation.lng}`
+                                    : ''
+                                  window.open(
+                                    `https://www.google.com/maps/dir/?api=1${origin}&destination=${hospital.lat},${hospital.lng}&destination_place_id=&travelmode=driving`,
+                                    '_blank'
+                                  )
+                                }}
+                                disabled={!hospital.lat || !hospital.lng}
+                                className="mt-4 w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 py-3 text-[11px] font-black text-emerald-400 uppercase tracking-widest transition-all hover:bg-emerald-500/30 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
+                              >
+                                <Navigation size={14} />
+                                <span>{t('voice.hospitals.getDirections')}</span>
+                              </button>
                             </motion.div>
                           )
                         })}
@@ -1701,7 +1891,13 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                         onClick={() => {
                           const first = routedHospitals[0]
                           if (!first?.lat || !first?.lng) return
-                          window.open(`https://www.google.com/maps/search/?api=1&query=${first.lat},${first.lng}`, '_blank')
+                          const origin = userLocation
+                            ? `&origin=${userLocation.lat},${userLocation.lng}`
+                            : ''
+                          window.open(
+                            `https://www.google.com/maps/dir/?api=1${origin}&destination=${first.lat},${first.lng}&travelmode=driving`,
+                            '_blank'
+                          )
                         }}
                         disabled={!routedHospitals[0]?.lat || !routedHospitals[0]?.lng}
                         className="w-full mt-8 flex items-center justify-center gap-3 rounded-2xl bg-emerald-500 py-5 text-xs font-black text-white shadow-2xl shadow-emerald-500/40 transition-all hover:bg-emerald-400 uppercase tracking-widest border border-emerald-400/20 disabled:opacity-50 disabled:cursor-not-allowed"
