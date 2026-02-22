@@ -146,6 +146,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const consultationIdRef = useRef<number | null>(null)
   const consultationLanguageRef = useRef<LanguageCode>(normalizeLanguageCode(i18n.language || 'en'))
   const [currentAIMessage, setCurrentAIMessage] = useState<string | null>(null)
+  const rawAIMessageRef = useRef<string | null>(null)
   const [currentAIMessageSeq, setCurrentAIMessageSeq] = useState(0)
   const [consultationDetail, setConsultationDetail] = useState<ConsultationDetailResponse['consultation'] | null>(null)
   const [routedHospitals, setRoutedHospitals] = useState<HospitalListItem[]>([])
@@ -385,7 +386,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   }
 
   const activeQuestion: TriageQuestion | null = currentAIMessage && !consultationComplete
-    ? { id: String(currentAIMessageSeq), question: currentAIMessage }
+    ? { id: String(currentAIMessageSeq), question: localizeServerQuestion(rawAIMessageRef.current ?? currentAIMessage) }
     : null
 
   const speakText = async (text: string, onEnd?: () => void, languageOverride?: LanguageCode) => {
@@ -515,7 +516,10 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       console.debug('[VoiceInteraction] consultationsApi.start response', res)
         const id = res.consultation_id
         updateConsultationId(id)
+        rawAIMessageRef.current = res.message.content
         const localizedMsg = localizeServerQuestion(res.message.content)
+        // Brief pause so the "thinking" indicator is visible before the first question
+        await new Promise(r => setTimeout(r, 1200))
         setCurrentAIMessage(localizedMsg)
         setCurrentAIMessageSeq(1)
         setAIResponse({ heading: t('voice.responseHeading'), summary: stripSystemPrefix(message) })
@@ -555,6 +559,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
         void speakText(localizedMsg, undefined, sessionLang)
       }
       
+      rawAIMessageRef.current = res.message.content
       setCurrentAIMessage(localizeServerQuestion(res.message.content))
       setCurrentAIMessageSeq(prev => prev + 1)
       if (res.severity) {
@@ -615,6 +620,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
         consultationLanguageRef.current = nextLang
         setConsultationLanguage(nextLang)
         setCurrentAIMessage(null)
+        rawAIMessageRef.current = null
         setCurrentAIMessageSeq(0)
         setConsultationDetail(null)
         updateConsultationComplete(false)
@@ -877,10 +883,21 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   }, [sessionStatus])
 
   useEffect(() => {
-    if (consultationIdRef.current !== null && !consultationCompleteRef.current) return
+    // Always keep consultationLanguage in sync with the user's selected language,
+    // even during an active consultation, so switching languages mid-triage works.
     const nextLang = normalizeLanguageCode(localStorage.getItem('alavia.selectedLanguage') || i18n.language || selectedLanguage)
+    const prevLang = consultationLanguageRef.current
     consultationLanguageRef.current = nextLang
     setConsultationLanguage(nextLang)
+
+    // If language changed during an active consultation with a displayed question,
+    // re-translate the current question and re-speak it in the new language.
+    if (prevLang !== nextLang && rawAIMessageRef.current && consultationIdRef.current !== null && !consultationCompleteRef.current) {
+      const reTranslated = localizeServerQuestion(rawAIMessageRef.current)
+      setCurrentAIMessage(reTranslated)
+      setCurrentAIMessageSeq(prev => prev + 1) // bump seq to trigger re-speak
+      void speakText(reTranslated, undefined, nextLang)
+    }
   }, [i18n.language, selectedLanguage])
 
   useEffect(() => {
