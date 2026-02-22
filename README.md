@@ -47,7 +47,7 @@ On Windows (PowerShell):
 On Mac/Linux:
 ```bash
 echo "VITE_API_BASE_URL=https://api.tmb.it.com" > .env
-echo "VITE_VOICE_MODEL_API=+3sN@7Q2nsJ1rR" >> .env
+echo "VITE_VOICE_MODEL_API=sk_live_pk3eB2P9QDBihUuqfzXgWZIPIVcf7Lkby6oTqScSQZ8" >> .env
 echo "VITE_YARNGPT_TTS_ENDPOINT=https://yarngpt.ai/api/v1/tts" >> .env
 ```
 
