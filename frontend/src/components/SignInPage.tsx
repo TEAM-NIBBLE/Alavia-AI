@@ -3,6 +3,7 @@ import { useTranslation } from 'react-i18next'
 import { Eye, EyeOff } from 'lucide-react'
 import alaviaLogo from '../assets/alavia-ai_logo.png'
 import { authApi } from '../api/services'
+import { ApiError } from '../api/client'
 
 interface SignInPageProps {
   onSuccess: () => void
@@ -18,6 +19,20 @@ export default function SignInPage({ onSuccess, onSwitchToSignUp, onBack }: Sign
   const [errors, setErrors] = useState<Partial<typeof form>>({})
   const [forgotSent, setForgotSent] = useState(false)
   const [apiError, setApiError] = useState('')
+
+  const formatSignInError = (error: unknown) => {
+    if (error instanceof ApiError) {
+      if (error.status === 401) return 'Invalid email/phone or password.'
+      if (error.status === 404) return 'User account not found. Please sign up first.'
+      if (error.status === 422) return 'Please check your login details and try again.'
+      return error.message || 'Unable to sign in right now.'
+    }
+    if (error instanceof Error) {
+      if (/fetch|network|timeout/i.test(error.message)) return 'Cannot reach server. Check your internet or API base URL.'
+      return error.message
+    }
+    return 'Unable to sign in right now.'
+  }
 
   const validate = () => {
     const newErrors: Partial<typeof form> = {}
@@ -53,9 +68,8 @@ export default function SignInPage({ onSuccess, onSwitchToSignUp, onBack }: Sign
       setIsLoading(false)
       onSuccess()
     } catch (error) {
-      setApiError(error instanceof Error ? error.message : 'Unable to sign in with server, using demo mode.')
+      setApiError(formatSignInError(error))
       setIsLoading(false)
-      onSuccess()
     }
   }
 
