@@ -159,6 +159,20 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     setTextInput('')
   }
 
+  const getPreferredTtsVoice = (): 'alloy' | 'nova' | 'verse' => {
+    try {
+      const raw = localStorage.getItem('alavia.profileSettings')
+      if (!raw) return 'alloy'
+      const parsed = JSON.parse(raw) as { ttsVoice?: string }
+      if (parsed.ttsVoice === 'nova' || parsed.ttsVoice === 'verse' || parsed.ttsVoice === 'alloy') {
+        return parsed.ttsVoice
+      }
+      return 'alloy'
+    } catch {
+      return 'alloy'
+    }
+  }
+
   const selectedLanguage = (i18n.language || 'en').toLowerCase()
 
   const languages = [
@@ -197,6 +211,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       const tts = await speechApi.tts({
         text,
         language: selectedLangConfig.apiLanguage,
+        voice: getPreferredTtsVoice(),
       })
       if (tts.audio_url) {
         audioRef.current?.pause()

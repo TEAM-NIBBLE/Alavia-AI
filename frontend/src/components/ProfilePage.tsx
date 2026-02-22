@@ -23,6 +23,7 @@ interface Settings {
   darkMode: boolean
   audioAutoplay: boolean
   voiceSpeed: 'slow' | 'normal' | 'fast'
+  ttsVoice: 'alloy' | 'nova' | 'verse'
   readPrompts: boolean
   ageBand: string
   gender: string
@@ -47,7 +48,7 @@ interface Settings {
 const getDefaults = (): Settings => ({
   appLanguage: (localStorage.getItem('alavia.selectedLanguage') as LanguageCode) || 'en',
   largeText: false, highContrast: false, darkMode: false,
-  audioAutoplay: true, voiceSpeed: 'normal', readPrompts: false,
+  audioAutoplay: true, voiceSpeed: 'normal', ttsVoice: 'alloy', readPrompts: false,
   ageBand: '', gender: '', pregnancyStatus: false,
   condAsthma: false, condDiabetes: false, condHypertension: false,
   condSickleCell: false, condHeart: false, condNone: false,
@@ -422,6 +423,18 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
               ))}
             </div>
           </div>
+
+          <Row label="AI Voice" hint="Choose the voice used for spoken replies" dark={dark}>
+            <select
+              value={settings.ttsVoice}
+              onChange={e => set('ttsVoice', e.target.value as Settings['ttsVoice'])}
+              className={selectCls(dark)}
+            >
+              <option value="alloy">Alloy</option>
+              <option value="nova">Nova</option>
+              <option value="verse">Verse</option>
+            </select>
+          </Row>
 
           {/* Read Prompts */}
           <Row label={t('profile.readPrompts')} hint={t('profile.readPromptsHint')} dark={dark}>
