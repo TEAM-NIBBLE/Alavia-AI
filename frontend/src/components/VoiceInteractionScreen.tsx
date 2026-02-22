@@ -197,7 +197,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   ]
 
   const currentLanguageName = t(`language.${selectedLanguage}.name`)
-  const selectedLangConfig = LANGUAGE_CONFIG[selectedLanguage] ?? LANGUAGE_CONFIG.en
   const consultationLangConfig = LANGUAGE_CONFIG[consultationLanguage] ?? LANGUAGE_CONFIG.en
   const triageT = useMemo(() => i18n.getFixedT(consultationLanguage), [consultationLanguage, i18n])
 

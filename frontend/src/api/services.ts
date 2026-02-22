@@ -80,6 +80,7 @@ export interface ProfilePatchResponse {
 }
 
 export interface HospitalsQuery {
+  [key: string]: string | number | boolean | undefined
   lat?: number
   lng?: number
   specialty?: string
