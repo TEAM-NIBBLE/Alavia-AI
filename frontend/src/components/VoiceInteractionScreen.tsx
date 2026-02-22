@@ -209,10 +209,12 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const localizeServerQuestion = (message: string) => {
     if (consultationLanguage === 'en') return message
     const msg = message.toLowerCase()
-    if (msg.includes('breath')) return triageT('voice.questions.breathing')
-    if (msg.includes('faint') || msg.includes('confusion')) return triageT('voice.questions.fainting')
-    if (msg.includes('worse') || msg.includes('getting worse')) return triageT('voice.questions.worse')
-    if (msg.includes('weakness') || msg.includes('one sided')) return triageT('voice.questions.weakness')
+    // Client-side fallback localization for common triage questions
+    // when the AI model responds in English despite language instructions
+    if (msg.includes('breath') || msg.includes('breathing')) return triageT('voice.questions.breathing')
+    if (msg.includes('faint') || msg.includes('confusion') || msg.includes('dizz')) return triageT('voice.questions.fainting')
+    if (msg.includes('worse') || msg.includes('getting worse') || msg.includes('worsen')) return triageT('voice.questions.worse')
+    if (msg.includes('weakness') || msg.includes('one sided') || msg.includes('slur')) return triageT('voice.questions.weakness')
     return message
   }
 
@@ -229,38 +231,48 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     const speechLanguage = languageOverride ?? consultationLanguageRef.current
     const speechLangConfig = LANGUAGE_CONFIG[speechLanguage] ?? LANGUAGE_CONFIG.en
 
+    // Race the backend TTS against a tight timeout so the user never waits long.
+    // If the API responds fast we play the high-quality audio; otherwise we
+    // instantly fall through to the browser's built-in speech synthesis.
+    const TTS_TIMEOUT_MS = 2500
+
     try {
-      const tts = await speechApi.tts({
+      const ttsPromise = speechApi.tts({
         text,
         language: speechLangConfig.apiLanguage,
         voice: getPreferredTtsVoice(),
       })
-      if (tts.audio_url) {
+
+      // Timeout sentinel – resolves to null after TTS_TIMEOUT_MS
+      const timeoutPromise = new Promise<null>((resolve) =>
+        setTimeout(() => resolve(null), TTS_TIMEOUT_MS)
+      )
+
+      const tts = await Promise.race([ttsPromise, timeoutPromise])
+
+      if (tts && tts.audio_url) {
         audioRef.current?.pause()
         if (audioRef.current && audioRef.current.src.startsWith('blob:')) {
           URL.revokeObjectURL(audioRef.current.src)
         }
         const audio = new Audio(tts.audio_url)
-        audio.preload = 'auto' // Preload audio immediately
+        audio.preload = 'auto'
         audioRef.current = audio
-        
+
         audio.onended = () => {
           if (audio.src.startsWith('blob:')) URL.revokeObjectURL(audio.src)
           onEnd?.()
         }
-        
+
         audio.onerror = () => {
-          // If audio fails, fallback to speech synthesis
           if ('speechSynthesis' in window) {
             fallbackToSpeechSynthesis()
           } else {
             onEnd?.()
           }
         }
-        
-        // Start playing immediately without waiting
+
         audio.play().catch(() => {
-          // If autoplay is blocked, try speech synthesis fallback
           if ('speechSynthesis' in window) {
             fallbackToSpeechSynthesis()
           } else {
@@ -269,11 +281,12 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
         })
         return
       }
+      // tts was null (timeout) or had no audio_url — fall through
     } catch {
-      // fallback to browser synthesis
+      // Network / API error — fall through to browser synthesis
     }
 
-    // Fallback to speech synthesis
+    // Instant zero-latency fallback
     fallbackToSpeechSynthesis()
 
     function fallbackToSpeechSynthesis() {
@@ -294,8 +307,8 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
       const utterance = new SpeechSynthesisUtterance(text)
       utterance.lang = bcp47List[0]   // primary preference
-      utterance.rate = 1.05  // Slightly faster for reduced delay perception
-      utterance.pitch = 1.1  // warmer female pitch
+      utterance.rate = 1.12  // Faster for reduced delay perception
+      utterance.pitch = 1.08  // warmer female pitch
 
       // Female voice name fragments
       const FEMALE_NAMES = [
@@ -900,16 +913,12 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       lastSpokenQuestionRef.current = activeQuestion.id
       if (conversationModeRef.current === 'keyboard') {
         // keyboard mode: speak question only; typing happens inline in triage card
-        setTimeout(() => {
-          void speakText(activeQuestion.question)
-        }, 200)
+        void speakText(activeQuestion.question)
       } else {
-        // voice mode: speak question then auto-start mic
-        setTimeout(() => {
-          speakText(activeQuestion.question, () => {
-            void startListening()
-          })
-        }, 200)
+        // voice mode: speak question then auto-start mic (no artificial delay)
+        speakText(activeQuestion.question, () => {
+          void startListening()
+        })
       }
     }
   }, [activeQuestion, aiResponse])
@@ -1454,34 +1463,175 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                         )}
 
                         {!isHospitalsLoading && !hospitalsError && displayHospitals.length > 0 && (
-                          <div className="relative h-48 w-full overflow-hidden rounded-[28px] bg-slate-800 border border-white/5">
-                            <div className="absolute inset-0 opacity-20">
-                              <svg width="100%" height="100%" viewBox="0 0 100 100" preserveAspectRatio="none">
-                                <path d="M0,20 L100,20 M0,50 L100,50 M0,80 L100,80 M30,0 L30,100 M70,0 L70,100" stroke="white" strokeWidth="0.5" fill="none" />
+                          <div className="relative h-64 w-full overflow-hidden rounded-[28px] border border-white/10 shadow-inner">
+                            {/* Realistic map background */}
+                            <div className="absolute inset-0 bg-[#1a2332]">
+                              <svg width="100%" height="100%" viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" className="absolute inset-0">
+                                <defs>
+                                  {/* Water texture gradient */}
+                                  <linearGradient id="waterGrad" x1="0" y1="0" x2="1" y2="1">
+                                    <stop offset="0%" stopColor="#0c4a6e" stopOpacity="0.5" />
+                                    <stop offset="100%" stopColor="#164e63" stopOpacity="0.3" />
+                                  </linearGradient>
+                                  {/* Land fill */}
+                                  <linearGradient id="landGrad" x1="0" y1="0" x2="0" y2="1">
+                                    <stop offset="0%" stopColor="#1e3a2f" stopOpacity="0.4" />
+                                    <stop offset="100%" stopColor="#1a2e25" stopOpacity="0.3" />
+                                  </linearGradient>
+                                  {/* Road dash pattern */}
+                                  <pattern id="roadDash" patternUnits="userSpaceOnUse" width="12" height="2">
+                                    <rect width="7" height="1" fill="rgba(255,255,255,0.12)" />
+                                  </pattern>
+                                  {/* Route dash */}
+                                  <filter id="routeGlow">
+                                    <feGaussianBlur stdDeviation="2" result="blur" />
+                                    <feMerge>
+                                      <feMergeNode in="blur" />
+                                      <feMergeNode in="SourceGraphic" />
+                                    </feMerge>
+                                  </filter>
+                                </defs>
+
+                                {/* Water/lagoon areas */}
+                                <path d="M0,200 Q50,180 120,195 Q200,215 280,190 Q350,175 400,200 L400,260 L0,260 Z" fill="url(#waterGrad)" />
+                                <path d="M300,0 Q310,30 305,60 Q295,90 310,120 Q330,90 340,50 Q345,20 350,0 Z" fill="url(#waterGrad)" opacity="0.4" />
+                                <ellipse cx="80" cy="230" rx="60" ry="20" fill="url(#waterGrad)" opacity="0.3" />
+
+                                {/* Land mass */}
+                                <path d="M0,0 L400,0 L400,200 Q350,175 280,190 Q200,215 120,195 Q50,180 0,200 Z" fill="url(#landGrad)" />
+
+                                {/* Terrain patches (parks/green areas) */}
+                                <ellipse cx="60" cy="80" rx="30" ry="18" fill="#166534" opacity="0.15" />
+                                <ellipse cx="240" cy="50" rx="25" ry="15" fill="#166534" opacity="0.12" />
+                                <ellipse cx="160" cy="150" rx="20" ry="12" fill="#166534" opacity="0.1" />
+
+                                {/* Major roads - horizontal */}
+                                <line x1="0" y1="60" x2="400" y2="65" stroke="rgba(255,255,255,0.08)" strokeWidth="4" />
+                                <line x1="0" y1="60" x2="400" y2="65" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
+                                <line x1="0" y1="120" x2="290" y2="115" stroke="rgba(255,255,255,0.08)" strokeWidth="3.5" />
+                                <line x1="0" y1="120" x2="290" y2="115" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
+                                <line x1="30" y1="170" x2="350" y2="165" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
+                                <line x1="30" y1="170" x2="350" y2="165" stroke="rgba(255,255,255,0.1)" strokeWidth="0.8" />
+
+                                {/* Major roads - vertical / diagonal */}
+                                <line x1="100" y1="0" x2="110" y2="200" stroke="rgba(255,255,255,0.08)" strokeWidth="4" />
+                                <line x1="100" y1="0" x2="110" y2="200" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
+                                <line x1="200" y1="0" x2="195" y2="200" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
+                                <line x1="200" y1="0" x2="195" y2="200" stroke="rgba(255,255,255,0.1)" strokeWidth="0.8" />
+                                <path d="M260,0 Q270,80 240,170 Q230,200 220,210" stroke="rgba(255,255,255,0.06)" strokeWidth="3" fill="none" />
+
+                                {/* Secondary / minor roads */}
+                                <line x1="50" y1="30" x2="180" y2="35" stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" />
+                                <line x1="140" y1="80" x2="280" y2="85" stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" />
+                                <line x1="60" y1="0" x2="55" y2="130" stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" />
+                                <line x1="150" y1="40" x2="155" y2="170" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+                                <line x1="340" y1="30" x2="330" y2="160" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
+
+                                {/* Block / neighborhood fills */}
+                                <rect x="105" y="65" width="35" height="45" rx="3" fill="rgba(255,255,255,0.02)" />
+                                <rect x="55" y="65" width="40" height="50" rx="3" fill="rgba(255,255,255,0.015)" />
+                                <rect x="115" y="125" width="30" height="35" rx="3" fill="rgba(255,255,255,0.02)" />
+                                <rect x="202" y="30" width="50" height="30" rx="3" fill="rgba(255,255,255,0.015)" />
+                                <rect x="205" y="70" width="45" height="40" rx="3" fill="rgba(255,255,255,0.02)" />
+
+                                {/* Route lines: user → each hospital (dashed, glowing) */}
+                                {mapPoints.user && mapPoints.hospitals.map((h) => (
+                                  <line
+                                    key={`route-${h.id}`}
+                                    x1={mapPoints.user!.x * 4}
+                                    y1={mapPoints.user!.y * 2.6}
+                                    x2={h.x * 4}
+                                    y2={h.y * 2.6}
+                                    stroke="#10b981"
+                                    strokeWidth="1.5"
+                                    strokeDasharray="6,4"
+                                    opacity="0.4"
+                                    filter="url(#routeGlow)"
+                                  />
+                                ))}
                               </svg>
                             </div>
 
+                            {/* User location marker with pulse */}
                             {mapPoints.user && (
                               <div
-                                className="absolute -translate-x-1/2 -translate-y-1/2 z-20"
+                                className="absolute -translate-x-1/2 -translate-y-1/2 z-30"
                                 style={{ left: `${mapPoints.user.x}%`, top: `${mapPoints.user.y}%` }}
                               >
-                                <div className="h-4 w-4 rounded-full bg-blue-500 border-2 border-white shadow-[0_0_15px_rgba(59,130,246,0.8)]" />
+                                <div className="relative">
+                                  {/* Outer pulse ring */}
+                                  <motion.div
+                                    animate={{ scale: [1, 2.5], opacity: [0.4, 0] }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
+                                    className="absolute inset-0 rounded-full bg-blue-500"
+                                    style={{ width: 16, height: 16, marginLeft: -2, marginTop: -2 }}
+                                  />
+                                  {/* Inner pulse ring */}
+                                  <motion.div
+                                    animate={{ scale: [1, 1.8], opacity: [0.3, 0] }}
+                                    transition={{ duration: 2, repeat: Infinity, ease: 'easeOut', delay: 0.4 }}
+                                    className="absolute inset-0 rounded-full bg-blue-400"
+                                    style={{ width: 16, height: 16, marginLeft: -2, marginTop: -2 }}
+                                  />
+                                  {/* Dot */}
+                                  <div className="relative h-3 w-3 rounded-full bg-blue-500 border-[2.5px] border-white shadow-[0_0_12px_rgba(59,130,246,0.9)]" />
+                                  {/* Label */}
+                                  <span className="absolute left-5 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-blue-500/90 px-2 py-0.5 text-[8px] font-black text-white shadow-lg backdrop-blur-sm">
+                                    You
+                                  </span>
+                                </div>
                               </div>
                             )}
 
-                            {mapPoints.hospitals.map((marker) => (
+                            {/* Hospital markers with drop-pin style */}
+                            {mapPoints.hospitals.map((marker, idx) => (
                               <div
                                 key={marker.id}
-                                className="absolute -translate-x-1/2 -translate-y-1/2 z-10"
+                                className="absolute -translate-x-1/2 -translate-y-full z-20"
                                 style={{ left: `${marker.x}%`, top: `${marker.y}%` }}
                                 title={marker.name}
                               >
-                                <div className="flex h-7 w-7 items-center justify-center rounded-full bg-emerald-500 text-white border-2 border-slate-900 shadow-lg">
-                                  <HeartPulse size={12} />
-                                </div>
+                                <motion.div
+                                  initial={{ y: -20, opacity: 0 }}
+                                  animate={{ y: 0, opacity: 1 }}
+                                  transition={{ delay: idx * 0.12, type: 'spring', stiffness: 300 }}
+                                  className="relative flex flex-col items-center"
+                                >
+                                  {/* Pin head */}
+                                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white border-[2.5px] border-white shadow-[0_2px_12px_rgba(16,185,129,0.6)]">
+                                    <HeartPulse size={13} strokeWidth={2.5} />
+                                  </div>
+                                  {/* Pin tail */}
+                                  <div className="h-2 w-0.5 bg-white/60" />
+                                  <div className="h-1.5 w-1.5 rounded-full bg-white/40" />
+                                  {/* Hospital name tooltip */}
+                                  <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-black/70 px-1.5 py-0.5 text-[7px] font-bold text-white/90 backdrop-blur-sm">
+                                    {marker.name.length > 18 ? marker.name.slice(0, 16) + '…' : marker.name}
+                                  </span>
+                                </motion.div>
                               </div>
                             ))}
+
+                            {/* Legend bar */}
+                            <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between z-30">
+                              <div className="flex items-center gap-3 rounded-lg bg-black/50 px-3 py-1.5 backdrop-blur-md border border-white/5">
+                                <div className="flex items-center gap-1.5">
+                                  <div className="h-2 w-2 rounded-full bg-blue-500 border border-white/60" />
+                                  <span className="text-[8px] font-bold text-white/70">You</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  <div className="h-2 w-2 rounded-full bg-emerald-500 border border-white/60" />
+                                  <span className="text-[8px] font-bold text-white/70">Hospital</span>
+                                </div>
+                                <div className="flex items-center gap-1.5">
+                                  <div className="h-0.5 w-4 border-t border-dashed border-emerald-400/60" />
+                                  <span className="text-[8px] font-bold text-white/70">Route</span>
+                                </div>
+                              </div>
+                              <span className="rounded-lg bg-black/50 px-2 py-1 text-[7px] font-bold text-white/40 backdrop-blur-md border border-white/5">
+                                Lagos, NG
+                              </span>
+                            </div>
                           </div>
                         )}
 
