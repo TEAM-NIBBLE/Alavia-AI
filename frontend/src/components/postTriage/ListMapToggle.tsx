@@ -14,16 +14,15 @@ export function ListMapToggle({ mode, onChange }: ListMapToggleProps) {
         className={`inline-flex min-h-12 items-center rounded-full px-4 text-sm font-semibold ${mode === 'list' ? 'bg-emerald-600 text-white' : 'text-slate-700'}`}
         onClick={() => onChange('list')}
       >
-        📋 List view
+        {t('routing.listView')}
       </button>
       <button
         type="button"
         className={`inline-flex min-h-12 items-center rounded-full px-4 text-sm font-semibold ${mode === 'map' ? 'bg-emerald-600 text-white' : 'text-slate-700'}`}
         onClick={() => onChange('map')}
       >
-        🗺️ Map view
+        {t('routing.mapView')}
       </button>
     </div>
   )
 }
-
