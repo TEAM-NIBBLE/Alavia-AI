@@ -62,5 +62,55 @@ class HospitalMetaSeeder extends Seeder
                 ];
             })->all()
         );
+
+        $hospitalIds = DB::table('hospitals')->pluck('id')->all();
+        if (empty($hospitalIds)) {
+            return;
+        }
+
+        DB::table('hospital_facilities')
+            ->whereNotNull('hospital_id')
+            ->delete();
+
+        DB::table('hospital_specialties')
+            ->whereNotNull('hospital_id')
+            ->delete();
+
+        $facilityMax = min(4, count($facilities));
+        $facilityMin = min(2, $facilityMax);
+        $specialtyMax = min(3, count($specialties));
+        $specialtyMin = min(1, $specialtyMax);
+
+        $facilityRows = [];
+        $specialtyRows = [];
+
+        foreach ($hospitalIds as $hospitalId) {
+            $facilityCount = rand($facilityMin, $facilityMax);
+            $specialtyCount = rand($specialtyMin, $specialtyMax);
+
+            $pickedFacilities = collect($facilities)->shuffle()->take($facilityCount)->all();
+            $pickedSpecialties = collect($specialties)->shuffle()->take($specialtyCount)->all();
+
+            foreach ($pickedFacilities as $facility) {
+                $facilityRows[] = [
+                    'hospital_id' => $hospitalId,
+                    'facility_name' => $facility,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+
+            foreach ($pickedSpecialties as $specialty) {
+                $specialtyRows[] = [
+                    'hospital_id' => $hospitalId,
+                    'specialty_name' => $specialty,
+                    'created_at' => $now,
+                    'updated_at' => $now,
+                ];
+            }
+        }
+
+        DB::table('hospital_facilities')->insert($facilityRows);
+        DB::table('hospital_specialties')->insert($specialtyRows);
     }
 }
