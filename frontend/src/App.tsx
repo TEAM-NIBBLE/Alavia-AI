@@ -60,8 +60,8 @@ function App() {
       setTimeout(() => {
         const existingUser = localStorage.getItem('alavia.user')
         setStep(existingUser ? 'signin' : 'signup')
-      }, 700)
-    }, 800)
+      }, 200)
+    }, 200)
   }
 
   const handleSignUpSuccess = (user: { name: string }) => {

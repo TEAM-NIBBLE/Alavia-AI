@@ -1,12 +1,15 @@
+import { useTranslation } from 'react-i18next'
+
 interface RedFlagChecklistProps {
   items: string[]
   onEscalate: () => void
 }
 
 export function RedFlagChecklist({ items, onEscalate }: RedFlagChecklistProps) {
+  const { t } = useTranslation()
   return (
     <section className="rounded-2xl border border-red-100 bg-red-50 p-5 shadow-sm">
-      <h3 className="mb-3 text-lg font-bold text-red-900">Watch for these signs</h3>
+      <h3 className="mb-3 text-lg font-bold text-red-900">{t('firstAidScreen.redFlagsTitle')}</h3>
       <ul className="space-y-2">
         {items.map((item) => (
           <li key={item} className="flex items-start gap-2 text-sm text-red-800">
@@ -21,7 +24,7 @@ export function RedFlagChecklist({ items, onEscalate }: RedFlagChecklistProps) {
         onClick={onEscalate}
       >
         <span>🚑</span>
-        <span>I have one of these signs</span>
+        <span>{t('firstAidScreen.redFlagsCta')}</span>
       </button>
     </section>
   )

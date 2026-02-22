@@ -15,6 +15,7 @@ class StartConsultationRequest extends FormRequest
     {
         return [
             'initial_message' => ['sometimes', 'string', 'max:2000'],
+            'language' => ['sometimes', 'in:EN,PIDGIN,YORUBA,HAUSA,IGBO'],
         ];
     }
 }

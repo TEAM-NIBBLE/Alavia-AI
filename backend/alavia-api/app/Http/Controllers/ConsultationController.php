@@ -20,7 +20,7 @@ class ConsultationController extends Controller
         CryptoService $cryptoService
     ): JsonResponse {
         $user = $request->user();
-        $language = $user->language ?? 'EN';
+        $language = $request->validated()['language'] ?? ($user->language ?? 'EN');
 
         $consultation = Consultation::create([
             'user_id' => $user->id,
@@ -79,7 +79,7 @@ class ConsultationController extends Controller
             'content_encrypted' => $cryptoService->encrypt($request->validated()['content']),
         ]);
 
-        $language = $request->user()->language ?? 'EN';
+        $language = $request->validated()['language'] ?? ($request->user()->language ?? 'EN');
         $messages = ConsultationMessage::where('consultation_id', $consultation->id)
             ->orderBy('id')
             ->get()

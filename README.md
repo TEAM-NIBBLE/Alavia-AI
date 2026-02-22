@@ -19,6 +19,15 @@ Tech stack
 - Backend: Laravel (PHP) REST API (Sanctum for auth)
 - Speech & AI: Backend connects to speech services / AI providers for STT/TTS and optional language-aware instructions
 
+Tools & technologies used
+- YarnGPT TTS API for Nigerian voices and speech
+- OpenStreetMap (OSM) data for hospital locations
+- Web Speech API (browser) for natural text-to-speech fallback
+- GitHub Copilot and OpenAI Codex for debugging and development assistance
+- Google Gemini for logo generation
+- Lucide React for icons
+- PostCSS + Autoprefixer (frontend build pipeline)
+
 Repository layout
 - `frontend/` — React + TypeScript app (Vite)
 - `backend/alavia-api/` — Laravel API and business logic

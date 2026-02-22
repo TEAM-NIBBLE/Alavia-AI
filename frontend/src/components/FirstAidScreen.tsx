@@ -1,4 +1,5 @@
 import { useMemo, useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import { ActionCardAccordion, type FirstAidAction } from './postTriage/ActionCardAccordion'
 import { RedFlagChecklist } from './postTriage/RedFlagChecklist'
 import { SeverityBadge } from './postTriage/SeverityBadge'
@@ -13,20 +14,6 @@ interface FirstAidScreenProps {
   onEndSession: () => void
 }
 
-const nextStepBySeverity: Record<FirstAidScreenProps['severity'], { primary: string; secondary: string }> = {
-  low: { primary: 'Continue self care', secondary: 'Find clinic near me' },
-  medium: { primary: 'Book a clinic visit', secondary: 'Find hospital near me' },
-  high: { primary: 'Go to a hospital now', secondary: 'Call emergency contact' },
-  critical: { primary: 'Emergency actions', secondary: 'Route to nearest emergency hospital' },
-}
-
-const avoidBySeverity: Record<FirstAidScreenProps['severity'], string[]> = {
-  low: ['Do not ignore new breathing issues.', 'Do not self-medicate with unknown drugs.'],
-  medium: ['Do not drive if you feel weak or dizzy.', 'Do not delay care beyond today if symptoms persist.'],
-  high: ['Do not stay alone if symptoms are worsening.', 'Do not do heavy activity right now.'],
-  critical: ['Do not wait at home for symptoms to pass.', 'Do not eat or drink if choking risk is present.'],
-}
-
 export function FirstAidScreen({
   severity,
   symptomSummary,
@@ -36,12 +23,16 @@ export function FirstAidScreen({
   onOpenRouting,
   onEndSession,
 }: FirstAidScreenProps) {
+  const { t } = useTranslation()
   const [simpleMode, setSimpleMode] = useState(true)
   const [showEmergencyModal, setShowEmergencyModal] = useState(false)
   const [largeTextMode, setLargeTextMode] = useState(false)
   const [darkMode, setDarkMode] = useState(false)
-  const nextSteps = nextStepBySeverity[severity]
-  const avoidList = avoidBySeverity[severity]
+  const nextSteps = {
+    primary: t(`firstAidScreen.nextSteps.primary.${severity}`),
+    secondary: t(`firstAidScreen.nextSteps.secondary.${severity}`),
+  }
+  const avoidList = t(`firstAidScreen.avoid.${severity}`, { returnObjects: true }) as string[]
 
   const speak = (text: string) => {
     if (!('speechSynthesis' in window)) return
@@ -64,9 +55,9 @@ export function FirstAidScreen({
           <div className="flex items-center justify-between gap-3">
             <button type="button" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm font-semibold" onClick={onBack}>
               <span>←</span>
-              <span>Back</span>
+              <span>{t('firstAidScreen.back')}</span>
             </button>
-            <h1 className="text-xl font-bold">First Aid Guidance</h1>
+            <h1 className="text-xl font-bold">{t('firstAidScreen.title')}</h1>
             <div className="flex items-center gap-2">
               <SeverityBadge severity={severity} />
               <button type="button" className="inline-flex min-h-12 min-w-12 items-center justify-center rounded-full border border-red-200 bg-red-50 text-red-700">
@@ -80,31 +71,31 @@ export function FirstAidScreen({
       <main className="mx-auto flex w-full max-w-4xl flex-col gap-5 px-4 pb-32 pt-6">
         <div className="flex flex-wrap gap-2">
           <button type="button" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm font-semibold" onClick={() => setLargeTextMode((value) => !value)}>
-            🔠 {largeTextMode ? 'Standard Text' : 'Large Text'}
+            🔠 {largeTextMode ? t('firstAidScreen.standardText') : t('firstAidScreen.largeText')}
           </button>
           <button type="button" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm font-semibold" onClick={() => setDarkMode((value) => !value)}>
-            🌙 {darkMode ? 'Light Mode' : 'Dark Mode'}
+            🌙 {darkMode ? t('firstAidScreen.lightMode') : t('firstAidScreen.darkMode')}
           </button>
           <button type="button" className={`inline-flex min-h-12 items-center gap-2 rounded-xl border px-4 text-sm font-semibold ${simpleMode ? 'border-emerald-200 bg-emerald-50 text-emerald-800' : 'border-slate-200'}`} onClick={() => setSimpleMode((value) => !value)}>
-            🧠 Keep it simple
+            🧠 {t('firstAidScreen.keepSimple')}
           </button>
         </div>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:bg-slate-900">
-          <h2 className="text-lg font-bold">What I understood</h2>
+          <h2 className="text-lg font-bold">{t('firstAidScreen.understoodTitle')}</h2>
           <p className="mt-2 text-sm text-slate-700 dark:text-slate-200">{symptomSummary}</p>
           <div className="mt-3 flex flex-wrap gap-2">
             <button type="button" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm font-semibold" onClick={() => speak(symptomSummary)}>
-              🔊 Play audio summary
+              🔊 {t('firstAidScreen.playAudio')}
             </button>
             <button type="button" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-200 px-4 text-sm font-semibold">
-              🌐 Translate
+              🌐 {t('firstAidScreen.translate')}
             </button>
           </div>
         </section>
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:bg-slate-900">
-          <h3 className="mb-4 text-lg font-bold">Do this now</h3>
+          <h3 className="mb-4 text-lg font-bold">{t('firstAidScreen.doNow')}</h3>
           <div className="space-y-3">
             {actions.map((action) => (
               <ActionCardAccordion key={action.id} action={action} simpleMode={simpleMode} onSpeak={speak} />
@@ -113,7 +104,7 @@ export function FirstAidScreen({
         </section>
 
         <section className="rounded-2xl border border-amber-100 bg-amber-50 p-5 shadow-sm">
-          <h3 className="mb-3 text-lg font-bold text-amber-900">Avoid this</h3>
+          <h3 className="mb-3 text-lg font-bold text-amber-900">{t('firstAidScreen.avoidTitle')}</h3>
           <ul className="space-y-2">
             {avoidList.map((item) => (
               <li key={item} className="flex gap-2 text-sm text-amber-800">
@@ -127,7 +118,7 @@ export function FirstAidScreen({
         <RedFlagChecklist items={redFlags} onEscalate={() => setShowEmergencyModal(true)} />
 
         <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm dark:bg-slate-900">
-          <h3 className="mb-3 text-lg font-bold">Next steps</h3>
+          <h3 className="mb-3 text-lg font-bold">{t('firstAidScreen.nextStepsTitle')}</h3>
           <div className="grid gap-3 sm:grid-cols-2">
             <button type="button" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-emerald-600 px-4 text-sm font-semibold text-white" onClick={() => onOpenRouting(false)}>
               ➡️ {nextSteps.primary}
@@ -145,10 +136,10 @@ export function FirstAidScreen({
             🚑 {nextSteps.primary}
           </button>
           <button type="button" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-200 px-3 text-xs font-semibold" onClick={() => onOpenRouting(false)}>
-            🗺️ View hospitals
+            🗺️ {t('firstAidScreen.viewHospitals')}
           </button>
           <button type="button" className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-slate-200 px-3 text-xs font-semibold" onClick={onEndSession}>
-            💾 End & save
+            💾 {t('firstAidScreen.endSave')}
           </button>
         </div>
       </div>
@@ -156,16 +147,16 @@ export function FirstAidScreen({
       <div className={`fixed inset-0 z-40 transition ${showEmergencyModal ? 'pointer-events-auto opacity-100' : 'pointer-events-none opacity-0'}`}>
         <div className="absolute inset-0 bg-slate-900/50" onClick={() => setShowEmergencyModal(false)} />
         <section className={`absolute left-1/2 top-1/2 w-[92%] max-w-md -translate-x-1/2 rounded-2xl bg-white p-6 shadow-2xl transition-transform ${showEmergencyModal ? '-translate-y-1/2' : 'translate-y-8'}`}>
-          <h4 className="text-xl font-bold text-red-800">Emergency signs detected</h4>
+          <h4 className="text-xl font-bold text-red-800">{t('firstAidScreen.emergencyTitle')}</h4>
           <p className="mt-2 text-sm text-slate-700">
-            Stay with someone if possible, avoid exertion, and route to the nearest emergency-ready hospital now.
+            {t('firstAidScreen.emergencyBody')}
           </p>
           <div className="mt-4 grid gap-2">
             <button type="button" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-red-700 text-sm font-semibold text-white" onClick={() => onOpenRouting(true)}>
-              🚑 Route now
+              🚑 {t('firstAidScreen.routeNow')}
             </button>
             <button type="button" className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-slate-200 text-sm font-semibold" onClick={() => setShowEmergencyModal(false)}>
-              Close
+              {t('firstAidScreen.close')}
             </button>
           </div>
         </section>

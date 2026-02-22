@@ -12,7 +12,9 @@ class HospitalController extends Controller
 {
     public function index(Request $request, GeoService $geoService)
     {
-        $query = Hospital::query()->where('state', 'Lagos');
+        $query = Hospital::query()
+            ->where('state', 'Lagos')
+            ->with(['specialties', 'facilities']);
 
         if ($request->filled('specialty')) {
             $specialty = $request->string('specialty')->toString();
@@ -70,7 +72,9 @@ class HospitalController extends Controller
 
     public function show(int $id)
     {
-        $hospital = Hospital::where('state', 'Lagos')->findOrFail($id);
+        $hospital = Hospital::where('state', 'Lagos')
+            ->with(['specialties', 'facilities'])
+            ->findOrFail($id);
 
         return new HospitalResource($hospital);
     }
