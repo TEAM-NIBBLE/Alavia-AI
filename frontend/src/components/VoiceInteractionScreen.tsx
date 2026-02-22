@@ -241,76 +241,95 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
           URL.revokeObjectURL(audioRef.current.src)
         }
         const audio = new Audio(tts.audio_url)
+        audio.preload = 'auto' // Preload audio immediately
         audioRef.current = audio
+        
         audio.onended = () => {
           if (audio.src.startsWith('blob:')) URL.revokeObjectURL(audio.src)
           onEnd?.()
         }
-        let didPlay = false
-        try {
-          await audio.play()
-          didPlay = true
-        } catch {
-          // If browser blocks autoplay for blob/media URLs, fallback to Web Speech TTS.
+        
+        audio.onerror = () => {
+          // If audio fails, fallback to speech synthesis
+          if ('speechSynthesis' in window) {
+            fallbackToSpeechSynthesis()
+          } else {
+            onEnd?.()
+          }
         }
-        if (didPlay) return
+        
+        // Start playing immediately without waiting
+        audio.play().catch(() => {
+          // If autoplay is blocked, try speech synthesis fallback
+          if ('speechSynthesis' in window) {
+            fallbackToSpeechSynthesis()
+          } else {
+            onEnd?.()
+          }
+        })
+        return
       }
     } catch {
       // fallback to browser synthesis
     }
 
-    if (!('speechSynthesis' in window)) {
-      onEnd?.()
-      return
-    }
+    // Fallback to speech synthesis
+    fallbackToSpeechSynthesis()
 
-    // Map app language codes → BCP47 tags (priority order per language)
-    const LANG_BCP47: Record<string, string[]> = {
-      en:  ['en-NG', 'en-GB', 'en-US', 'en'],
-      pcm: ['en-NG', 'en-GB', 'en-US', 'en'],   // Nigerian Pidgin – closest TTS is NG English
-      yo:  ['yo', 'yo-NG', 'en-NG', 'en'],        // Yoruba (rare – falls back to NG English)
-      ha:  ['ha', 'ha-NE', 'en-NG', 'en'],        // Hausa
-      ig:  ['ig', 'ig-NG', 'en-NG', 'en'],        // Igbo
-    }
-    const bcp47List = [speechLangConfig.speechLocale, ...(LANG_BCP47[speechLanguage] ?? ['en-NG', 'en'])]
+    function fallbackToSpeechSynthesis() {
+      if (!('speechSynthesis' in window)) {
+        onEnd?.()
+        return
+      }
 
-    const utterance = new SpeechSynthesisUtterance(text)
-    utterance.lang = bcp47List[0]   // primary preference
-    utterance.rate = 0.95
-    utterance.pitch = 1.1           // warmer female pitch
+      // Map app language codes → BCP47 tags (priority order per language)
+      const LANG_BCP47: Record<string, string[]> = {
+        en:  ['en-NG', 'en-GB', 'en-US', 'en'],
+        pcm: ['en-NG', 'en-GB', 'en-US', 'en'],   // Nigerian Pidgin – closest TTS is NG English
+        yo:  ['yo', 'yo-NG', 'en-NG', 'en'],        // Yoruba (rare – falls back to NG English)
+        ha:  ['ha', 'ha-NE', 'en-NG', 'en'],        // Hausa
+        ig:  ['ig', 'ig-NG', 'en-NG', 'en'],        // Igbo
+      }
+      const bcp47List = [speechLangConfig.speechLocale, ...(LANG_BCP47[speechLanguage] ?? ['en-NG', 'en'])]
 
-    // Female voice name fragments
-    const FEMALE_NAMES = [
-      'zira', 'samantha', 'victoria', 'karen', 'fiona', 'susan', 'moira',
-      'veena', 'tessa', 'female', 'woman', 'serena', 'siri', 'ava', 'allison',
-      'joanna', 'ivy', 'kimberly', 'kendra', 'salli', 'olivia', 'aria', 'hazel',
-    ]
-    const isFemale = (v: SpeechSynthesisVoice) =>
-      FEMALE_NAMES.some(n => v.name.toLowerCase().includes(n))
+      const utterance = new SpeechSynthesisUtterance(text)
+      utterance.lang = bcp47List[0]   // primary preference
+      utterance.rate = 1.05  // Slightly faster for reduced delay perception
+      utterance.pitch = 1.1  // warmer female pitch
 
-    const voices = voicesRef.current
-    let chosen: SpeechSynthesisVoice | undefined
+      // Female voice name fragments
+      const FEMALE_NAMES = [
+        'zira', 'samantha', 'victoria', 'karen', 'fiona', 'susan', 'moira',
+        'veena', 'tessa', 'female', 'woman', 'serena', 'siri', 'ava', 'allison',
+        'joanna', 'ivy', 'kimberly', 'kendra', 'salli', 'olivia', 'aria', 'hazel',
+      ]
+      const isFemale = (v: SpeechSynthesisVoice) =>
+        FEMALE_NAMES.some(n => v.name.toLowerCase().includes(n))
 
-    // 1. Female voice matching any of the preferred BCP47 tags (in priority order)
-    for (const tag of bcp47List) {
-      chosen = voices.find(v => isFemale(v) && v.lang.startsWith(tag.split('-')[0]))
-      if (chosen) break
-    }
-    // 2. Any voice (not necessarily female) matching the language
-    if (!chosen) {
+      const voices = voicesRef.current
+      let chosen: SpeechSynthesisVoice | undefined
+
+      // 1. Female voice matching any of the preferred BCP47 tags (in priority order)
       for (const tag of bcp47List) {
-        chosen = voices.find(v => v.lang.startsWith(tag.split('-')[0]))
+        chosen = voices.find(v => isFemale(v) && v.lang.startsWith(tag.split('-')[0]))
         if (chosen) break
       }
+      // 2. Any voice (not necessarily female) matching the language
+      if (!chosen) {
+        for (const tag of bcp47List) {
+          chosen = voices.find(v => v.lang.startsWith(tag.split('-')[0]))
+          if (chosen) break
+        }
+      }
+      // 3. Any female English voice as last resort
+      if (!chosen) chosen = voices.find(v => isFemale(v) && v.lang.startsWith('en'))
+
+      if (chosen) utterance.voice = chosen
+
+      if (onEnd) utterance.onend = onEnd
+      window.speechSynthesis.cancel()
+      window.speechSynthesis.speak(utterance)
     }
-    // 3. Any female English voice as last resort
-    if (!chosen) chosen = voices.find(v => isFemale(v) && v.lang.startsWith('en'))
-
-    if (chosen) utterance.voice = chosen
-
-    if (onEnd) utterance.onend = onEnd
-    window.speechSynthesis.cancel()
-    window.speechSynthesis.speak(utterance)
   }
 
   const triggerHaptics = (pattern: number | number[]) => {
@@ -421,6 +440,16 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     try {
       const res = await consultationsApi.message(id, prefixed, LANGUAGE_CONFIG[sessionLang].apiLanguage)
       console.debug('[VoiceInteraction] consultationsApi.message response', res)
+      
+      // Immediately start playing audio in parallel with state updates to reduce perceived delay
+      const normalizedStatus = String(res.status ?? '').toLowerCase()
+      const isComplete = ['complete', 'completed', 'closed', 'ended'].includes(normalizedStatus)
+      
+      if (!isComplete && res.message.content) {
+        // Start audio playback immediately - don't wait
+        void speakText(res.message.content, undefined, sessionLang)
+      }
+      
       setCurrentAIMessage(res.message.content)
       setCurrentAIMessageSeq(prev => prev + 1)
       if (res.severity) {
@@ -429,8 +458,8 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
           setAIResponse(prev => prev ? { ...prev, severity: normalized } : prev)
         }
       }
-      const normalizedStatus = String(res.status ?? '').toLowerCase()
-      if (['complete', 'completed', 'closed', 'ended'].includes(normalizedStatus)) {
+      
+      if (isComplete) {
         updateConsultationComplete(true)
         try {
           const detail = await consultationsApi.detail(id)
@@ -453,8 +482,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
         } catch {
           // detail fetch failed — first aid will be empty
         }
-      } else {
-        void speakText(res.message.content, undefined, sessionLang)
       }
     } catch (err) {
       setApiError(err instanceof Error ? err.message : 'Request failed')
