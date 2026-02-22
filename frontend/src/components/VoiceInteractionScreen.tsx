@@ -583,12 +583,21 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
               summary: stripSystemPrefix(detail.consultation.summary),
             })
           }
+          const completeLang = consultationLanguageRef.current
+          const completeLangT = i18n.getFixedT(completeLang)
+          let sev: Severity | undefined
           if (detail.consultation.severity) {
-            const sev = normalizeSeverity(detail.consultation.severity)
+            sev = normalizeSeverity(detail.consultation.severity)
             if (sev) {
               setAIResponse(prev => prev ? { ...prev, severity: sev } : prev)
             }
           }
+          // Speak translated summary + first aid steps
+          const sevKey = sev ?? 'medium'
+          const summaryText = completeLangT(`voice.summaries.${sevKey}`) as string
+          const firstAidSteps = completeLangT(`voice.firstAid.${sevKey}`, { returnObjects: true }) as string[]
+          const spokenText = [summaryText, ...firstAidSteps].join('. ')
+          void speakText(spokenText, undefined, completeLang)
         } catch {
           // detail fetch failed — first aid will be empty
         }
@@ -1553,20 +1562,24 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                       <h3 className="text-xl font-black text-slate-800 tracking-tight">{t('voice.firstAidTitle')}</h3>
                     </div>
                     <div className="space-y-4">
-                      {(consultationDetail?.first_aid ?? []).map((step, idx) => (
-                        <motion.div
-                          key={idx}
-                          initial={{ opacity: 0, x: -20 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ delay: idx * 0.1 }}
-                          className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100/50"
-                        >
-                          <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-black text-white">
-                            {idx + 1}
-                          </span>
-                          <p className="text-sm font-bold text-slate-600 leading-relaxed">{step}</p>
-                        </motion.div>
-                      ))}
+                      {(() => {
+                        const sevKey = aiResponse?.severity ?? 'medium'
+                        const steps = t(`voice.firstAid.${sevKey}`, { returnObjects: true }) as string[]
+                        return (Array.isArray(steps) ? steps : []).map((step, idx) => (
+                          <motion.div
+                            key={idx}
+                            initial={{ opacity: 0, x: -20 }}
+                            animate={{ opacity: 1, x: 0 }}
+                            transition={{ delay: idx * 0.1 }}
+                            className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100/50"
+                          >
+                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-black text-white">
+                              {idx + 1}
+                            </span>
+                            <p className="text-sm font-bold text-slate-600 leading-relaxed">{step}</p>
+                          </motion.div>
+                        ))
+                      })()}
                     </div>
                   </div>
 
