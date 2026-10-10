@@ -1515,7 +1515,7 @@ export default function VoiceInteractionScreen({ userName, isGuest = false, onSi
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className={`mx-auto max-w-xl px-4 sm:px-6 pt-4 ${consultationComplete ? 'pb-10' : 'pb-56'} relative z-10`}>
+      <main className={`mx-auto max-w-xl px-4 sm:px-6 pt-4 ${consultationComplete ? 'pb-10' : 'pb-64'} relative z-10`}>
         <div className="flex flex-col gap-4 text-left">
           <FollowUpCheckIn onEscalate={activateEmergencyMode} />
 
@@ -1769,14 +1769,14 @@ export default function VoiceInteractionScreen({ userName, isGuest = false, onSi
                   onContextMenu={(e) => e.preventDefault()}
                   aria-label={isListening ? t('voice.stop') : t('voice.speakTitle')}
                   style={{ touchAction: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
-                  className={`relative -mt-10 flex h-28 w-28 items-center justify-center rounded-full border-4 border-white transition-all active:scale-95 ${micPermission === 'denied'
+                  className={`relative -mt-14 flex h-36 w-36 items-center justify-center rounded-full border-4 border-white transition-all active:scale-95 ${micPermission === 'denied'
                     ? 'bg-red-50 text-red-500'
                     : isListening
                       ? `${isEmergencyMode ? 'bg-red-600' : 'bg-emerald-500'} text-white ring-[12px] ${isEmergencyMode ? 'ring-red-500/20' : 'ring-emerald-500/20'}`
                       : isEmergencyMode ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'
                     }`}
                 >
-                  {micPermission === 'denied' ? <MicOff size={48} /> : isListening ? <Square size={36} fill="currentColor" /> : <Mic size={52} />}
+                  {micPermission === 'denied' ? <MicOff size={60} /> : isListening ? <Square size={46} fill="currentColor" /> : <Mic size={68} />}
                 </button>
                 <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
                   {isListening
@@ -1787,13 +1787,24 @@ export default function VoiceInteractionScreen({ userName, isGuest = false, onSi
                 </span>
               </div>
 
-              <button
-                type="button"
-                onClick={() => setInputMode(inputMode === 'tap' ? 'hold' : 'tap')}
-                className="justify-self-end rounded-full px-3 py-2 text-[11px] font-black uppercase tracking-widest text-slate-400 transition-all active:scale-95 hover:text-slate-600"
+              <div
+                role="group"
+                aria-label={`${t('voice.modeTap')} / ${t('voice.modeHold')}`}
+                className="flex flex-col gap-1 justify-self-end rounded-full bg-slate-100 p-1"
               >
-                {inputMode === 'tap' ? t('voice.modeHold') : t('voice.modeTap')}
-              </button>
+                {(['tap', 'hold'] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    role="switch"
+                    aria-checked={inputMode === mode}
+                    onClick={() => setInputMode(mode)}
+                    className={`rounded-full px-3 py-2 text-[11px] font-black uppercase tracking-widest transition-all active:scale-95 ${inputMode === mode ? (isEmergencyMode ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white') : 'text-slate-400'}`}
+                  >
+                    {mode === 'tap' ? t('voice.modeTap') : t('voice.modeHold')}
+                  </button>
+                ))}
+              </div>
             </div>
           )}
         </div>
