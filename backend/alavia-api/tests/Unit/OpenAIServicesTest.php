@@ -90,7 +90,5 @@ it('speech service throws when YarnGPT refuses', function () {
 
 function setYarnKey(string $value): void
 {
-    putenv('YARNGPT_API_KEY=' . $value);
-    $_ENV['YARNGPT_API_KEY'] = $value;
-    $_SERVER['YARNGPT_API_KEY'] = $value;
+    config(['alavia.yarngpt.key' => $value]);
 }

@@ -10,7 +10,7 @@ class CryptoService
 
     public function __construct()
     {
-        $rawKey = (string) env('ENCRYPTION_KEY');
+        $rawKey = (string) config('alavia.encryption_key');
         if ($rawKey === '') {
             throw new RuntimeException('ENCRYPTION_KEY is not set.');
         }

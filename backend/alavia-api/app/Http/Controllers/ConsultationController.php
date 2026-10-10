@@ -137,7 +137,7 @@ class ConsultationController extends Controller
 
         if ($result === null) {
             $signals = null;
-            if (filter_var(env('TRIAGE_AI_ENABLED', false), FILTER_VALIDATE_BOOLEAN)) {
+            if (filter_var(config('alavia.triage_ai_enabled'), FILTER_VALIDATE_BOOLEAN)) {
                 $lastUserText = $messages->where('role', 'USER')->pluck('content')->last() ?? '';
                 $signals = $triageClassifier->classify((string) $lastUserText, $language);
             }

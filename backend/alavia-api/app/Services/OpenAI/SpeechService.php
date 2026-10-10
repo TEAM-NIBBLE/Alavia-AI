@@ -3,6 +3,7 @@
 namespace App\Services\OpenAI;
 
 use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 use RuntimeException;
@@ -35,6 +36,12 @@ class SpeechService
         $response = $this->client->postMultipart('/audio/transcriptions', $payload, 'file', $filePath, $fileName);
 
         if (! $response->successful()) {
+            Log::warning('Transcription failed', [
+                'status' => $response->status(),
+                'provider' => $this->client->usingGroq() ? 'groq' : 'openai',
+                'key_configured' => $this->client->configured(),
+                'body' => mb_substr($response->body(), 0, 300),
+            ]);
             throw new RuntimeException('OpenAI transcription failed.');
         }
 
@@ -49,7 +56,7 @@ class SpeechService
         // YarnGPT (Nigerian voices for English, Pidgin, Hausa, Yoruba, Igbo) is the preferred voice.
         // It returns a short-lived streaming link the browser plays directly, so sound starts at once
         // and the API key never leaves the server.
-        if ($yarnKey = (string) env('YARNGPT_API_KEY')) {
+        if ($yarnKey = (string) config('alavia.yarngpt.key')) {
             return $this->yarnStream($text, $yarnKey);
         }
 
@@ -100,14 +107,14 @@ class SpeechService
      */
     private function yarnStream(string $text, string $apiKey): array
     {
-        $base = rtrim((string) env('YARNGPT_BASE_URL', 'https://api.yarngpt.ai'), '/');
+        $base = rtrim((string) config('alavia.yarngpt.base_url'), '/');
 
         $response = Http::withToken($apiKey)
             ->timeout(20)
             ->asJson()
             ->post($base . '/api/v1/tts/prepare', array_filter([
                 'text' => mb_substr($text, 0, 15000),
-                'voice' => env('YARNGPT_VOICE', 'adaora'),
+                'voice' => config('alavia.yarngpt.voice'),
                 'output_format' => 'mp3',
             ]));
 

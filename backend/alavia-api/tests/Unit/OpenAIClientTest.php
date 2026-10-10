@@ -10,12 +10,7 @@ uses(TestCase::class);
 it('posts json with auth header to openai base url', function () {
     Http::fake();
 
-    putenv('OPENAI_API_KEY=test-key');
-    putenv('OPENAI_BASE_URL=https://api.openai.com/v1');
-    $_ENV['OPENAI_API_KEY'] = 'test-key';
-    $_SERVER['OPENAI_API_KEY'] = 'test-key';
-    $_ENV['OPENAI_BASE_URL'] = 'https://api.openai.com/v1';
-    $_SERVER['OPENAI_BASE_URL'] = 'https://api.openai.com/v1';
+    config(['alavia.groq_key' => '', 'alavia.openai.key' => 'test-key', 'alavia.openai.base_url' => 'https://api.openai.com/v1']);
 
     $client = new OpenAIClient();
     $client->postJson('/chat/completions', ['model' => 'gpt-4o-mini']);
@@ -30,12 +25,7 @@ it('posts json with auth header to openai base url', function () {
 it('posts multipart to openai base url', function () {
     Http::fake();
 
-    putenv('OPENAI_API_KEY=test-key');
-    putenv('OPENAI_BASE_URL=https://api.openai.com/v1');
-    $_ENV['OPENAI_API_KEY'] = 'test-key';
-    $_SERVER['OPENAI_API_KEY'] = 'test-key';
-    $_ENV['OPENAI_BASE_URL'] = 'https://api.openai.com/v1';
-    $_SERVER['OPENAI_BASE_URL'] = 'https://api.openai.com/v1';
+    config(['alavia.groq_key' => '', 'alavia.openai.key' => 'test-key', 'alavia.openai.base_url' => 'https://api.openai.com/v1']);
 
     $tmp = tempnam(sys_get_temp_dir(), 'audio');
     file_put_contents($tmp, 'audio');
