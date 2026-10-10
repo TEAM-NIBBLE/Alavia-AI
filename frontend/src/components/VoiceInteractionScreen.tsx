@@ -205,6 +205,8 @@ export default function VoiceInteractionScreen({ userName, isGuest = false, onSi
   const restartTimeoutRef = useRef<number | null>(null)
   const conversationModeRef = useRef<'voice' | 'keyboard' | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  // Bumped whenever speech is stopped or replaced, so audio that arrives late for an old question is dropped.
+  const speechTokenRef = useRef(0)
 
   const [conversationMode, setConversationMode] = useState<'voice' | 'keyboard' | null>(null)
   const [voiceNotice, setVoiceNotice] = useState<string | null>(null)
@@ -489,9 +491,19 @@ export default function VoiceInteractionScreen({ userName, isGuest = false, onSi
     return true
   }
 
+  const stopSpeaking = () => {
+    speechTokenRef.current += 1
+    audioRef.current?.pause()
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel()
+  }
+
   // `force` is for explicit user actions (Play button) and safety messages; automatic
   // narration respects the Audio Autoplay / Read Prompts settings.
-  const speakText = async (text: string, onEnd?: () => void, languageOverride?: LanguageCode, force = false) => {
+  const speakText = async (text: string, onEndRaw?: () => void, languageOverride?: LanguageCode, force = false) => {
+    // One voice at a time: whatever was talking stops, and its late-arriving audio never plays.
+    stopSpeaking()
+    const token = speechTokenRef.current
+    const onEnd = onEndRaw ? () => { if (token === speechTokenRef.current) onEndRaw() } : undefined
     if (!text.trim()) {
       onEnd?.()
       return
@@ -524,12 +536,13 @@ export default function VoiceInteractionScreen({ userName, isGuest = false, onSi
           }),
         ),
       )
+      if (token !== speechTokenRef.current) return
       const urls = results.map((r) => r.audio_url).filter((u): u is string => !!u)
 
       if (urls.length) {
-        audioRef.current?.pause()
         const playbackRate = VOICE_SPEED_RATE[prefs.voiceSpeed ?? 'normal'] ?? 1
         const playAt = (index: number) => {
+          if (token !== speechTokenRef.current) return
           if (index >= urls.length) {
             onEnd?.()
             return
@@ -549,6 +562,8 @@ export default function VoiceInteractionScreen({ userName, isGuest = false, onSi
       if (Date.now() >= cloudTtsDownUntil) cloudTtsDownUntil = Date.now() + CLOUD_TTS_COOLDOWN_MS
       void err
     }
+
+    if (token !== speechTokenRef.current) return
 
     // Cloud voice failed: the browser's own voice is the fallback.
     if (speakWithBrowser(text, speechLanguage, browserRate, onEnd)) {
@@ -625,7 +640,7 @@ export default function VoiceInteractionScreen({ userName, isGuest = false, onSi
         rawAIMessageRef.current = res.message.content
         const localizedMsg = localizeServerQuestion(res.message.content)
         // Brief pause so the "thinking" indicator is visible before the first question
-        await new Promise(r => setTimeout(r, 1200))
+        await new Promise(r => setTimeout(r, 300))
         setCurrentAIMessage(localizedMsg)
         setCurrentAIMessageSeq(1)
         setAIResponse({ heading: t('voice.responseHeading'), summary: stripSystemPrefix(message) })
@@ -765,6 +780,7 @@ export default function VoiceInteractionScreen({ userName, isGuest = false, onSi
   const submitInputIntoFlow = (value: string, source: 'voice' | 'keyboard' = 'voice') => {
     const cleaned = value.trim()
     if (!cleaned) return
+    stopSpeaking()
     if (shouldKeepListeningRef.current) stopListening()
     if (source === 'voice') {
       setTranscript(cleaned)
@@ -1031,6 +1047,7 @@ export default function VoiceInteractionScreen({ userName, isGuest = false, onSi
   const startListening = async () => {
     if (!supportsSpeech) return
     if (isListening || isStartingRef.current) return
+    stopSpeaking()
     isStartingRef.current = true
 
     try {
@@ -1141,10 +1158,9 @@ export default function VoiceInteractionScreen({ userName, isGuest = false, onSi
   // When a result arrives: open the tab that matters most for its urgency, and show it from the top.
   useEffect(() => {
     if (!consultationComplete) return
-    const sev = (consultationDetail?.severity ?? '').toUpperCase()
-    setResultTab(sev === 'HIGH' || sev === 'CRITICAL' ? 'hospitals' : 'steps')
+    setResultTab('steps')
     window.scrollTo({ top: 0, behavior: 'smooth' })
-  }, [consultationComplete, consultationDetail?.severity])
+  }, [consultationComplete])
 
   // A new question appears at the top of the screen: make sure it is in view.
   useEffect(() => {
@@ -1499,7 +1515,7 @@ export default function VoiceInteractionScreen({ userName, isGuest = false, onSi
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-xl px-4 sm:px-6 pt-4 pb-56 relative z-10">
+      <main className={`mx-auto max-w-xl px-4 sm:px-6 pt-4 ${consultationComplete ? 'pb-10' : 'pb-56'} relative z-10`}>
         <div className="flex flex-col gap-4 text-left">
           <FollowUpCheckIn onEscalate={activateEmergencyMode} />
 
@@ -1633,7 +1649,7 @@ export default function VoiceInteractionScreen({ userName, isGuest = false, onSi
               </motion.div>
 
               <div className="grid grid-cols-2 gap-1 rounded-full bg-slate-100 p-1">
-                {(['hospitals', 'steps'] as const).map((tab) => (
+                {(['steps', 'hospitals'] as const).map((tab) => (
                   <button
                     key={tab}
                     type="button"
@@ -1692,6 +1708,7 @@ export default function VoiceInteractionScreen({ userName, isGuest = false, onSi
       </main>
 
       {/* Bottom dock: mic + typing always within thumb reach, never covering the answer above. */}
+      {!consultationComplete && (
       <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-100 bg-white/95 px-4 pt-3 backdrop-blur-xl" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
         <div className="mx-auto max-w-xl">
           {conversationMode === 'keyboard' ? (
@@ -1781,6 +1798,7 @@ export default function VoiceInteractionScreen({ userName, isGuest = false, onSi
           )}
         </div>
       </div>
+      )}
 
       <AnimatePresence>
         {showLanguagePanel && (
