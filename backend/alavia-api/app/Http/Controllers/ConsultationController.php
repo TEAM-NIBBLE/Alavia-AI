@@ -8,22 +8,28 @@ use App\Models\Consultation;
 use App\Models\ConsultationMessage;
 use App\Services\CryptoService;
 use App\Services\TriageClassifier;
+use App\Services\TriageAdvisor;
 use App\Services\TriageEngine;
 use App\Services\TriageQuestions;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Str;
 
 class ConsultationController extends Controller
 {
     public function start(
         StartConsultationRequest $request,
-        CryptoService $cryptoService
+        CryptoService $cryptoService,
+        TriageAdvisor $triageAdvisor
     ): JsonResponse {
-        $user = $request->user();
-        $language = $request->validated()['language'] ?? ($user->language ?? 'EN');
+        // Works signed in or as a guest (emergency use without an account).
+        $user = $request->user('sanctum');
+        $language = $request->validated()['language'] ?? ($user?->language ?? 'EN');
 
+        $guestToken = null;
         $consultation = Consultation::create([
-            'user_id' => $user->id,
+            'user_id' => $user?->id,
+            'guest_token_hash' => $user ? null : hash('sha256', $guestToken = Str::random(48)),
             'status' => 'ACTIVE',
             'category' => null,
         ]);
@@ -37,21 +43,37 @@ class ConsultationController extends Controller
             ]);
         }
 
-        $firstQuestion = TriageQuestions::all()[$language]['GENERAL'][0] ?? 'What symptoms are you feeling right now?';
+        $firstQuestion = null;
+        $guided = false;
+        $startAnswerType = null;
+        // If they already described their problem, follow up on that instead of asking again.
+        if ($initialMessage && $triageAdvisor->available($language)) {
+            $advice = $triageAdvisor->advise(collect([['role' => 'USER', 'content' => $initialMessage]]), $language, true);
+            if ($advice !== null && ! $advice['complete']) {
+                $firstQuestion = $advice['question'];
+                $startAnswerType = $advice['answer_type'] ?? null;
+                $guided = true;
+                $consultation->update(['category' => $advice['category']]);
+            }
+        }
+        $firstQuestion ??= TriageQuestions::all()[$language]['GENERAL'][0] ?? 'What symptoms are you feeling right now?';
         $aiMessage = ConsultationMessage::create([
             'consultation_id' => $consultation->id,
             'role' => 'AI',
             'content_encrypted' => $cryptoService->encrypt($firstQuestion),
         ]);
 
-        return response()->json([
+        return response()->json(array_filter([
             'consultation_id' => $consultation->id,
+            'guest_token' => $guestToken,
+            'guided' => $guided,
+            'answer_type' => $startAnswerType,
             'message' => [
                 'id' => $aiMessage->id,
                 'role' => 'AI',
                 'content' => $firstQuestion,
             ],
-        ], 201);
+        ], fn ($value) => $value !== null), 201);
     }
 
     public function message(
@@ -59,10 +81,10 @@ class ConsultationController extends Controller
         int $id,
         CryptoService $cryptoService,
         TriageEngine $triageEngine,
-        TriageClassifier $triageClassifier
+        TriageClassifier $triageClassifier,
+        TriageAdvisor $triageAdvisor
     ): JsonResponse {
-        $consultation = Consultation::where('user_id', $request->user()->id)
-            ->findOrFail($id);
+        $consultation = $this->ownedConsultation($request, $id);
 
         if ($consultation->status === 'COMPLETED') {
             return response()->json([
@@ -79,7 +101,7 @@ class ConsultationController extends Controller
             'content_encrypted' => $cryptoService->encrypt($request->validated()['content']),
         ]);
 
-        $language = $request->validated()['language'] ?? ($request->user()->language ?? 'EN');
+        $language = $request->validated()['language'] ?? ($request->user('sanctum')?->language ?? 'EN');
         $messages = ConsultationMessage::where('consultation_id', $consultation->id)
             ->orderBy('id')
             ->get()
@@ -90,13 +112,38 @@ class ConsultationController extends Controller
                 ];
             });
 
-        $signals = null;
-        if (filter_var(env('TRIAGE_AI_ENABLED', false), FILTER_VALIDATE_BOOLEAN)) {
-            $lastUserText = $messages->where('role', 'USER')->pluck('content')->last() ?? '';
-            $signals = $triageClassifier->classify((string) $lastUserText, $language);
+        // The language model runs the conversation when it is configured; the rule-based engine
+        // is the fallback (and the safety floor for red flags) so triage never stops working.
+        $guided = false;
+        $answerType = null;
+        $result = null;
+        if ($triageAdvisor->available($language)) {
+            $advice = $triageAdvisor->advise($messages, $language);
+            if ($advice !== null) {
+                $guided = true;
+                $answerType = $advice['answer_type'] ?? null;
+                $result = [
+                    'category' => $advice['category'],
+                    'next_question' => $advice['question'],
+                    'complete' => $advice['complete'],
+                    'severity' => $advice['severity'],
+                    'summary' => $advice['summary'],
+                    'first_aid' => $advice['first_aid'],
+                    'warnings' => $advice['warnings'],
+                    'recommended_specialty' => $advice['specialty'],
+                ];
+            }
         }
 
-        $result = $triageEngine->evaluate($consultation, $messages, $language, $signals);
+        if ($result === null) {
+            $signals = null;
+            if (filter_var(env('TRIAGE_AI_ENABLED', false), FILTER_VALIDATE_BOOLEAN)) {
+                $lastUserText = $messages->where('role', 'USER')->pluck('content')->last() ?? '';
+                $signals = $triageClassifier->classify((string) $lastUserText, $language);
+            }
+
+            $result = $triageEngine->evaluate($consultation, $messages, $language, $signals);
+        }
 
         $consultation->category = $result['category'];
 
@@ -107,12 +154,13 @@ class ConsultationController extends Controller
             $consultation->first_aid_json = $result['first_aid'];
             $consultation->warnings_json = $result['warnings'];
             $consultation->summary_encrypted = $cryptoService->encrypt((string) $result['summary']);
+            $consultation->follow_up_due_at = $this->followUpDueAt((string) $result['severity']);
         }
 
         $consultation->save();
 
         $aiContent = $result['complete']
-            ? $this->formatFinalResponse($result)
+            ? ($guided ? (string) $result['summary'] : $this->formatFinalResponse($result))
             : (string) $result['next_question'];
 
         $aiMessage = ConsultationMessage::create([
@@ -125,6 +173,9 @@ class ConsultationController extends Controller
             'consultation_id' => $consultation->id,
             'status' => $consultation->status,
             'severity' => $consultation->severity,
+            'follow_up_due_at' => $consultation->follow_up_due_at,
+            'guided' => $guided,
+            'answer_type' => $answerType,
             'message' => [
                 'id' => $aiMessage->id,
                 'role' => 'AI',
@@ -135,8 +186,7 @@ class ConsultationController extends Controller
 
     public function show(Request $request, int $id, CryptoService $cryptoService): JsonResponse
     {
-        $consultation = Consultation::where('user_id', $request->user()->id)
-            ->findOrFail($id);
+        $consultation = $this->ownedConsultation($request, $id);
 
         $messages = ConsultationMessage::where('consultation_id', $consultation->id)
             ->orderBy('id')
@@ -162,6 +212,9 @@ class ConsultationController extends Controller
                 'summary' => $consultation->summary_encrypted
                     ? $cryptoService->decrypt($consultation->summary_encrypted)
                     : null,
+                'follow_up_due_at' => $consultation->follow_up_due_at,
+                'follow_up_outcome' => $consultation->follow_up_outcome,
+                'feedback_helpful' => $consultation->feedback_helpful,
                 'created_at' => $consultation->created_at,
                 'updated_at' => $consultation->updated_at,
             ],
@@ -192,6 +245,57 @@ class ConsultationController extends Controller
         ]);
     }
 
+    /**
+     * "Was this helpful?" feedback after a completed consultation.
+     */
+    public function feedback(Request $request, int $id, CryptoService $cryptoService): JsonResponse
+    {
+        $data = $request->validate([
+            'helpful' => ['required', 'boolean'],
+            'comment' => ['nullable', 'string', 'max:1000'],
+        ]);
+
+        $consultation = $this->ownedConsultation($request, $id);
+        $consultation->feedback_helpful = (bool) $data['helpful'];
+        $consultation->feedback_comment_encrypted = ! empty($data['comment'])
+            ? $cryptoService->encrypt($data['comment'])
+            : null;
+        $consultation->feedback_at = now();
+        $consultation->save();
+
+        return response()->json(['status' => 'ok']);
+    }
+
+    /**
+     * The person's answer to Alavia's check-back ("how are you feeling now?").
+     * WORSE comes back flagged so the client can escalate to emergency help right away.
+     */
+    public function followUp(Request $request, int $id): JsonResponse
+    {
+        $data = $request->validate([
+            'outcome' => ['required', 'in:BETTER,SAME,WORSE'],
+        ]);
+
+        $consultation = $this->ownedConsultation($request, $id);
+
+        if ($consultation->status !== 'COMPLETED') {
+            return response()->json([
+                'error' => ['message' => 'Consultation is not completed yet.', 'type' => 'consultation'],
+            ], 409);
+        }
+
+        $consultation->follow_up_outcome = $data['outcome'];
+        $consultation->follow_up_at = now();
+        $consultation->save();
+
+        return response()->json([
+            'status' => 'ok',
+            'escalate' => $data['outcome'] === 'WORSE',
+            // SAME on a serious case is also worth a second look; the client uses severity to decide.
+            'severity' => $consultation->severity,
+        ]);
+    }
+
     public function destroy(Request $request, int $id): JsonResponse
     {
         $consultation = Consultation::where('user_id', $request->user()->id)
@@ -200,6 +304,37 @@ class ConsultationController extends Controller
         $consultation->delete();
 
         return response()->json(['status' => 'ok']);
+    }
+
+    /** Sooner check-backs for more serious outcomes. */
+    private function followUpDueAt(string $severity): \Illuminate\Support\Carbon
+    {
+        return match (strtoupper($severity)) {
+            'CRITICAL' => now()->addHour(),
+            'HIGH' => now()->addHours(2),
+            'MEDIUM' => now()->addHours(6),
+            default => now()->addHours(24),
+        };
+    }
+
+    /**
+     * Resolve a consultation the caller owns: either their own (signed in) or a guest
+     * consultation proven by the X-Guest-Token header. Anything else is a 404.
+     */
+    private function ownedConsultation(Request $request, int $id): Consultation
+    {
+        $user = $request->user('sanctum');
+
+        if ($user) {
+            return Consultation::where('user_id', $user->id)->findOrFail($id);
+        }
+
+        $token = (string) $request->header('X-Guest-Token', '');
+        abort_if($token === '', 401, 'Unauthenticated.');
+
+        return Consultation::whereNull('user_id')
+            ->where('guest_token_hash', hash('sha256', $token))
+            ->findOrFail($id);
     }
 
     /**

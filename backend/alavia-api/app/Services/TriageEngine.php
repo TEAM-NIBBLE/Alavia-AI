@@ -52,13 +52,22 @@ class TriageEngine
 
     private function detectCategory(Collection $messages): string
     {
-        $text = Str::lower($messages->where('role', 'USER')->pluck('content')->implode(' '));
+        $text = TriageLexicon::normalize($messages->where('role', 'USER')->pluck('content')->implode(' '));
 
-        if (Str::contains($text, ['chest', 'heart', 'pressure', 'tightness', 'pain in chest'])) {
+        // Immediately dangerous complaints decide the category first, in any language.
+        if (TriageLexicon::hasAny($text, TriageLexicon::CHEST)) {
             return 'CHEST';
         }
 
-        if (Str::contains($text, ['fever', 'temperature', 'hot body', 'body hot', 'iba'])) {
+        if (TriageLexicon::hasAny($text, TriageLexicon::BREATHING)) {
+            return 'RESP';
+        }
+
+        if (TriageLexicon::hasAny($text, TriageLexicon::NEURO_FLAGS)) {
+            return 'NEURO';
+        }
+
+        if (Str::contains($text, ['fever', 'temperature', 'hot body', 'body hot', 'iba']) || $this->inCategory($text, 'FEVER')) {
             return 'FEVER';
         }
 
@@ -66,35 +75,40 @@ class TriageEngine
             return 'EYE';
         }
 
-        if (Str::contains($text, ['stomach', 'abdominal', 'belly', 'diarrhea', 'vomit', 'nausea'])) {
+        if (Str::contains($text, ['stomach', 'abdominal', 'belly', 'diarrhea', 'vomit', 'nausea']) || $this->inCategory($text, 'GI')) {
             return 'GI';
         }
 
-        if (Str::contains($text, ['headache', 'migraine', 'head pain', 'dizzy', 'dizziness'])) {
+        if (Str::contains($text, ['headache', 'migraine', 'head pain', 'dizzy', 'dizziness']) || $this->inCategory($text, 'HEAD')) {
             return 'HEAD';
         }
 
-        if (Str::contains($text, ['cough', 'wheezing', 'shortness of breath', 'breathing', 'asthma'])) {
+        if (Str::contains($text, ['cough', 'wheezing', 'shortness of breath', 'breathing', 'asthma']) || $this->inCategory($text, 'RESP')) {
             return 'RESP';
         }
 
-        if (Str::contains($text, ['rash', 'itch', 'skin', 'hives', 'eczema'])) {
+        if (Str::contains($text, ['rash', 'itch', 'skin', 'hives', 'eczema']) || $this->inCategory($text, 'SKIN')) {
             return 'SKIN';
         }
 
-        if (Str::contains($text, ['weakness', 'numb', 'numbness', 'seizure', 'slurred', 'stroke'])) {
+        if (Str::contains($text, ['weakness', 'numb', 'numbness', 'seizure', 'slurred', 'stroke']) || $this->inCategory($text, 'NEURO')) {
             return 'NEURO';
         }
 
-        if (Str::contains($text, ['urine', 'urinating', 'pee', 'burning', 'flank', 'kidney'])) {
+        if (Str::contains($text, ['urine', 'urinating', 'pee', 'burning', 'flank', 'kidney']) || $this->inCategory($text, 'URO')) {
             return 'URO';
         }
 
-        if (Str::contains($text, ['joint', 'muscle', 'sprain', 'back pain', 'leg pain', 'arm pain'])) {
+        if (Str::contains($text, ['joint', 'muscle', 'sprain', 'back pain', 'leg pain', 'arm pain']) || $this->inCategory($text, 'MUSCULO')) {
             return 'MUSCULO';
         }
 
         return 'GENERAL';
+    }
+
+    private function inCategory(string $text, string $category): bool
+    {
+        return TriageLexicon::hasAny($text, TriageLexicon::CATEGORY[$category] ?? []);
     }
 
     /**
@@ -106,10 +120,31 @@ class TriageEngine
         $lang = $all[$language] ?? $all['EN'];
         $en = $all['EN'];
 
+        // Prefer the user's own language over a more specific English question set:
+        // breathing problems reuse the chest questions, anything else the translated general set.
+        $related = $category === 'RESP' ? 'CHEST' : 'GENERAL';
+
         return $lang[$category]
+            ?? $lang[$related]
             ?? $en[$category]
-            ?? $lang['GENERAL']
             ?? $en['GENERAL'];
+    }
+
+    /** Latest 0-10 score the person gave (e.g. "3", "6 out of 10", "7/10"), or null. */
+    private function painScore(Collection $messages): ?int
+    {
+        foreach ($messages->where('role', 'USER')->pluck('content')->reverse() as $text) {
+            if (preg_match('/\b(day|days|hour|hours|week|weeks|month|year|years|yr|hr|min|ọjọ́|ọjọ|ọdún|wákàtí|kwana|awa|sa\'a|ụbọchị|afọ)\b/iu', (string) $text)) {
+                continue;
+            }
+            if (preg_match('/(?<![\d.])(10|[0-9])(?![\d])\s*(?:\/|out of|nínú|na|cikin|n\'ime|from)?\s*10?\b/iu', (string) $text, $m)
+                && (int) $m[1] <= 10
+                && mb_strlen(trim((string) $text)) <= 40) {
+                return (int) $m[1];
+            }
+        }
+
+        return null;
     }
 
     /**
@@ -118,29 +153,38 @@ class TriageEngine
      */
     private function determineSeverity(Collection $messages, string $category, ?array $signals = null): array
     {
-        $text = Str::lower($messages->where('role', 'USER')->pluck('content')->implode(' '));
+        $text = TriageLexicon::normalize($messages->where('role', 'USER')->pluck('content')->implode(' '));
 
-        $redFlags = [
-            'trouble breathing',
-            'shortness of breath',
-            'left arm',
-            'jaw',
-            'sweating',
-            'faint',
-            'unconscious',
-            'vision loss',
-            'seizure',
-            'severe bleeding',
-        ];
+        $hasBreathingTrouble = TriageLexicon::hasAny($text, TriageLexicon::BREATHING);
+        $isUnconscious = TriageLexicon::hasAny($text, TriageLexicon::UNCONSCIOUS);
+        $isBleeding = TriageLexicon::hasAny($text, TriageLexicon::BLEEDING);
+        $hasNeuroFlag = TriageLexicon::hasAny($text, TriageLexicon::NEURO_FLAGS);
+        $isSevere = TriageLexicon::hasAny($text, TriageLexicon::SEVERE);
+        $isMild = TriageLexicon::hasAny($text, TriageLexicon::MILD);
 
-        $severity = 'MEDIUM';
+        // Sweating / pain spreading to the arm or jaw only count as red flags for chest complaints;
+        // elsewhere "sweating" is just a fever symptom.
+        $chestRedFlag = $category === 'CHEST'
+            && TriageLexicon::hasAny($text, ['sweating', 'sweat', 'left arm', 'jaw', 'faint', 'dey sweat', 'left hand', 'crushing']);
+
         $signalFlags = array_map('strtolower', (array) ($signals['red_flags'] ?? []));
-        if (! empty($signalFlags) || Str::contains($text, $redFlags)) {
+
+        // The person's own 0-10 score for pain/discomfort: low means low, high means high.
+        $score = $this->painScore($messages);
+        $isMild = $isMild || ($score !== null && $score <= 3);
+        $isSevere = $isSevere || ($score !== null && $score >= 7);
+
+        if (! empty($signalFlags) || $hasBreathingTrouble || $isUnconscious || $isBleeding || $hasNeuroFlag || $chestRedFlag) {
             $severity = 'CRITICAL';
-        } elseif (Str::contains($text, ['severe', '10/10', 'very painful'])) {
+        } elseif ($category === 'CHEST') {
+            // Chest pain is never downgraded below HIGH unless the person calls it mild.
+            $severity = $isMild && ! $isSevere ? 'MEDIUM' : 'HIGH';
+        } elseif ($isSevere) {
             $severity = 'HIGH';
-        } elseif (Str::contains($text, ['mild', '2/10', '3/10'])) {
+        } elseif ($isMild) {
             $severity = 'LOW';
+        } else {
+            $severity = 'MEDIUM';
         }
 
         $firstAid = match ($category) {

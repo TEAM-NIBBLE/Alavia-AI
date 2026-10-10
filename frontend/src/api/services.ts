@@ -1,9 +1,14 @@
-import { ApiError, apiRequest, authTokenStorage } from './client'
+import { apiRequest, authTokenStorage } from './client'
 import { API } from './endpoints'
+import { guestSession } from '../utils/guest'
 
-const getToken = () => authTokenStorage.get()
-const YARN_TTS_ENDPOINT = import.meta.env.VITE_YARNGPT_TTS_ENDPOINT || 'https://yarngpt.ai/api/v1/tts'
-const YARN_TTS_API_KEY = import.meta.env.VITE_VOICE_MODEL_API || import.meta.env.VITE_VOICE_MODEL_API_KEY || ''
+// A guest session never sends a stale account token; it proves ownership of its own
+// consultations with the X-Guest-Token it was given when the consultation started.
+const getToken = () => (guestSession.isActive() ? null : authTokenStorage.get())
+const guestHeaders = (explicitToken?: string): Record<string, string> => {
+  const token = explicitToken ?? (guestSession.isActive() ? guestSession.getToken() : null)
+  return token ? { 'X-Guest-Token': token } : {}
+}
 
 function toQueryString(params: Record<string, string | number | boolean | undefined>) {
   const search = new URLSearchParams()
@@ -59,6 +64,7 @@ export interface UserProfile {
   language: string
   emergency_contact_name: string
   emergency_contact_phone: string
+  emergency_contacts?: Array<{ name: string; phone: string; relation?: string }>
   created_at: string
   updated_at: string
 }
@@ -69,6 +75,7 @@ export interface ProfilePatchPayload {
   language?: string
   emergency_contact_name?: string
   emergency_contact_phone?: string
+  emergency_contacts?: Array<{ name: string; phone: string; relation?: string }>
 }
 
 export interface ProfilePatchResponse {
@@ -128,6 +135,9 @@ export interface HospitalDetailResponse {
 
 export interface ConsultationStartResponse {
   consultation_id: number
+  guest_token?: string
+  guided?: boolean
+  answer_type?: 'yes_no' | 'scale' | 'open' | null
   message: { id: number; role: 'AI' | 'USER' | string; content: string }
 }
 
@@ -135,6 +145,9 @@ export interface ConsultationMessageResponse {
   consultation_id: number
   status: string
   severity: string | null
+  follow_up_due_at?: string | null
+  guided?: boolean
+  answer_type?: 'yes_no' | 'scale' | 'open' | null
   message: { id: number; role: 'AI' | 'USER' | string; content: string }
 }
 
@@ -148,6 +161,9 @@ export interface ConsultationDetailResponse {
     first_aid: string[]
     warnings: string[]
     summary: string
+    follow_up_due_at?: string | null
+    follow_up_outcome?: 'BETTER' | 'SAME' | 'WORSE' | null
+    feedback_helpful?: boolean | null
   }
   messages: Array<{ id: number; role: 'AI' | 'USER' | string; content: string }>
 }
@@ -232,6 +248,11 @@ export const authApi = {
     return result
   },
 
+  /** Drop any stale account token without calling the API (used when entering guest mode). */
+  clearLocalSession() {
+    authTokenStorage.clear()
+  },
+
   async logout() {
     const result = await apiRequest<StatusOkResponse>(API.auth.logout, {
       method: 'POST',
@@ -257,9 +278,26 @@ export const authApi = {
 }
 
 export const userApi = {
-  getProfile() {
-    return apiRequest<UserProfile>(API.user.profile, {
+  async getProfile() {
+    // The API wraps the resource as { data: {...} }.
+    const res = await apiRequest<{ data?: UserProfile } & Partial<UserProfile>>(API.user.profile, {
       method: 'GET',
+      token: getToken(),
+    })
+    return (res.data ?? res) as UserProfile
+  },
+
+  changePassword(payload: { current_password: string; new_password: string; new_password_confirmation: string }) {
+    return apiRequest<StatusOkResponse>(API.user.password, {
+      method: 'PUT',
+      body: payload,
+      token: getToken(),
+    })
+  },
+
+  deleteAccount() {
+    return apiRequest<StatusOkResponse>(API.user.profile, {
+      method: 'DELETE',
       token: getToken(),
     })
   },
@@ -288,18 +326,21 @@ export const hospitalsApi = {
 }
 
 export const consultationsApi = {
-  start(initial_message?: string, language?: string) {
-    return apiRequest<ConsultationStartResponse>(API.consultations.start, {
+  async start(initial_message?: string, language?: string) {
+    const res = await apiRequest<ConsultationStartResponse>(API.consultations.start, {
       method: 'POST',
       token: getToken(),
       body: { initial_message: initial_message ?? '', language: language ?? 'en' },
     })
+    if (guestSession.isActive() && res.guest_token) guestSession.setToken(res.guest_token)
+    return res
   },
 
   message(id: string | number, content: string, language?: string) {
     return apiRequest<ConsultationMessageResponse>(API.consultations.message(id), {
       method: 'POST',
       token: getToken(),
+      headers: guestHeaders(),
       body: { content, language: language ?? 'en' },
     })
   },
@@ -308,6 +349,7 @@ export const consultationsApi = {
     return apiRequest<ConsultationDetailResponse>(API.consultations.detail(id), {
       method: 'GET',
       token: getToken(),
+      headers: guestHeaders(),
     })
   },
 
@@ -315,6 +357,25 @@ export const consultationsApi = {
     return apiRequest<ConsultationHistoryResponse>(API.consultations.history, {
       method: 'GET',
       token: getToken(),
+    })
+  },
+
+  feedback(id: string | number, helpful: boolean, comment?: string, guestToken?: string) {
+    return apiRequest<StatusOkResponse>(API.consultations.feedback(id), {
+      method: 'POST',
+      token: getToken(),
+      headers: guestHeaders(guestToken),
+      body: { helpful, comment: comment?.trim() || undefined },
+    })
+  },
+
+  /** The person's answer to Alavia's check-back. `escalate` is true when they say they are worse. */
+  followUp(id: string | number, outcome: 'BETTER' | 'SAME' | 'WORSE', guestToken?: string) {
+    return apiRequest<{ status: string; escalate: boolean; severity: string | null }>(API.consultations.followUp(id), {
+      method: 'POST',
+      token: getToken(),
+      headers: guestHeaders(guestToken),
+      body: { outcome },
     })
   },
 
@@ -338,46 +399,6 @@ export const speechApi = {
   },
 
   async tts(payload: TtsPayload) {
-    if (YARN_TTS_API_KEY) {
-      const response = await fetch(YARN_TTS_ENDPOINT, {
-        method: 'POST',
-        headers: {
-          Accept: 'application/json, audio/*',
-          'Content-Type': 'application/json',
-          Authorization: `Bearer ${YARN_TTS_API_KEY}`,
-          'x-api-key': YARN_TTS_API_KEY,
-        },
-        body: JSON.stringify({
-          text: payload.text.slice(0, 2000),
-          voice: payload.voice || 'Idera',
-          response_format: payload.response_format || 'mp3',
-        }),
-      })
-
-      if (!response.ok) {
-        let message = `TTS request failed with status ${response.status}`
-        try {
-          const body = await response.json() as { message?: string }
-          if (body?.message) message = body.message
-        } catch {
-          // ignore non-json error payload
-        }
-        throw new ApiError(message, response.status)
-      }
-
-      const contentType = response.headers.get('content-type') ?? ''
-      if (contentType.includes('application/json')) {
-        const data = await response.json() as { audio_url?: string; url?: string; audio?: string }
-        if (data.audio_url) return { audio_url: data.audio_url }
-        if (data.url) return { audio_url: data.url }
-        if (data.audio) return { audio_url: `data:audio/${payload.response_format || 'mp3'};base64,${data.audio}` }
-        throw new ApiError('Invalid TTS JSON response.', 500)
-      }
-
-      const blob = await response.blob()
-      return { audio_url: URL.createObjectURL(blob) }
-    }
-
     return apiRequest<TtsResponse>(API.speech.tts, {
       method: 'POST',
       body: payload,

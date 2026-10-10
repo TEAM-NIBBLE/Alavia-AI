@@ -5,6 +5,7 @@ import SignUpPage from './components/SignUpPage'
 import SignInPage from './components/SignInPage'
 import VoiceInteractionScreen from './components/VoiceInteractionScreen'
 import { authApi } from './api/services'
+import { guestSession } from './utils/guest'
 import './App.css'
 
 type OnboardingStep = 'splash' | 'language' | 'signup' | 'signin' | 'app'
@@ -16,8 +17,9 @@ function App() {
   const { t, i18n } = useTranslation()
   const [step, setStep] = useState<OnboardingStep>(() => {
     const user = localStorage.getItem('alavia.user')
-    return user ? 'app' : 'splash'
+    return user || guestSession.isActive() ? 'app' : 'splash'
   })
+  const [isGuest, setIsGuest] = useState(() => !localStorage.getItem('alavia.user') && guestSession.isActive())
   const [selectedLanguage, setSelectedLanguage] = useState<LanguageCode>(
     (localStorage.getItem('alavia.selectedLanguage') as LanguageCode) ||
     (i18n.language as LanguageCode) ||
@@ -64,12 +66,26 @@ function App() {
     }, 200)
   }
 
+  // Emergency access without an account. Always unblocks the user; never asks for anything.
+  const handleContinueAsGuest = () => {
+    localStorage.setItem('alavia.selectedLanguage', selectedLanguage)
+    authApi.clearLocalSession()
+    guestSession.enter()
+    setUserName('')
+    setIsGuest(true)
+    setStep('app')
+  }
+
   const handleSignUpSuccess = (user: { name: string }) => {
+    guestSession.exit()
+    setIsGuest(false)
     setUserName(user.name)
     setStep('app')
   }
 
   const handleSignInSuccess = () => {
+    guestSession.exit()
+    setIsGuest(false)
     try {
       const stored = localStorage.getItem('alavia.user')
       if (stored) setUserName((JSON.parse(stored) as { name: string }).name)
@@ -78,12 +94,23 @@ function App() {
   }
 
   const handleLogout = () => {
-    void authApi.logout().catch(() => {
-      // Ignore API logout failures in offline/demo mode.
-    })
+    if (!isGuest) {
+      void authApi.logout().catch(() => {
+        // Ignore API logout failures in offline/demo mode.
+      })
+    }
+    guestSession.exit()
+    setIsGuest(false)
     localStorage.removeItem('alavia.user')
     setUserName('')
     setStep('language')
+  }
+
+  // A guest who decides to sign in or register leaves guest mode first.
+  const handleGuestToAuth = (target: 'signin' | 'signup') => {
+    guestSession.exit()
+    setIsGuest(false)
+    setStep(target)
   }
 
   const handleLanguageChange = (code: LanguageCode) => {
@@ -97,6 +124,7 @@ function App() {
       <SignUpPage
         onSuccess={handleSignUpSuccess}
         onSwitchToSignIn={() => setStep('signin')}
+        onContinueAsGuest={handleContinueAsGuest}
         onBack={() => { setIsSaved(false); setStep('language') }}
       />
     )
@@ -107,6 +135,7 @@ function App() {
       <SignInPage
         onSuccess={handleSignInSuccess}
         onSwitchToSignUp={() => setStep('signup')}
+        onContinueAsGuest={handleContinueAsGuest}
         onBack={() => { setIsSaved(false); setStep('language') }}
       />
     )
@@ -116,6 +145,9 @@ function App() {
     return (
       <VoiceInteractionScreen
         userName={userName}
+        isGuest={isGuest}
+        onSignIn={() => handleGuestToAuth('signin')}
+        onSignUp={() => handleGuestToAuth('signup')}
         onLogout={handleLogout}
         onLanguageChange={handleLanguageChange}
       />
@@ -131,38 +163,44 @@ function App() {
       <div className="absolute left-0 top-0 h-full w-1.5 bg-emerald-600/60 sm:w-2" aria-hidden="true" />
       <div className="absolute right-0 top-0 h-full w-1.5 bg-emerald-600/60 sm:w-2" aria-hidden="true" />
 
-      <section className={`relative mx-auto flex min-h-screen w-full max-w-5xl flex-col items-center px-6 transition-all duration-1000 ease-in-out ${step === 'splash' ? 'justify-center py-12' : 'justify-start pt-16 pb-12'
-        }`}>
+      {/* Layout is identical in every step; only transform/opacity animate, so the
+          splash -> language handoff runs on the compositor with no reflow. */}
+      <section className="relative mx-auto flex min-h-screen w-full max-w-5xl flex-col items-center justify-start px-6 pt-16 pb-12">
 
-        {/* Brand Container - Settles at the top with reduced size */}
+        {/* Brand: rendered at its final (top) size. On splash it is translated to the
+            vertical centre of the viewport and scaled up. */}
         <div
-          className={`flex flex-col items-center transition-all duration-1000 ease-in-out ${step === 'splash'
-            ? 'scale-110 mb-0'
-            : 'scale-90 mb-8 sm:mb-12'
-            }`}
+          className="flex flex-col items-center will-change-transform"
+          style={{
+            transform:
+              step === 'splash'
+                ? 'translate3d(0, calc(50svh - 4rem - 50%), 0) scale(1.6)'
+                : 'translate3d(0, 0, 0) scale(1)',
+            transformOrigin: 'center',
+            transition: 'transform 1000ms cubic-bezier(0.22, 1, 0.36, 1)',
+            marginBottom: '2rem',
+          }}
         >
           <div className="relative">
             <img
               src={alaviaLogo}
-              className={`object-contain transition-all duration-1000 ring-offset-8 ring-emerald-100/30 rounded-full ${step === 'splash' ? 'h-32 w-32 md:h-48 md:w-48' : 'h-16 w-16 md:h-20 md:w-20'
-                } animate-in zoom-in fade-in duration-1000`}
+              className="h-16 w-16 rounded-full object-contain md:h-20 md:w-20 animate-in zoom-in fade-in duration-1000"
               alt="Alavia AI logo"
             />
-            {step === 'splash' && (
-              <div className="absolute -inset-4 bg-emerald-200/20 blur-2xl rounded-full -z-10 animate-pulse duration-[3000ms]" />
-            )}
+            <div
+              className={`absolute -inset-4 -z-10 rounded-full bg-emerald-200/20 blur-2xl transition-opacity duration-700 ${step === 'splash' ? 'opacity-100 animate-pulse' : 'opacity-0'
+                }`}
+              aria-hidden="true"
+            />
           </div>
 
-          <h1
-            className={`mt-4 text-center font-bold tracking-tight transition-all duration-1000 ${step === 'splash' ? 'text-4xl md:text-6xl text-slate-900' : 'text-xl md:text-2xl text-slate-800'
-              } animate-in slide-in-from-bottom-4 fade-in duration-1000 delay-300 fill-mode-both`}
-          >
+          <h1 className="mt-4 text-center text-xl font-bold tracking-tight text-slate-800 md:text-2xl animate-in slide-in-from-bottom-4 fade-in duration-1000 delay-300 fill-mode-both">
             ALAVIA AI
           </h1>
 
           <p
-            className={`text-center font-medium text-emerald-600 transition-all duration-1000 delay-500 ${step === 'splash' ? 'text-lg md:text-xl opacity-100 mt-3' : 'text-xs md:text-sm opacity-60 mt-1'
-              } animate-in fade-in duration-1000`}
+            className={`mt-1 text-center text-xs font-medium text-emerald-600 transition-opacity duration-700 md:text-sm ${step === 'splash' ? 'opacity-100' : 'opacity-60'
+              }`}
           >
             {t('onboarding.tagline')}
           </p>
@@ -170,11 +208,21 @@ function App() {
 
         {/* Language Selection Card */}
         <div
-          className={`w-full max-w-xl transition-all duration-1000 ease-out ${step === 'language'
-            ? 'translate-y-0 opacity-100'
-            : 'translate-y-16 opacity-0 pointer-events-none'
+          className={`w-full max-w-xl will-change-transform transition-[opacity,transform] duration-700 ease-out ${step === 'language'
+            ? 'translate-y-0 opacity-100 delay-500'
+            : 'translate-y-8 opacity-0 pointer-events-none'
             }`}
         >
+          <div className="mb-4 text-center">
+            <button
+              type="button"
+              onClick={handleContinueAsGuest}
+              className="w-full rounded-full border-2 border-red-200 bg-red-50 px-6 py-3 text-sm font-bold text-red-700 transition-all hover:bg-red-100 active:scale-[0.98]"
+            >
+              {t('auth.guestContinue')}
+            </button>
+            <p className="mt-2 text-xs text-slate-500">{t('auth.guestHint')}</p>
+          </div>
           <div className="rounded-3xl border border-white/40 bg-white/70 p-6 shadow-2xl backdrop-blur-xl sm:p-9 ring-1 ring-slate-900/5">
             <div className="mb-6 flex items-center justify-between">
               <div>
@@ -261,7 +309,7 @@ function App() {
 
         {/* Footer Text */}
         <div
-          className={`absolute bottom-6 text-center px-4 transition-all duration-1000 ${step === 'language' ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
+          className={`absolute bottom-6 text-center px-4 transition-[opacity,transform] duration-700 ${step === 'language' ? 'opacity-100 translate-y-0 delay-700' : 'opacity-0 translate-y-4'
             }`}
         >
           <p className="text-xs font-bold uppercase tracking-widest text-slate-400">{t('onboarding.footer')}</p>

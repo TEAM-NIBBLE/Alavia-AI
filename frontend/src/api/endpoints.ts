@@ -11,6 +11,7 @@ export const API = {
   },
   user: {
     profile: '/api/user/profile',
+    password: '/api/user/password',
   },
   hospitals: {
     list: '/api/hospitals',
@@ -22,6 +23,8 @@ export const API = {
     detail: (id: string | number) => `/api/consultations/${id}`,
     history: '/api/consultations/history',
     delete: (id: string | number) => `/api/consultations/${id}`,
+    feedback: (id: string | number) => `/api/consultations/${id}/feedback`,
+    followUp: (id: string | number) => `/api/consultations/${id}/follow-up`,
   },
   speech: {
     stt: '/api/speech/stt',

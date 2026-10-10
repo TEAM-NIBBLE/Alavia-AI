@@ -13,7 +13,7 @@ class ChatService
     public function phrase(string $text, string $language): string
     {
         $payload = [
-            'model' => 'gpt-4o-mini',
+            'model' => $this->client->usingGroq() ? 'openai/gpt-oss-120b' : 'gpt-4o-mini',
             'messages' => [
                 [
                     'role' => 'system',

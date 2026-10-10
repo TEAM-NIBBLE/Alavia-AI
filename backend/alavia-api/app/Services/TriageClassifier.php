@@ -38,7 +38,7 @@ class TriageClassifier
         ];
 
         $payload = [
-            'model' => 'gpt-4o-mini',
+            'model' => $this->client->usingGroq() ? 'openai/gpt-oss-120b' : 'gpt-4o-mini',
             'messages' => [
                 [
                     'role' => 'system',

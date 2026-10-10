@@ -1,6 +1,12 @@
-import { useEffect, useMemo, useRef, useState } from 'react'
+import { useEffect, useMemo, useRef, useState, type PointerEvent as ReactPointerEvent } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { useTranslation } from 'react-i18next'
+import { HospitalResultsPanel } from './postTriage/HospitalResultsPanel'
+import { FeedbackCard } from './postTriage/FeedbackCard'
+import { FollowUpCheckIn } from './postTriage/FollowUpCheckIn'
+import { followUps } from '../utils/followUps'
+import { guestSession } from '../utils/guest'
+import { VOICE_SPEED_RATE, getEmergencyContacts, readStoredSettings } from '../utils/appSettings'
 import {
   Mic,
   Keyboard,
@@ -11,17 +17,14 @@ import {
   Activity,
   CheckCircle2,
   Volume2,
-  ShieldCheck,
   User,
   Globe,
   ChevronDown,
   LogOut,
   Loader2,
   MicOff,
+  Square,
   UserCircle,
-  Navigation,
-  Map as MapIcon,
-  HeartPulse,
 } from 'lucide-react'
 import alaviaLogo from '../assets/alavia-ai_logo.png'
 import ProfilePage from './ProfilePage'
@@ -29,6 +32,70 @@ import { consultationsApi, hospitalsApi, speechApi } from '../api/services'
 import type { ConsultationDetailResponse, HospitalListItem } from '../api/services'
 
 type InputMode = 'tap' | 'hold'
+
+// After the cloud voice fails (missing key, outage) skip it for a while instead of paying a
+// failed round-trip on every message; the browser voice takes over in the meantime.
+const CLOUD_TTS_COOLDOWN_MS = 5 * 60 * 1000
+let cloudTtsDownUntil = 0
+// Hospital data covers Lagos; this is where distances are measured from when the device gives no position.
+const LAGOS_CENTRE = { lat: 6.5244, lng: 3.3792 }
+
+async function approximateLocation(): Promise<{ lat: number; lng: number }> {
+  try {
+    const controller = new AbortController()
+    const timer = window.setTimeout(() => controller.abort(), 3000)
+    const res = await fetch('https://ipwho.is/', { signal: controller.signal })
+    window.clearTimeout(timer)
+    const data = (await res.json()) as { success?: boolean; latitude?: number; longitude?: number }
+    const { latitude, longitude } = data
+    if (data.success && typeof latitude === 'number' && typeof longitude === 'number'
+      && latitude > 6.3 && latitude < 6.8 && longitude > 2.7 && longitude < 4.0) {
+      return { lat: latitude, lng: longitude }
+    }
+  } catch {
+    // fall through to the Lagos centre
+  }
+  return LAGOS_CENTRE
+}
+
+// Cloud voices accept short inputs; break text at sentence ends into pieces of at most `max` characters.
+function splitForSpeech(text: string, max = 190): string[] {
+  const sentences = text.replace(/\s+/g, ' ').trim().match(/[^.!?]+[.!?]*/g) ?? [text]
+  const pieces: string[] = []
+  let current = ''
+  for (const raw of sentences) {
+    const sentence = raw.trim()
+    if (!sentence) continue
+    if ((current + ' ' + sentence).trim().length <= max) {
+      current = (current + ' ' + sentence).trim()
+      continue
+    }
+    if (current) pieces.push(current)
+    let rest = sentence
+    while (rest.length > max) {
+      const cut = rest.lastIndexOf(' ', max)
+      const at = cut > 40 ? cut : max
+      pieces.push(rest.slice(0, at).trim())
+      rest = rest.slice(at).trim()
+    }
+    current = rest
+  }
+  if (current) pieces.push(current)
+  return pieces.length ? pieces : [text.slice(0, max)]
+}
+
+const TTS_URL_TTL_MS = 60 * 1000
+const ttsUrlCache = new Map<string, { at: number; url: Promise<string | null> }>()
+const fetchTtsUrl = (text: string, language: string, voice: string): Promise<string | null> => {
+  const key = `${language}|${voice}|${text}`
+  const hit = ttsUrlCache.get(key)
+  if (hit && Date.now() - hit.at < TTS_URL_TTL_MS) return hit.url
+  const url = speechApi.tts({ text, language, voice }).then((r) => r.audio_url ?? null)
+  ttsUrlCache.set(key, { at: Date.now(), url })
+  url.catch(() => ttsUrlCache.delete(key))
+  return url
+}
+
 type SessionStatus = 'ready' | 'listening' | 'processing'
 type Severity = 'low' | 'medium' | 'high' | 'critical'
 type MicPermission = 'unknown' | 'granted' | 'denied'
@@ -103,6 +170,8 @@ interface SpeechRecognition extends EventTarget {
   onresult: ((event: SpeechRecognitionEvent) => void) | null
   onerror: ((event: SpeechRecognitionErrorEvent) => void) | null
   onend: (() => void) | null
+  onstart: (() => void) | null
+  abort: () => void
   start: () => void
   stop: () => void
 }
@@ -116,11 +185,14 @@ const severityStyle: Record<Severity, { bg: string, text: string, border: string
 
 interface VoiceInteractionScreenProps {
   userName?: string
+  isGuest?: boolean
+  onSignIn?: () => void
+  onSignUp?: () => void
   onLogout: () => void
   onLanguageChange: (code: any) => void
 }
 
-export default function VoiceInteractionScreen({ userName, onLogout, onLanguageChange }: VoiceInteractionScreenProps) {
+export default function VoiceInteractionScreen({ userName, isGuest = false, onSignIn, onSignUp, onLogout, onLanguageChange }: VoiceInteractionScreenProps) {
   const { t, i18n } = useTranslation()
   const recognitionRef = useRef<SpeechRecognition | null>(null)
   const isFinalizingVoiceRef = useRef(false)
@@ -129,13 +201,26 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const interimRef = useRef('')
   const lastSpokenQuestionRef = useRef<string | null>(null)
   const shouldKeepListeningRef = useRef(false)
+  const holdActiveRef = useRef(false)
+  const isStartingRef = useRef(false)
+  const recognitionActiveRef = useRef(false)
+  const micStreamRef = useRef<MediaStream | null>(null)
+  // Parallel recording of the same mic: if the browser's own recognition returns nothing
+  // (it needs Google's servers, which some networks block), the audio is sent to the backend.
+  const recorderRef = useRef<MediaRecorder | null>(null)
+  const sessionSubmittedRef = useRef(false)
+  const vadTimerRef = useRef<number | null>(null)
+  const audioCtxRef = useRef<AudioContext | null>(null)
   const inputModeRef = useRef<InputMode>('tap')
   const silenceTimeoutRef = useRef<number | null>(null)
   const restartTimeoutRef = useRef<number | null>(null)
   const conversationModeRef = useRef<'voice' | 'keyboard' | null>(null)
   const audioRef = useRef<HTMLAudioElement | null>(null)
+  // Bumped whenever speech is stopped or replaced, so audio that arrives late for an old question is dropped.
+  const speechTokenRef = useRef(0)
 
   const [conversationMode, setConversationMode] = useState<'voice' | 'keyboard' | null>(null)
+  const [voiceNotice, setVoiceNotice] = useState<string | null>(null)
   const [sessionStatus, setSessionStatus] = useState<SessionStatus>('ready')
   const [inputMode, setInputMode] = useState<InputMode>('tap')
   const [isListening, setIsListening] = useState(false)
@@ -148,6 +233,11 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   const [currentAIMessage, setCurrentAIMessage] = useState<string | null>(null)
   const rawAIMessageRef = useRef<string | null>(null)
   const [currentAIMessageSeq, setCurrentAIMessageSeq] = useState(0)
+  // True when the AI wrote the questions/guidance itself (English, Pidgin): show them as-is.
+  const [isGuided, setIsGuided] = useState(false)
+  const [answerType, setAnswerType] = useState<'yes_no' | 'scale' | 'open' | null>(null)
+  const [resultTab, setResultTab] = useState<'hospitals' | 'steps'>('steps')
+  const guidedRef = useRef(false)
   const [consultationDetail, setConsultationDetail] = useState<ConsultationDetailResponse['consultation'] | null>(null)
   const [routedHospitals, setRoutedHospitals] = useState<HospitalListItem[]>([])
   const [isHospitalsLoading, setIsHospitalsLoading] = useState(false)
@@ -206,7 +296,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   }, [])
 
   const localizeServerQuestion = (message: string) => {
-    if (consultationLanguage === 'en') return message
+    if (consultationLanguage === 'en' || guidedRef.current) return message
 
     // Detect if this message is already in a non-English language by checking
     // for non-ASCII characters common in Yoruba/Hausa/Igbo/Pidgin loanwords.
@@ -389,8 +479,51 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     ? { id: String(currentAIMessageSeq), question: localizeServerQuestion(rawAIMessageRef.current ?? currentAIMessage) }
     : null
 
-  const speakText = async (text: string, onEnd?: () => void, languageOverride?: LanguageCode) => {
+  // Browser speech synthesis as a fallback when the cloud voice (YarnGPT/OpenAI) is unavailable.
+  // Returns false when this device has no voice for the language, so the caller can say so
+  // instead of reading Yoruba/Hausa/Igbo text with an English voice.
+  const speakWithBrowser = (text: string, language: LanguageCode, rate: number, onEnd?: () => void): boolean => {
+    if (typeof window === 'undefined' || !('speechSynthesis' in window)) return false
+
+    const wanted = language === 'pcm' ? 'en' : language
+    const voices = window.speechSynthesis.getVoices()
+    const voice =
+      voices.find((v) => v.lang.toLowerCase().startsWith(`${wanted}-ng`)) ??
+      voices.find((v) => v.lang.toLowerCase().startsWith(wanted))
+    if (!voice) return false
+
+    const utterance = new SpeechSynthesisUtterance(text)
+    utterance.voice = voice
+    utterance.lang = voice.lang
+    utterance.rate = rate
+    utterance.onend = () => onEnd?.()
+    utterance.onerror = () => onEnd?.()
+    window.speechSynthesis.cancel()
+    window.speechSynthesis.speak(utterance)
+    return true
+  }
+
+  const stopSpeaking = () => {
+    speechTokenRef.current += 1
+    audioRef.current?.pause()
+    if (typeof window !== 'undefined' && 'speechSynthesis' in window) window.speechSynthesis.cancel()
+  }
+
+  // `force` is for explicit user actions (Play button) and safety messages; automatic
+  // narration respects the Audio Autoplay / Read Prompts settings.
+  const speakText = async (text: string, onEndRaw?: () => void, languageOverride?: LanguageCode, force = false) => {
+    // One voice at a time: whatever was talking stops, and its late-arriving audio never plays.
+    stopSpeaking()
+    const token = speechTokenRef.current
+    const onEnd = onEndRaw ? () => { if (token === speechTokenRef.current) onEndRaw() } : undefined
     if (!text.trim()) {
+      onEnd?.()
+      return
+    }
+
+    const prefs = readStoredSettings()
+    const allowAudio = force || (prefs.audioAutoplay ?? true) || !!prefs.readPrompts
+    if (!allowAudio) {
       onEnd?.()
       return
     }
@@ -398,41 +531,62 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     const speechLanguage = languageOverride ?? consultationLanguageRef.current
     const speechLangConfig = LANGUAGE_CONFIG[speechLanguage] ?? LANGUAGE_CONFIG.en
 
+    // The cloud voice (YarnGPT via the backend) is the product's voice and covers all five
+    // languages; the browser's own voice is the fallback if it is unavailable.
+    const browserRate = VOICE_SPEED_RATE[prefs.voiceSpeed ?? 'normal'] ?? 1
+
     try {
-      const tts = await speechApi.tts({
-        text,
-        language: speechLangConfig.apiLanguage,
-        voice: getPreferredTtsVoice(),
-      })
+      if (Date.now() < cloudTtsDownUntil) throw new Error('cloud tts cooling down')
+      // Short pieces, all requested at once; piece 1 plays the moment it is ready while the rest load behind it.
+      const pieces = splitForSpeech(text, 180)
+      const startedAt = performance.now()
+      const requests = pieces.map((piece) => fetchTtsUrl(piece, speechLangConfig.apiLanguage, getPreferredTtsVoice()))
+      requests.slice(1).forEach((r) => r.catch(() => null))
+      const firstUrl = await requests[0]
+      if (token !== speechTokenRef.current) return
+      console.debug(`[voice] first piece ready in ${Math.round(performance.now() - startedAt)}ms (${pieces.length} pieces)`)
 
-      if (tts.audio_url) {
-        audioRef.current?.pause()
-        if (audioRef.current && audioRef.current.src.startsWith('blob:')) {
-          URL.revokeObjectURL(audioRef.current.src)
+      if (firstUrl) {
+        const playbackRate = VOICE_SPEED_RATE[prefs.voiceSpeed ?? 'normal'] ?? 1
+        const playAt = async (index: number, knownUrl?: string | null) => {
+          if (token !== speechTokenRef.current) return
+          if (index >= pieces.length) {
+            onEnd?.()
+            return
+          }
+          const url = knownUrl !== undefined ? knownUrl : await requests[index].catch(() => null)
+          if (token !== speechTokenRef.current) return
+          if (!url) {
+            void playAt(index + 1)
+            return
+          }
+          const audio = new Audio(url)
+          audio.preload = 'auto'
+          audio.playbackRate = playbackRate
+          audioRef.current = audio
+          if (index === 0) audio.onplaying = () => { console.debug(`[voice] audio started after ${Math.round(performance.now() - startedAt)}ms`); audio.onplaying = null }
+          audio.onended = () => { void playAt(index + 1) }
+          audio.onerror = () => { void playAt(index + 1) }
+          audio.play().catch(() => onEnd?.())
         }
-        const audio = new Audio(tts.audio_url)
-        audio.preload = 'auto'
-        audioRef.current = audio
-
-        audio.onended = () => {
-          if (audio.src.startsWith('blob:')) URL.revokeObjectURL(audio.src)
-          onEnd?.()
-        }
-
-        audio.onerror = () => {
-          onEnd?.()
-        }
-
-        audio.play().catch(() => {
-          onEnd?.()
-        })
+        void playAt(0, firstUrl)
         return
       }
-    } catch {
-      // YarnGPT request failed — silently continue without voice
+    } catch (err) {
+      if (Date.now() >= cloudTtsDownUntil) cloudTtsDownUntil = Date.now() + CLOUD_TTS_COOLDOWN_MS
+      void err
     }
 
-    // If YarnGPT didn't return audio, just fire onEnd so the flow continues
+    if (token !== speechTokenRef.current) return
+
+    // Cloud voice failed: the browser's own voice is the fallback.
+    if (speakWithBrowser(text, speechLanguage, browserRate, onEnd)) {
+      setVoiceNotice(null)
+      return
+    }
+
+    // Neither voice is available: tell the user why it is silent.
+    setVoiceNotice(t('voice.voiceOutputUnavailable'))
     onEnd?.()
   }
 
@@ -442,47 +596,28 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     }
   }
 
-  const getEmergencyContactPhone = () => {
-    try {
-      const profileRaw = localStorage.getItem('alavia.profileSettings')
-      if (profileRaw) {
-        const profile = JSON.parse(profileRaw) as { emergencyPhone?: string }
-        if (profile.emergencyPhone?.trim()) return profile.emergencyPhone.trim()
-      }
-    } catch {
-      // ignore malformed local storage
-    }
+  const getEmergencyContactList = () => getEmergencyContacts()
 
-    try {
-      const userRaw = localStorage.getItem('alavia.user')
-      if (userRaw) {
-        const user = JSON.parse(userRaw) as { emergency_contact_phone?: string; phone?: string }
-        if (user.emergency_contact_phone?.trim()) return user.emergency_contact_phone.trim()
-        if (user.phone?.trim()) return user.phone.trim()
-      }
-    } catch {
-      // ignore malformed local storage
-    }
+  const dialNumber = (phone: string) => {
+    window.location.href = `tel:${phone}`
+  }
 
-    return '112'
+  const smsNumber = (phone: string) => {
+    const emergencyMessage = encodeURIComponent('ALAVIA AI emergency request. Please assist immediately.')
+    window.location.href = `sms:${phone}?body=${emergencyMessage}`
   }
 
   const activateEmergencyMode = () => {
     setIsEmergencyMode(true)
     setShowEmergencyPanel(true)
     stopListening()
-    void speakText(t('voice.emergencyModeActivated'))
-  }
+    void speakText(t('voice.emergencyModeActivated'), undefined, undefined, true)
 
-  const handleEmergencyCall = () => {
-    const phone = getEmergencyContactPhone()
-    window.location.href = `tel:${phone}`
-  }
-
-  const handleEmergencySms = () => {
-    const phone = getEmergencyContactPhone()
-    const emergencyMessage = encodeURIComponent('ALAVIA AI emergency request. Please assist immediately.')
-    window.location.href = `sms:${phone}?body=${emergencyMessage}`
+    // Honour Profile → Safety → Emergency Button Action. 'app' just opens the panel.
+    const primary = getEmergencyContactList()[0]?.phone ?? '112'
+    const behavior = readStoredSettings().emergencyButtonBehavior ?? 'call'
+    if (behavior === 'call') dialNumber(primary)
+    else if (behavior === 'sms') smsNumber(primary)
   }
 
   const updateConsultationId = (id: number | null) => {
@@ -496,10 +631,8 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
   // Instruction prepended to every message so the AI model always responds
   // in the correct language, regardless of backend language field support.
-  const langInstruction = (langName: string, langCode: LanguageCode) =>
-    langCode === 'en'
-      ? ''  // no prefix needed for English
-      : `[IMPORTANT SYSTEM INSTRUCTION: You are a medical triage assistant. You MUST respond ENTIRELY and ONLY in ${langName}. Every single word of your response must be in ${langName}. NEVER use English words, phrases, or sentences. The patient ONLY understands ${langName}. Translate everything including medical terms into ${langName}. This is mandatory.]\n`
+  // The backend picks the language from the request; no instruction text is added to what the person says.
+  const langInstruction = (_langName: string, _langCode: LanguageCode) => ''
 
   const startConsultation = (message: string) => {
     console.debug('[VoiceInteraction] startConsultation called', { message, mode: conversationModeRef.current })
@@ -516,10 +649,13 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       console.debug('[VoiceInteraction] consultationsApi.start response', res)
         const id = res.consultation_id
         updateConsultationId(id)
+        guidedRef.current = !!res.guided
+        setIsGuided(!!res.guided)
+        setAnswerType(res.answer_type ?? null)
         rawAIMessageRef.current = res.message.content
         const localizedMsg = localizeServerQuestion(res.message.content)
         // Brief pause so the "thinking" indicator is visible before the first question
-        await new Promise(r => setTimeout(r, 1200))
+        await new Promise(r => setTimeout(r, 300))
         setCurrentAIMessage(localizedMsg)
         setCurrentAIMessageSeq(1)
         setAIResponse({ heading: t('voice.responseHeading'), summary: stripSystemPrefix(message) })
@@ -553,12 +689,16 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       const normalizedStatus = String(res.status ?? '').toLowerCase()
       const isComplete = ['complete', 'completed', 'closed', 'ended'].includes(normalizedStatus)
       
+      guidedRef.current = !!res.guided
       if (!isComplete && res.message.content) {
         // Translate and start audio playback immediately
         const localizedMsg = localizeServerQuestion(res.message.content)
         void speakText(localizedMsg, undefined, sessionLang)
       }
       
+      guidedRef.current = !!res.guided
+      setIsGuided(!!res.guided)
+      setAnswerType(res.answer_type ?? null)
       rawAIMessageRef.current = res.message.content
       setCurrentAIMessage(localizeServerQuestion(res.message.content))
       setCurrentAIMessageSeq(prev => prev + 1)
@@ -571,9 +711,22 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       
       if (isComplete) {
         updateConsultationComplete(true)
+        // Nothing left to answer: close the typing panel so it doesn't sit over the results.
+        conversationModeRef.current = 'voice'
+        setConversationMode('voice')
         try {
           const detail = await consultationsApi.detail(id)
           setConsultationDetail(detail.consultation)
+          // Alavia checks back later; remember it on this device so a reload doesn't lose it.
+          const dueAt = detail.consultation.follow_up_due_at ?? res.follow_up_due_at
+          if (dueAt) {
+            followUps.schedule({
+              consultationId: detail.consultation.id,
+              dueAt,
+              severity: detail.consultation.severity,
+              guestToken: guestSession.isActive() ? guestSession.getToken() ?? undefined : undefined,
+            })
+          }
           if (detail.consultation.summary) {
             setAIResponse(prev => prev ? {
               ...prev,
@@ -592,10 +745,22 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
               setAIResponse(prev => prev ? { ...prev, severity: sev } : prev)
             }
           }
-          // Speak translated summary + first aid steps
+          // Speak the summary + first aid steps: the AI's own words when it wrote them,
+          // otherwise the curated translations for this language.
           const sevKey = sev ?? 'medium'
-          const summaryText = completeLangT(`voice.summaries.${sevKey}`) as string
-          const firstAidSteps = completeLangT(`voice.firstAid.${sevKey}`, { returnObjects: true }) as string[]
+          const aiSummary = res.guided ? stripSystemPrefix(detail.consultation.summary ?? '') : ''
+          const aiSteps = res.guided ? (detail.consultation.first_aid ?? []) : []
+          const summaryText = aiSummary || (completeLangT(`voice.summaries.${sevKey}`) as string)
+          const firstAidSteps = aiSteps.length
+            ? aiSteps
+            : (completeLangT(`voice.firstAid.${sevKey}`, { returnObjects: true }) as string[])
+          // Show it on screen too, not the backend's raw English line.
+          if (summaryText) {
+            setAIResponse(prev => prev ? { ...prev, summary: summaryText } : {
+              heading: t('voice.responseHeading'),
+              summary: summaryText,
+            })
+          }
           const spokenText = [summaryText, ...firstAidSteps].join('. ')
           void speakText(spokenText, undefined, completeLang)
         } catch {
@@ -609,9 +774,31 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     }
   }
 
+  // Clears the finished conversation so the next voice/typed input starts a fresh check.
+  const resetConversation = () => {
+    updateConsultationId(null)
+    const nextLang = normalizeLanguageCode(localStorage.getItem('alavia.selectedLanguage') || i18n.language || selectedLanguage)
+    consultationLanguageRef.current = nextLang
+    setConsultationLanguage(nextLang)
+    setCurrentAIMessage(null)
+    rawAIMessageRef.current = null
+    setCurrentAIMessageSeq(0)
+    setConsultationDetail(null)
+    guidedRef.current = false
+    setIsGuided(false)
+    setAnswerType(null)
+    updateConsultationComplete(false)
+    setAIResponse(null)
+    setApiError(null)
+    setTranscript('')
+    setInterimTranscript('')
+  }
+
   const submitInputIntoFlow = (value: string, source: 'voice' | 'keyboard' = 'voice') => {
     const cleaned = value.trim()
     if (!cleaned) return
+    stopSpeaking()
+    if (shouldKeepListeningRef.current) stopListening()
     if (source === 'voice') {
       setTranscript(cleaned)
     } else {
@@ -623,19 +810,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     if (currentId && !isComplete) {
       void sendConsultationMessage(cleaned)
     } else {
-      if (isComplete) {
-        updateConsultationId(null)
-        const nextLang = normalizeLanguageCode(localStorage.getItem('alavia.selectedLanguage') || i18n.language || selectedLanguage)
-        consultationLanguageRef.current = nextLang
-        setConsultationLanguage(nextLang)
-        setCurrentAIMessage(null)
-        rawAIMessageRef.current = null
-        setCurrentAIMessageSeq(0)
-        setConsultationDetail(null)
-        updateConsultationComplete(false)
-        setAIResponse(null)
-        setApiError(null)
-      }
+      if (isComplete) resetConversation()
       conversationModeRef.current = source
       setConversationMode(source)
       startConsultation(cleaned)
@@ -682,12 +857,115 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     }
 
     isFinalizingVoiceRef.current = true
+    sessionSubmittedRef.current = true
     lastSubmittedVoiceRef.current = { text: finalText, at: now }
     submitInputIntoFlow(finalText, 'voice')
   }
 
+  // Watches the mic level so a tap-to-speak recording ends by itself ~2s after the person stops
+  // talking (or after 12s of silence), instead of needing a second tap.
+  const stopVoiceActivity = () => {
+    if (vadTimerRef.current !== null) {
+      window.clearInterval(vadTimerRef.current)
+      vadTimerRef.current = null
+    }
+    void audioCtxRef.current?.close().catch(() => undefined)
+    audioCtxRef.current = null
+  }
+
+  const startVoiceActivity = (stream: MediaStream) => {
+    stopVoiceActivity()
+    const Ctx = window.AudioContext ?? (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext
+    if (!Ctx) return
+    try {
+      const ctx = new Ctx()
+      const analyser = ctx.createAnalyser()
+      analyser.fftSize = 512
+      ctx.createMediaStreamSource(stream).connect(analyser)
+      const buf = new Uint8Array(analyser.fftSize)
+      const startedAt = Date.now()
+      let heardVoice = false
+      let lastVoiceAt = startedAt
+      vadTimerRef.current = window.setInterval(() => {
+        analyser.getByteTimeDomainData(buf)
+        let sum = 0
+        for (const v of buf) {
+          const x = (v - 128) / 128
+          sum += x * x
+        }
+        const now = Date.now()
+        if (Math.sqrt(sum / buf.length) > 0.04) {
+          heardVoice = true
+          lastVoiceAt = now
+        }
+        if (inputModeRef.current !== 'tap' || !shouldKeepListeningRef.current) return
+        if ((heardVoice && now - lastVoiceAt > 2000) || (!heardVoice && now - startedAt > 12000)) {
+          stopListening()
+        }
+      }, 120)
+      audioCtxRef.current = ctx
+    } catch {
+      // no level meter: the manual stop and the 9s inactivity stop still work
+    }
+  }
+
+  const startRecorder = (stream: MediaStream) => {
+    if (typeof MediaRecorder === 'undefined') return
+    try {
+      const chunks: Blob[] = []
+      const recorder = new MediaRecorder(stream)
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data) }
+      recorder.onstop = () => {
+        recorderRef.current = null
+        // Give the browser recognition a moment to deliver its own result first.
+        window.setTimeout(() => {
+          if (sessionSubmittedRef.current || !chunks.length) return
+          const blob = new Blob(chunks, { type: recorder.mimeType || 'audio/webm' })
+          if (blob.size < 3000) return
+          void transcribeOnServer(blob)
+        }, 400)
+      }
+      recorder.start()
+      recorderRef.current = recorder
+    } catch {
+      recorderRef.current = null
+    }
+  }
+
+  const transcribeOnServer = async (blob: Blob) => {
+    setSessionStatus('processing')
+    try {
+      const ext = blob.type.includes('mp4') ? 'mp4' : blob.type.includes('ogg') ? 'ogg' : 'webm'
+      const file = new File([blob], `speech.${ext}`, { type: blob.type })
+      const res = await speechApi.stt({ audio: file, language: consultationLanguageRef.current })
+      const text = (res.transcript ?? '').trim()
+      if (text && !sessionSubmittedRef.current) {
+        sessionSubmittedRef.current = true
+        isFinalizingVoiceRef.current = true
+        lastSubmittedVoiceRef.current = { text, at: Date.now() }
+        submitInputIntoFlow(text, 'voice')
+        return
+      }
+      if (!text) setVoiceNotice(t('voice.didNotCatch'))
+    } catch {
+      setVoiceNotice(t('voice.didNotCatch'))
+    } finally {
+      setSessionStatus((cur) => (cur === 'processing' && !isFinalizingVoiceRef.current ? 'ready' : cur))
+    }
+  }
+
+  // Held for the whole listening period so the browser's mic indicator stays steady while
+  // the speech engine restarts its own sessions underneath.
+  const releaseMicStream = () => {
+    stopVoiceActivity()
+    micStreamRef.current?.getTracks().forEach((track) => track.stop())
+    micStreamRef.current = null
+  }
+
   const stopListening = () => {
     shouldKeepListeningRef.current = false
+    if (recorderRef.current?.state === 'recording') recorderRef.current.stop()
+    releaseMicStream()
     clearSpeechTimers()
     recognitionRef.current?.stop()
     setIsListening(false)
@@ -695,7 +973,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     triggerHaptics([10, 20, 10])
   }
 
-  const fetchRoutedHospitals = async (severity?: string | null) => {
+  const fetchRoutedHospitals = async (severity?: string | null, specialty?: string | null) => {
     setIsHospitalsLoading(true)
     setHospitalsError(null)
     setLocationNotice(null)
@@ -703,12 +981,16 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     let lat: number | undefined
     let lng: number | undefined
 
-    if (navigator.geolocation) {
+    const locationAllowed = readStoredSettings().useLocation !== false
+    if (!locationAllowed) {
+      setUserLocation(null)
+      setLocationNotice(t('voice.locationOffNotice'))
+    } else if (navigator.geolocation) {
       try {
         const position = await new Promise<GeolocationPosition>((resolve, reject) => {
           navigator.geolocation.getCurrentPosition(resolve, reject, {
             enableHighAccuracy: false,
-            timeout: 4000,
+            timeout: 8000,
             maximumAge: 300000,
           })
         })
@@ -716,8 +998,13 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
         lng = position.coords.longitude
         setUserLocation({ lat, lng })
       } catch {
-        setUserLocation(null)
-        setLocationNotice('Location unavailable. Showing general nearest results.')
+        // No exact position (denied, or the browser has no location service): estimate from the
+        // network, else assume central Lagos, so distances still show. The notice says so.
+        const approx = await approximateLocation()
+        lat = approx.lat
+        lng = approx.lng
+        setUserLocation({ lat, lng })
+        setLocationNotice(t('voice.locationApprox'))
       }
     }
 
@@ -727,11 +1014,13 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
         lat,
         lng,
         severity: severityCode || undefined,
-        emergency_ready: ['HIGH', 'CRITICAL'].includes(severityCode) ? true : undefined,
+        specialty: specialty || undefined,
+        // No hard emergency_ready filter: OSM data can't confirm it for most places, so the
+        // API ranks emergency-capable hospitals first instead of excluding everything else.
       })
       setRoutedHospitals(response.data ?? [])
     } catch (err) {
-      setHospitalsError(err instanceof Error ? err.message : 'Failed to load hospitals')
+      setHospitalsError(t('voice.hospitalsLoadFailed'))
       setRoutedHospitals([])
     } finally {
       setIsHospitalsLoading(false)
@@ -772,74 +1061,67 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     })
   }, [routedHospitals, userLocation])
 
-  const mapPoints = useMemo(() => {
-    const hospitals = displayHospitals.slice(0, 6)
-    if (hospitals.length === 0) return { hospitals: [] as Array<{ id: number; name: string; x: number; y: number }>, user: null as null | { x: number; y: number } }
-
-    const lats = hospitals.map((h) => h.lat)
-    const lngs = hospitals.map((h) => h.lng)
-    if (userLocation) {
-      lats.push(userLocation.lat)
-      lngs.push(userLocation.lng)
-    }
-
-    const minLat = Math.min(...lats)
-    const maxLat = Math.max(...lats)
-    const minLng = Math.min(...lngs)
-    const maxLng = Math.max(...lngs)
-
-    const latRange = maxLat - minLat || 0.02
-    const lngRange = maxLng - minLng || 0.02
-
-    const toMapX = (lng: number) => 10 + ((lng - minLng) / lngRange) * 80
-    const toMapY = (lat: number) => 90 - ((lat - minLat) / latRange) * 80
-
-    return {
-      hospitals: hospitals.map((h) => ({
-        id: h.id,
-        name: h.name,
-        x: toMapX(h.lng),
-        y: toMapY(h.lat),
-      })),
-      user: userLocation
-        ? {
-            x: toMapX(userLocation.lng),
-            y: toMapY(userLocation.lat),
-          }
-        : null,
-    }
-  }, [displayHospitals, userLocation])
-
   const startListening = async () => {
     if (!supportsSpeech) return
-    if (isListening) return
+    if (isListening || isStartingRef.current) return
+    stopSpeaking()
+    isStartingRef.current = true
 
     try {
-      await navigator.mediaDevices.getUserMedia({ audio: true })
-      setMicPermission('granted')
-    } catch {
-      setMicPermission('denied')
-      return
+      // Open the mic once per listening session (prompts only the first time).
+      if (!micStreamRef.current) {
+        try {
+          micStreamRef.current = await navigator.mediaDevices.getUserMedia({ audio: true })
+          setMicPermission('granted')
+        } catch {
+          setMicPermission('denied')
+          return
+        }
+      }
+
+      // Hold mode: the finger was released while we were waiting on permission.
+      if (inputModeRef.current === 'hold' && !holdActiveRef.current) {
+        releaseMicStream()
+        return
+      }
+
+      shouldKeepListeningRef.current = true
+      isFinalizingVoiceRef.current = false
+      sessionSubmittedRef.current = false
+      if (!recorderRef.current && micStreamRef.current) startRecorder(micStreamRef.current)
+      if (micStreamRef.current) startVoiceActivity(micStreamRef.current)
+      clearSpeechTimers()
+      setTranscript('')
+      setSessionStatus('listening')
+      setInterimTranscript('')
+      transcriptRef.current = ''
+      interimRef.current = ''
+
+      try {
+        if (recognitionActiveRef.current) {
+          // The previous session is still winding down (e.g. a quick re-press after release).
+          // Abort it; onend sees shouldKeepListening and starts a fresh session.
+          recognitionRef.current?.abort()
+        } else {
+          recognitionRef.current?.start()
+        }
+      } catch (err) {
+        if (!(err instanceof DOMException && err.name === 'InvalidStateError')) {
+          console.error('Speech recognition start failed:', err)
+        }
+      }
+
+      setIsListening(true)
+      triggerHaptics(30)
+      if (['yo', 'ha', 'ig'].includes(consultationLanguageRef.current)) {
+        setVoiceNotice(t('voice.speechBestEffort'))
+      } else {
+        setVoiceNotice(null)
+      }
+      if (inputModeRef.current === 'tap') queueInactivityStop()
+    } finally {
+      isStartingRef.current = false
     }
-
-    shouldKeepListeningRef.current = true
-    isFinalizingVoiceRef.current = false
-    clearSpeechTimers()
-    setTranscript('')
-    setSessionStatus('listening')
-    setInterimTranscript('')
-    transcriptRef.current = ''
-    interimRef.current = ''
-
-    try {
-      recognitionRef.current?.start()
-    } catch (err) {
-      console.error('Speech recognition start failed:', err)
-      // If it fails because it's already started, we just continue
-    }
-
-    setIsListening(true)
-    triggerHaptics(30)
   }
 
   const handleSpeakTap = () => {
@@ -851,15 +1133,30 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
     void startListening()
   }
 
-  const handleHoldStart = () => {
+  const handleHoldStart = (event: ReactPointerEvent<HTMLButtonElement>) => {
     if (inputMode !== 'hold') return
+    if (event.pointerType === 'mouse' && event.button !== 0) return
+    // Keep receiving pointerup even if the finger/cursor slides off the button.
+    event.currentTarget.setPointerCapture?.(event.pointerId)
+    holdActiveRef.current = true
     void startListening()
   }
 
   const handleHoldEnd = () => {
     if (inputMode !== 'hold') return
-    if (isListening) stopListening()
+    if (!holdActiveRef.current) return
+    holdActiveRef.current = false
+    if (shouldKeepListeningRef.current) stopListening()
   }
+
+  // Chrome fills the browser voice list asynchronously; touch it early so the TTS fallback has voices.
+  useEffect(() => {
+    if (!('speechSynthesis' in window)) return
+    window.speechSynthesis.getVoices()
+    const warm = () => { window.speechSynthesis.getVoices() }
+    window.speechSynthesis.addEventListener('voiceschanged', warm)
+    return () => window.speechSynthesis.removeEventListener('voiceschanged', warm)
+  }, [])
 
   useEffect(() => {
     transcriptRef.current = transcript
@@ -871,7 +1168,21 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
   useEffect(() => {
     inputModeRef.current = inputMode
+    holdActiveRef.current = false
+    if (shouldKeepListeningRef.current) stopListening()
   }, [inputMode])
+
+  // When a result arrives: open the tab that matters most for its urgency, and show it from the top.
+  useEffect(() => {
+    if (!consultationComplete) return
+    setResultTab('steps')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [consultationComplete])
+
+  // A new question appears at the top of the screen: make sure it is in view.
+  useEffect(() => {
+    if (currentAIMessageSeq > 0) window.scrollTo({ top: 0, behavior: 'smooth' })
+  }, [currentAIMessageSeq])
 
   useEffect(() => {
     if (!consultationComplete) {
@@ -882,8 +1193,8 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       return
     }
 
-    void fetchRoutedHospitals(consultationDetail?.severity)
-  }, [consultationComplete, consultationDetail?.severity])
+    void fetchRoutedHospitals(consultationDetail?.severity, consultationDetail?.recommended_specialty)
+  }, [consultationComplete, consultationDetail?.severity, consultationDetail?.recommended_specialty])
 
   useEffect(() => {
     if (sessionStatus === 'ready') {
@@ -935,57 +1246,83 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
         }
       }
 
-      if (interim) setInterimTranscript(interim.trim())
-      if (finalChunk.trim()) setTranscript((prev) => `${prev} ${finalChunk}`.trim())
+      interimRef.current = interim.trim()
+      setInterimTranscript(interimRef.current)
+      if (finalChunk.trim()) {
+        transcriptRef.current = `${transcriptRef.current} ${finalChunk}`.trim()
+        setTranscript(transcriptRef.current)
+      }
       queueInactivityStop()
     }
 
+    // Chrome ends continuous sessions on its own (silence, ~60s cap, brief network blips).
+    // While the user still wants to listen, restart, retrying if the engine hasn't fully
+    // shut down yet ("already started"), so a long hold doesn't silently die.
+    const scheduleRestart = (delay: number, attempt = 0) => {
+      if (restartTimeoutRef.current !== null) window.clearTimeout(restartTimeoutRef.current)
+      restartTimeoutRef.current = window.setTimeout(() => {
+        restartTimeoutRef.current = null
+        if (!shouldKeepListeningRef.current) return
+        try {
+          recognitionRef.current?.start()
+        } catch (err) {
+          const alreadyStarted = err instanceof DOMException && err.name === 'InvalidStateError'
+          if (alreadyStarted) return // a session is already running; nothing to do
+          if (attempt < 10) {
+            scheduleRestart(250 * (attempt + 1), attempt + 1)
+            return
+          }
+          shouldKeepListeningRef.current = false
+          releaseMicStream()
+          setIsListening(false)
+          setSessionStatus('ready')
+          finalizeCurrentTranscript()
+        }
+      }, delay)
+    }
+
+    recognition.onstart = () => {
+      recognitionActiveRef.current = true
+      if (!shouldKeepListeningRef.current) return
+      setIsListening(true)
+      setSessionStatus('listening')
+    }
+
     recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-      const shouldContinue = shouldKeepListeningRef.current && inputModeRef.current === 'tap'
-      const transientError = event.error === 'no-speech' || event.error === 'aborted'
+      const transientError = ['no-speech', 'aborted', 'network'].includes(event.error)
 
       if (event.error === 'language-not-supported') {
-        recognition.lang = 'en-NG'
-      }
-
-      if (shouldContinue && transientError) {
-        restartTimeoutRef.current = window.setTimeout(() => {
-          if (!shouldKeepListeningRef.current || inputModeRef.current !== 'tap') return
-          try {
-            recognitionRef.current?.start()
-            setIsListening(true)
-            setSessionStatus('listening')
-          } catch {
-            // Browser can throw if recognition is already active.
-          }
-        }, 150)
+        // This browser can't recognise the chosen language: stop and hand over to typing
+        // instead of silently mis-hearing the person.
+        shouldKeepListeningRef.current = false
+        releaseMicStream()
+        clearSpeechTimers()
+        setIsListening(false)
+        setSessionStatus('ready')
+        setVoiceNotice(t('voice.speechUnsupportedLang'))
+        conversationModeRef.current = 'keyboard'
+        setConversationMode('keyboard')
         return
       }
 
+      // onend always follows an error and handles the restart; just don't tear down here.
+      if (shouldKeepListeningRef.current && transientError) return
+
       shouldKeepListeningRef.current = false
+      releaseMicStream()
       clearSpeechTimers()
       setIsListening(false)
       setSessionStatus('ready')
     }
 
     recognition.onend = () => {
-      const shouldContinue = shouldKeepListeningRef.current && inputModeRef.current === 'tap'
-      setIsListening(false)
-
-      if (shouldContinue) {
-        restartTimeoutRef.current = window.setTimeout(() => {
-          if (!shouldKeepListeningRef.current || inputModeRef.current !== 'tap') return
-          try {
-            recognitionRef.current?.start()
-            setIsListening(true)
-            setSessionStatus('listening')
-          } catch {
-            // Safe no-op: browser can throw if restart collides with lifecycle.
-          }
-        }, 120)
+      recognitionActiveRef.current = false
+      if (shouldKeepListeningRef.current) {
+        scheduleRestart(150)
         return
       }
 
+      setIsListening(false)
       clearSpeechTimers()
       setSessionStatus('ready')
       finalizeCurrentTranscript()
@@ -995,6 +1332,9 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
 
     return () => {
       shouldKeepListeningRef.current = false
+      recognitionActiveRef.current = false
+      if (recorderRef.current) recorderRef.current.onstop = null
+      releaseMicStream()
       clearSpeechTimers()
       recognition.stop()
       recognitionRef.current = null
@@ -1031,6 +1371,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
   }, [activeQuestion, aiResponse])
 
   const currentTranscript = (interimTranscript || transcript).trim()
+  const hasConversation = !!consultationIdRef.current || !!aiResponse || !!activeQuestion || consultationComplete || sessionStatus === 'processing'
 
   return (
     <div className={`min-h-screen text-slate-900 transition-all duration-500 text-base ${isEmergencyMode ? 'bg-red-50' : 'bg-[#fdfdfd]'}`}>
@@ -1076,7 +1417,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
             <div className="flex flex-col">
               <h1 className={`hidden sm:block text-[10px] font-black uppercase tracking-[0.2em] ${isEmergencyMode ? 'text-red-700' : 'text-emerald-600/80'}`}>{t('common.appName')}</h1>
               <p className="text-lg sm:text-xl font-black text-slate-800 tracking-tight leading-none">
-                {userName ? `${t('voice.greeting')} ${userName.split(' ')[0]}` : t('voice.healthSession')}
+                {userName ? `${t('voice.greeting')} ${userName.split(' ')[0]}` : isGuest ? t('auth.guestLabel') : t('voice.healthSession')}
               </p>
             </div>
           </div>
@@ -1152,23 +1493,38 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
               </button>
             </div>
             {showEmergencyPanel && (
-              <div className="mt-3 grid grid-cols-2 gap-2">
-                <button
-                  type="button"
-                  onClick={handleEmergencyCall}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl bg-red-700 px-3 text-sm font-bold text-white"
-                >
-                  <PhoneCall size={16} />
-                  <span>{t('voice.emergencyCallContact')}</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={handleEmergencySms}
-                  className="inline-flex min-h-12 items-center justify-center gap-2 rounded-xl border border-red-300 bg-white px-3 text-sm font-bold text-red-700"
-                >
-                  <MessageCircle size={16} />
-                  <span>{t('voice.emergencySmsContact')}</span>
-                </button>
+              <div className="mt-3 space-y-2">
+                {(getEmergencyContactList().length
+                  ? getEmergencyContactList()
+                  : [{ id: 'nigeria-112', name: '112', phone: '112', relation: '' }]
+                ).map((contact) => (
+                  <div key={contact.id} className="flex items-center gap-2 rounded-xl bg-white/70 p-2">
+                    <div className="min-w-0 flex-1 px-2">
+                      <p className="truncate text-sm font-black text-red-900">{contact.name || contact.phone}</p>
+                      <p className="truncate text-xs font-semibold text-red-700/70">
+                        {contact.phone}{contact.relation ? ` · ${contact.relation}` : ''}
+                      </p>
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => dialNumber(contact.phone)}
+                      aria-label={`${t('voice.emergencyCallContact')} ${contact.name || contact.phone}`}
+                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full bg-red-700 px-4 text-sm font-bold text-white"
+                    >
+                      <PhoneCall size={16} />
+                      <span className="hidden sm:inline">{t('voice.emergencyCallContact')}</span>
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => smsNumber(contact.phone)}
+                      aria-label={`${t('voice.emergencySmsContact')} ${contact.name || contact.phone}`}
+                      className="inline-flex min-h-11 items-center justify-center gap-2 rounded-full border border-red-300 bg-white px-4 text-sm font-bold text-red-700"
+                    >
+                      <MessageCircle size={16} />
+                      <span className="hidden sm:inline">{t('voice.emergencySmsContact')}</span>
+                    </button>
+                  </div>
+                ))}
               </div>
             )}
           </motion.section>
@@ -1176,773 +1532,307 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
       </AnimatePresence>
 
       {/* Main Content */}
-      <main className="mx-auto max-w-xl px-4 sm:px-6 pt-6 sm:pt-8 pb-28 sm:pb-32 relative z-10">
-        <div className="flex flex-col items-center gap-10 sm:gap-10 text-center">
+      <main className={`mx-auto max-w-xl px-4 sm:px-6 pt-4 ${consultationComplete ? 'pb-10' : 'pb-64'} relative z-10`}>
+        <div className="flex flex-col gap-4 text-left">
+          <FollowUpCheckIn onEscalate={activateEmergencyMode} />
 
-          {/* Status Badge */}
-          <motion.div
-            initial={{ opacity: 0, y: -10 }}
-            animate={{ opacity: 1, y: 0 }}
-            className={`flex items-center gap-2 rounded-full px-5 py-2 text-[10px] font-black uppercase tracking-[0.2em] border shadow-sm transition-all duration-500 ${isListening
-              ? isEmergencyMode
-                ? 'bg-red-600 text-white border-red-500 shadow-red-200'
-                : 'bg-emerald-500 text-white border-emerald-400 shadow-emerald-200'
-              : 'bg-white text-slate-400 border-slate-100'
-              }`}
-          >
-            {!supportsSpeech && (
-              <div className="flex items-center gap-2">
-                <MicOff size={14} className="text-amber-500" />
-                <span className="text-amber-600">{t('voice.browserUnsupported')}</span>
-              </div>
-            )}
-            {supportsSpeech && micPermission === 'denied' && (
-              <div className="flex items-center gap-2">
-                <MicOff size={14} className="text-red-500" />
-                <span className="text-red-600">{t('voice.micBlocked')}</span>
-              </div>
-            )}
-            {supportsSpeech && micPermission !== 'denied' && (
-              <>
-                {isListening ? (
-                  <Activity size={14} className="animate-pulse" />
-                ) : (
-                  <ShieldCheck size={14} />
-                )}
-                {isListening ? t('voice.status.listening') : sessionStatus === 'processing' ? t('voice.status.processing') : t('voice.status.ready')}
-              </>
-            )}
-          </motion.div>
-
-          {/* Hero Section */}
-          <section className="relative flex flex-col items-center gap-6 sm:gap-10">
-            <div className="relative">
-              <AnimatePresence>
-                {isListening && (
-                  <>
-                    <motion.div
-                      key="pulse-1"
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 1.6, opacity: 1 }}
-                      exit={{ scale: 2.2, opacity: 0 }}
-                      transition={{ duration: 2, repeat: Infinity, ease: "easeOut" }}
-                      className={`absolute inset-0 rounded-full ${isEmergencyMode ? 'bg-red-500/15' : 'bg-emerald-500/10'}`}
-                    />
-                    <motion.div
-                      key="pulse-2"
-                      initial={{ scale: 0.8, opacity: 0 }}
-                      animate={{ scale: 2.2, opacity: 1 }}
-                      exit={{ scale: 3, opacity: 0 }}
-                      transition={{ duration: 2.5, repeat: Infinity, ease: "easeOut", delay: 0.6 }}
-                      className={`absolute inset-0 rounded-full ${isEmergencyMode ? 'bg-red-500/10' : 'bg-emerald-500/5'}`}
-                    />
-                  </>
-                )}
-              </AnimatePresence>
-
-              <motion.button
-                type="button"
-                whileHover={{ scale: 1.05, translateY: -2 }}
-                whileTap={{ scale: 0.94 }}
-                onClick={handleSpeakTap}
-                onMouseDown={handleHoldStart}
-                onMouseUp={handleHoldEnd}
-                onTouchStart={handleHoldStart}
-                onTouchEnd={handleHoldEnd}
-                className={`speak-button relative z-10 border-4 border-white ${micPermission === 'denied'
-                  ? 'bg-red-50 text-red-500 border-red-200'
-                  : isListening
-                    ? 'is-live scale-110'
-                    : 'bg-white text-slate-900 shadow-xl'
-                  }`}
-              >
-                {micPermission === 'denied' ? (
-                  <MicOff size={56} strokeWidth={2.5} />
-                ) : (
-                  <Mic size={56} strokeWidth={2.5} />
-                )}
-              </motion.button>
-
-              <AnimatePresence>
-                {isListening && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 10 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    exit={{ opacity: 0, y: 10 }}
-                    className="absolute -bottom-14 left-1/2 flex -translate-x-1/2 items-end gap-1.5 px-6 py-4 rounded-3xl bg-white/50 backdrop-blur-md border border-white"
-                  >
-                    {Array.from({ length: 15 }).map((_, i) => (
-                      <motion.span
-                        key={i}
-                        className={`wave-bar ${isEmergencyMode ? 'bg-red-500/90' : 'bg-emerald-500/80'}`}
-                        style={{ animationDelay: `${i * 80}ms` }}
-                      />
-                    ))}
-                  </motion.div>
-                )}
-              </AnimatePresence>
-            </div>
-
-            <div className="space-y-2 max-w-xs">
-              <motion.h2
-                layout
-                className="text-2xl sm:text-3xl font-black tracking-tight text-slate-800"
-              >
-                {isListening ? t('voice.listeningTitle') : t('voice.speakTitle')}
-              </motion.h2>
-              <motion.p
-                layout
-                className={`text-base font-bold leading-relaxed ${micPermission === 'denied' ? 'text-red-500' : 'text-slate-400'}`}
-              >
-                {micPermission === 'denied'
-                  ? t('voice.micDisabledText')
-                  : isListening
-                    ? t('voice.listeningHint')
-                    : t('voice.speakHint')}
-              </motion.p>
-            </div>
-          </section>
-
-          {/* Input Controls */}
-          <section className="flex flex-col items-center gap-3">
-            <div className="flex rounded-[20px] bg-white p-1 shadow-xl shadow-slate-200/50 border border-slate-50">
-              <button
-                onClick={() => setInputMode('tap')}
-                className={`rounded-[15px] px-5 py-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${inputMode === 'tap' ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-                  }`}
-              >
-                {t('voice.modeTap')}
-              </button>
-              <button
-                onClick={() => setInputMode('hold')}
-                className={`rounded-[15px] px-5 py-2 text-[10px] font-black uppercase tracking-widest transition-all duration-300 ${inputMode === 'hold' ? 'bg-slate-900 text-white shadow-xl' : 'text-slate-400 hover:text-slate-600 hover:bg-slate-50'
-                  }`}
-              >
-                {t('voice.modeHold')}
-              </button>
-            </div>
-            
-            <motion.button
-              whileHover={{ scale: 1.02 }}
-              whileTap={{ scale: 0.98 }}
-              onClick={() => {
-                const nextMode = conversationMode === 'keyboard' ? 'voice' : 'keyboard'
-                conversationModeRef.current = nextMode
-                setConversationMode(nextMode)
-                if (nextMode === 'keyboard') stopListening()
-              }}
-              className={`flex items-center gap-2 rounded-2xl px-6 py-3 text-xs font-black uppercase tracking-wider transition-all shadow-lg ${
-                conversationMode === 'keyboard'
-                  ? 'bg-emerald-500 text-white border-2 border-emerald-400'
-                  : 'bg-white text-slate-700 border-2 border-slate-200 hover:border-emerald-300'
-              }`}
+          {voiceNotice && (
+            <p
+              role="status"
+              className="rounded-2xl border border-amber-200 bg-amber-50 px-4 py-2 text-xs font-bold leading-snug text-amber-800"
             >
-              <Keyboard size={16} />
-              <span>{conversationMode === 'keyboard' ? t('voice.modeTap') : t('voice.typeSymptoms')}</span>
-            </motion.button>
-          </section>
+              {voiceNotice}
+            </p>
+          )}
 
-          {/* Results Area */}
-          <div className="w-full space-y-10 text-left">
-            <AnimatePresence mode="popLayout">
+          {!hasConversation && (
+            <section className="flex flex-col items-center gap-5 pt-6 text-center">
+              <div className="space-y-2">
+                <h2 className="text-3xl font-black tracking-tight text-slate-800">
+                  {micPermission === 'denied' ? t('voice.micBlocked') : t('voice.speakTitle')}
+                </h2>
+                <p className={`mx-auto max-w-xs text-base font-bold leading-relaxed ${micPermission === 'denied' ? 'text-red-500' : 'text-slate-400'}`}>
+                  {micPermission === 'denied' ? t('voice.micDisabledText') : t('voice.speakHint')}
+                </p>
+              </div>
+              {!supportsSpeech && (
+                <p className="flex items-center gap-2 text-sm font-bold text-amber-600">
+                  <MicOff size={16} /> {t('voice.browserUnsupported')}
+                </p>
+              )}
+              <div className="grid w-full grid-cols-2 gap-2.5">
+                {(['headache', 'fever', 'stomach', 'cough'] as const).map((key) => (
+                  <button
+                    key={key}
+                    type="button"
+                    onClick={() => submitInputIntoFlow(t(`voice.quick.${key}Msg`), 'voice')}
+                    className="min-h-14 rounded-2xl border-2 border-slate-100 bg-white px-4 py-3 text-sm font-black text-slate-700 transition-all active:scale-95 hover:border-emerald-300 hover:bg-emerald-50"
+                  >
+                    {t(`voice.quick.${key}`)}
+                  </button>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {hasConversation && !consultationComplete && (
+            <>
               {currentTranscript && (
-                <motion.div
-                  key="transcript"
-                  initial={{ opacity: 0, y: 30 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, scale: 0.95 }}
-                  className="triage-card p-6 border-none shadow-2xl shadow-slate-200/40 relative overflow-hidden"
-                >
-                  <div className="absolute top-0 left-0 w-2 h-full bg-slate-100" />
-                  <label className="mb-2 block text-[9px] font-black uppercase tracking-[0.3em] text-slate-300">{t('voice.transcript')}</label>
-                  <p className="text-xl font-bold leading-relaxed text-slate-800 tracking-tight">"{currentTranscript}"</p>
-                </motion.div>
+                <div className="ml-auto max-w-[85%] rounded-2xl rounded-br-md bg-emerald-50 px-4 py-3 text-base font-bold leading-snug text-emerald-900">
+                  {currentTranscript}
+                </div>
               )}
 
               {apiError && (
-                <motion.div
-                  key="api-error"
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: 20 }}
-                  className="triage-card p-5 border border-red-200 bg-red-50 text-sm font-bold text-red-600 relative overflow-hidden"
-                >
-                  <div className="absolute top-0 left-0 w-2 h-full bg-red-400" />
-                  <p className="pl-2">{apiError}</p>
-                </motion.div>
+                <p className="rounded-2xl border border-red-200 bg-red-50 px-4 py-3 text-sm font-bold text-red-600">{apiError}</p>
               )}
 
-              {aiResponse && (
-                <motion.div
-                  key="ai-response"
-                  initial={{ opacity: 0, scale: 0.95, y: 20 }}
-                  animate={{ opacity: 1, scale: 1, y: 0 }}
-                  className="triage-card border-none p-5 sm:p-8 shadow-emerald-200/40 bg-gradient-to-br from-white to-emerald-50/30"
-                >
-                  <div className="mb-4 flex items-center justify-between">
-                    <h3 className="text-2xl font-black text-slate-900 tracking-tighter">{aiResponse.heading}</h3>
-                    {aiResponse.severity && (
-                      <motion.span
-                        initial={{ scale: 0.5, opacity: 0 }}
-                        animate={{ scale: 1, opacity: 1 }}
-                        className={`inline-flex items-center gap-2 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-widest ${severityStyle[aiResponse.severity].bg} ${severityStyle[aiResponse.severity].text} border ${severityStyle[aiResponse.severity].border} shadow-sm
-                      `}>
-                        {(() => {
-                          const SeverityIcon = severityStyle[aiResponse.severity!].icon
-                          return <SeverityIcon size={12} strokeWidth={3} />
-                        })()}
-                        {t(`severity.${aiResponse.severity}`)}
-                      </motion.span>
-                    )}
+              <motion.div
+                key={sessionStatus === 'processing' ? 'thinking' : (activeQuestion?.id ?? 'q')}
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="relative overflow-hidden rounded-[28px] bg-slate-900 p-5 text-white sm:p-7"
+              >
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  <span className="text-[10px] font-black uppercase tracking-[0.25em] text-emerald-400">{t('voice.triageQuestion')}</span>
+                  {activeQuestion && sessionStatus !== 'processing' && (
+                    <button
+                      type="button"
+                      onClick={() => { void speakText(activeQuestion.question, undefined, undefined, true) }}
+                      aria-label={t('voice.playAudio')}
+                      className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-all active:scale-90 hover:bg-white/20"
+                    >
+                      <Volume2 size={18} />
+                    </button>
+                  )}
+                </div>
+                {sessionStatus === 'processing' || !activeQuestion ? (
+                  <div className="flex items-center gap-3 py-2">
+                    <Loader2 size={22} className="animate-spin text-emerald-400" />
+                    <p className="text-lg font-black text-white/90">{t('voice.thinking')}</p>
                   </div>
-                  <p className="text-lg sm:text-xl font-bold leading-snug text-slate-600 mb-6 sm:mb-8 tracking-tight">{aiResponse.summary}</p>
-                  <motion.button
-                    whileHover={{ scale: 1.02, translateY: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={() => { void speakText(currentAIMessage ?? `${aiResponse.heading}. ${aiResponse.summary}`) }}
-                    className="flex items-center gap-3 rounded-2xl bg-slate-900 px-6 py-4 text-xs font-black text-white shadow-2xl shadow-slate-900/20 transition-all active:scale-100 uppercase tracking-widest"
-                  >
-                    <Volume2 size={20} />
-                    {t('voice.playAudio')}
-                  </motion.button>
-                </motion.div>
-              )}
-
-              {/* Thinking indicator — shows while waiting for AI response / YarnGPT */}
-              <AnimatePresence>
-                {sessionStatus === 'processing' && consultationIdRef.current && (
-                  <motion.div
-                    initial={{ opacity: 0, y: 16, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    exit={{ opacity: 0, y: -10, scale: 0.95 }}
-                    transition={{ duration: 0.3, ease: 'easeOut' }}
-                    className="flex items-center gap-4 rounded-2xl bg-slate-900 px-6 py-5 shadow-xl border border-white/10"
-                  >
-                    <div className="flex h-10 w-10 items-center justify-center rounded-full bg-emerald-500/20">
-                      <motion.div
-                        animate={{ rotate: 360 }}
-                        transition={{ duration: 1.2, repeat: Infinity, ease: 'linear' }}
-                      >
-                        <Loader2 size={20} className="text-emerald-400" />
-                      </motion.div>
-                    </div>
-                    <div className="flex-1">
-                      <p className="text-sm font-black text-white/90 tracking-tight">{t('voice.thinking')}</p>
-                      <div className="mt-1.5 flex gap-1.5">
-                        {[0, 1, 2].map((i) => (
-                          <motion.div
-                            key={i}
-                            animate={{ opacity: [0.3, 1, 0.3], scale: [0.8, 1.1, 0.8] }}
-                            transition={{ duration: 1.2, repeat: Infinity, delay: i * 0.2 }}
-                            className="h-2 w-2 rounded-full bg-emerald-400"
-                          />
-                        ))}
-                      </div>
-                    </div>
-                  </motion.div>
+                ) : (
+                  <h4 className="text-2xl font-black leading-snug tracking-tight text-white sm:text-3xl">{activeQuestion.question}</h4>
                 )}
-              </AnimatePresence>
+              </motion.div>
 
-              {aiResponse && activeQuestion && (
-                <motion.div
-                  key={activeQuestion.id}
-                  initial={{ opacity: 0, x: 40 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  className="triage-card bg-slate-900 p-5 sm:p-8 text-white shadow-2xl shadow-slate-900/30 border-none relative overflow-hidden"
-                >
-                  <motion.div
-                    animate={{
-                      scale: [1, 1.1, 1],
-                      opacity: [0.1, 0.2, 0.1]
-                    }}
-                    transition={{ duration: 4, repeat: Infinity }}
-                    className="absolute -top-20 -right-20 h-64 w-64 rounded-full bg-emerald-500 blur-[80px]"
-                  />
-
-                  <div className="relative z-10">
-                    <div className="mb-6">
-                      <div className="flex items-center justify-between mb-3">
-                        <span className="text-[10px] font-black uppercase tracking-[0.3em] text-emerald-400">{t('voice.triageQuestion')}</span>
-                        <motion.button
-                          whileHover={{ scale: 1.05 }}
-                          whileTap={{ scale: 0.95 }}
-                          type="button"
-                          onClick={() => {
-                            const nextMode = conversationMode === 'keyboard' ? 'voice' : 'keyboard'
-                            conversationModeRef.current = nextMode
-                            setConversationMode(nextMode)
-                            if (nextMode === 'keyboard') stopListening()
-                          }}
-                          className={`inline-flex min-h-10 items-center gap-2 rounded-xl px-4 py-2 text-[10px] font-black uppercase tracking-wider transition-all shadow-lg ${
-                            conversationMode === 'keyboard'
-                              ? 'bg-emerald-500 text-white border-2 border-emerald-400'
-                              : 'bg-white/15 text-white border-2 border-white/20 hover:bg-white/20'
-                          }`}
-                        >
-                          {conversationMode === 'keyboard' ? <Mic size={14} /> : <Keyboard size={14} />}
-                          <span>{conversationMode === 'keyboard' ? t('voice.modeTap') : t('voice.typeSymptoms')}</span>
-                        </motion.button>
-                      </div>
-                      <h4 className="text-xl sm:text-2xl font-black leading-tight tracking-tight text-emerald-400">
-                        {activeQuestion.question}
-                      </h4>
-                    </div>
-
-                    {/* Response indicator — keyboard note or mic interface */}
-                    {conversationMode === 'keyboard' ? (
-                      <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        className="rounded-2xl border-2 border-emerald-400/30 bg-gradient-to-br from-white/15 to-white/5 p-4 backdrop-blur-sm shadow-2xl"
-                      >
-                        <div className="flex items-center gap-2">
-                          <Keyboard size={14} className="text-emerald-300" />
-                          <span className="text-sm font-black text-emerald-300">{t('voice.typeYourAnswer')}</span>
-                        </div>
-                        <p className="mt-2 text-xs font-semibold text-white/60">{t('voice.keyboardPanelHint')}</p>
-                      </motion.div>
-                    ) : (
-                    <div className={`rounded-2xl border px-4 py-3 transition-all ${
-                      isListening
-                        ? 'bg-emerald-500/20 border-emerald-500/40'
-                        : sessionStatus === 'processing'
-                          ? 'bg-white/5 border-white/10'
-                          : 'bg-white/10 border-white/20'
-                    }`}>
-                      <div className="flex items-center gap-3">
-                        <motion.div
-                          animate={isListening ? { scale: [1, 1.25, 1] } : {}}
-                          transition={{ repeat: Infinity, duration: 1.2 }}
-                        >
-                          {sessionStatus === 'processing'
-                            ? <Loader2 size={18} className="animate-spin text-white/40" />
-                            : isListening
-                              ? <Mic size={18} className="text-emerald-400" />
-                              : <MicOff size={18} className="text-white/30" />
-                          }
-                        </motion.div>
-                        <span className={`flex-1 text-sm font-bold ${
-                          isListening ? 'text-emerald-300' : 'text-white/40'
-                        }`}>
-                          {sessionStatus === 'processing'
-                            ? t('voice.status.processing')
-                            : isListening
-                              ? t('voice.status.listening')
-                              : t('voice.listeningHint')
-                          }
-                        </span>
-                        {isListening ? (
-                          <button
-                            type="button"
-                            onClick={stopListening}
-                            className="inline-flex min-h-12 items-center gap-2 rounded-xl border border-red-300/50 bg-red-500/20 px-3 text-xs font-black uppercase tracking-wider text-red-100"
-                          >
-                            <MicOff size={14} />
-                            <span>{t('voice.stop')}</span>
-                          </button>
-                        ) : null}
-                      </div>
-                    </div>
-                    )}
-                  </div>
-                </motion.div>
-              )}
-
-              {consultationComplete && (
-                <motion.div
-                  initial={{ opacity: 0, y: 40 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  className="space-y-6"
-                >
-                  <div className="rounded-[32px] bg-white p-5 sm:p-8 shadow-2xl shadow-slate-200/50 border border-slate-50">
-                    <div className="flex items-center gap-3 mb-6">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-200">
-                        <Activity size={20} />
-                      </div>
-                      <h3 className="text-xl font-black text-slate-800 tracking-tight">{t('voice.firstAidTitle')}</h3>
-                    </div>
-                    <div className="space-y-4">
-                      {(() => {
-                        const sevKey = aiResponse?.severity ?? 'medium'
-                        const steps = t(`voice.firstAid.${sevKey}`, { returnObjects: true }) as string[]
-                        return (Array.isArray(steps) ? steps : []).map((step, idx) => (
-                          <motion.div
-                            key={idx}
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: idx * 0.1 }}
-                            className="flex items-start gap-4 p-4 rounded-2xl bg-slate-50 border border-slate-100/50"
-                          >
-                            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-slate-900 text-[10px] font-black text-white">
-                              {idx + 1}
-                            </span>
-                            <p className="text-sm font-bold text-slate-600 leading-relaxed">{step}</p>
-                          </motion.div>
-                        ))
-                      })()}
-                    </div>
-                  </div>
-
-                  <div className="rounded-[32px] bg-slate-900 p-5 sm:p-8 shadow-2xl shadow-slate-900/20 text-white overflow-hidden relative">
-                    <motion.div
-                      animate={{ scale: [1, 1.2, 1], opacity: [0.1, 0.2, 0.1] }}
-                      transition={{ duration: 5, repeat: Infinity }}
-                      className="absolute -bottom-20 -left-20 h-64 w-64 rounded-full bg-emerald-500 blur-[80px]"
-                    />
-
-                    <div className="relative z-10">
-                      <div className="flex items-center justify-between mb-4">
-                        <div>
-                          <h3 className="text-lg sm:text-2xl font-black mb-1 tracking-tight">{t('voice.routingTitle')}</h3>
-                          <p className="text-sm font-bold text-white/50">{t('voice.routingDesc')}</p>
-                        </div>
-                        <div className="h-12 w-12 rounded-2xl bg-emerald-500/20 flex items-center justify-center border border-emerald-500/30">
-                          <MapIcon size={24} className="text-emerald-400" />
-                        </div>
-                      </div>
-
-                      <div className="space-y-4">
-                        {!isHospitalsLoading && locationNotice && (
-                          <div className="rounded-2xl border border-amber-300/20 bg-amber-500/10 px-4 py-3 text-xs font-bold text-amber-100">
-                            {locationNotice}
-                          </div>
-                        )}
-
-                        {!isHospitalsLoading && !hospitalsError && displayHospitals.length > 0 && (
-                          <div className="relative h-64 w-full overflow-hidden rounded-[28px] border border-white/10 shadow-inner">
-                            {/* Realistic map background */}
-                            <div className="absolute inset-0 bg-[#1a2332]">
-                              <svg width="100%" height="100%" viewBox="0 0 400 260" preserveAspectRatio="xMidYMid slice" className="absolute inset-0">
-                                <defs>
-                                  {/* Water texture gradient */}
-                                  <linearGradient id="waterGrad" x1="0" y1="0" x2="1" y2="1">
-                                    <stop offset="0%" stopColor="#0c4a6e" stopOpacity="0.5" />
-                                    <stop offset="100%" stopColor="#164e63" stopOpacity="0.3" />
-                                  </linearGradient>
-                                  {/* Land fill */}
-                                  <linearGradient id="landGrad" x1="0" y1="0" x2="0" y2="1">
-                                    <stop offset="0%" stopColor="#1e3a2f" stopOpacity="0.4" />
-                                    <stop offset="100%" stopColor="#1a2e25" stopOpacity="0.3" />
-                                  </linearGradient>
-                                  {/* Road dash pattern */}
-                                  <pattern id="roadDash" patternUnits="userSpaceOnUse" width="12" height="2">
-                                    <rect width="7" height="1" fill="rgba(255,255,255,0.12)" />
-                                  </pattern>
-                                  {/* Route dash */}
-                                  <filter id="routeGlow">
-                                    <feGaussianBlur stdDeviation="2" result="blur" />
-                                    <feMerge>
-                                      <feMergeNode in="blur" />
-                                      <feMergeNode in="SourceGraphic" />
-                                    </feMerge>
-                                  </filter>
-                                </defs>
-
-                                {/* Water/lagoon areas */}
-                                <path d="M0,200 Q50,180 120,195 Q200,215 280,190 Q350,175 400,200 L400,260 L0,260 Z" fill="url(#waterGrad)" />
-                                <path d="M300,0 Q310,30 305,60 Q295,90 310,120 Q330,90 340,50 Q345,20 350,0 Z" fill="url(#waterGrad)" opacity="0.4" />
-                                <ellipse cx="80" cy="230" rx="60" ry="20" fill="url(#waterGrad)" opacity="0.3" />
-
-                                {/* Land mass */}
-                                <path d="M0,0 L400,0 L400,200 Q350,175 280,190 Q200,215 120,195 Q50,180 0,200 Z" fill="url(#landGrad)" />
-
-                                {/* Terrain patches (parks/green areas) */}
-                                <ellipse cx="60" cy="80" rx="30" ry="18" fill="#166534" opacity="0.15" />
-                                <ellipse cx="240" cy="50" rx="25" ry="15" fill="#166534" opacity="0.12" />
-                                <ellipse cx="160" cy="150" rx="20" ry="12" fill="#166534" opacity="0.1" />
-
-                                {/* Major roads - horizontal */}
-                                <line x1="0" y1="60" x2="400" y2="65" stroke="rgba(255,255,255,0.08)" strokeWidth="4" />
-                                <line x1="0" y1="60" x2="400" y2="65" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
-                                <line x1="0" y1="120" x2="290" y2="115" stroke="rgba(255,255,255,0.08)" strokeWidth="3.5" />
-                                <line x1="0" y1="120" x2="290" y2="115" stroke="rgba(255,255,255,0.12)" strokeWidth="1" />
-                                <line x1="30" y1="170" x2="350" y2="165" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
-                                <line x1="30" y1="170" x2="350" y2="165" stroke="rgba(255,255,255,0.1)" strokeWidth="0.8" />
-
-                                {/* Major roads - vertical / diagonal */}
-                                <line x1="100" y1="0" x2="110" y2="200" stroke="rgba(255,255,255,0.08)" strokeWidth="4" />
-                                <line x1="100" y1="0" x2="110" y2="200" stroke="rgba(255,255,255,0.15)" strokeWidth="1.5" />
-                                <line x1="200" y1="0" x2="195" y2="200" stroke="rgba(255,255,255,0.06)" strokeWidth="3" />
-                                <line x1="200" y1="0" x2="195" y2="200" stroke="rgba(255,255,255,0.1)" strokeWidth="0.8" />
-                                <path d="M260,0 Q270,80 240,170 Q230,200 220,210" stroke="rgba(255,255,255,0.06)" strokeWidth="3" fill="none" />
-
-                                {/* Secondary / minor roads */}
-                                <line x1="50" y1="30" x2="180" y2="35" stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" />
-                                <line x1="140" y1="80" x2="280" y2="85" stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" />
-                                <line x1="60" y1="0" x2="55" y2="130" stroke="rgba(255,255,255,0.04)" strokeWidth="1.5" />
-                                <line x1="150" y1="40" x2="155" y2="170" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-                                <line x1="340" y1="30" x2="330" y2="160" stroke="rgba(255,255,255,0.03)" strokeWidth="1" />
-
-                                {/* Block / neighborhood fills */}
-                                <rect x="105" y="65" width="35" height="45" rx="3" fill="rgba(255,255,255,0.02)" />
-                                <rect x="55" y="65" width="40" height="50" rx="3" fill="rgba(255,255,255,0.015)" />
-                                <rect x="115" y="125" width="30" height="35" rx="3" fill="rgba(255,255,255,0.02)" />
-                                <rect x="202" y="30" width="50" height="30" rx="3" fill="rgba(255,255,255,0.015)" />
-                                <rect x="205" y="70" width="45" height="40" rx="3" fill="rgba(255,255,255,0.02)" />
-
-                                {/* Route lines: user → each hospital (dashed, glowing) */}
-                                {mapPoints.user && mapPoints.hospitals.map((h) => (
-                                  <line
-                                    key={`route-${h.id}`}
-                                    x1={mapPoints.user!.x * 4}
-                                    y1={mapPoints.user!.y * 2.6}
-                                    x2={h.x * 4}
-                                    y2={h.y * 2.6}
-                                    stroke="#10b981"
-                                    strokeWidth="1.5"
-                                    strokeDasharray="6,4"
-                                    opacity="0.4"
-                                    filter="url(#routeGlow)"
-                                  />
-                                ))}
-                              </svg>
-                            </div>
-
-                            {/* User location marker with pulse */}
-                            {mapPoints.user && (
-                              <div
-                                className="absolute -translate-x-1/2 -translate-y-1/2 z-30"
-                                style={{ left: `${mapPoints.user.x}%`, top: `${mapPoints.user.y}%` }}
-                              >
-                                <div className="relative">
-                                  {/* Outer pulse ring */}
-                                  <motion.div
-                                    animate={{ scale: [1, 2.5], opacity: [0.4, 0] }}
-                                    transition={{ duration: 2, repeat: Infinity, ease: 'easeOut' }}
-                                    className="absolute inset-0 rounded-full bg-blue-500"
-                                    style={{ width: 16, height: 16, marginLeft: -2, marginTop: -2 }}
-                                  />
-                                  {/* Inner pulse ring */}
-                                  <motion.div
-                                    animate={{ scale: [1, 1.8], opacity: [0.3, 0] }}
-                                    transition={{ duration: 2, repeat: Infinity, ease: 'easeOut', delay: 0.4 }}
-                                    className="absolute inset-0 rounded-full bg-blue-400"
-                                    style={{ width: 16, height: 16, marginLeft: -2, marginTop: -2 }}
-                                  />
-                                  {/* Dot */}
-                                  <div className="relative h-3 w-3 rounded-full bg-blue-500 border-[2.5px] border-white shadow-[0_0_12px_rgba(59,130,246,0.9)]" />
-                                  {/* Label */}
-                                  <span className="absolute left-5 top-1/2 -translate-y-1/2 whitespace-nowrap rounded-md bg-blue-500/90 px-2 py-0.5 text-[8px] font-black text-white shadow-lg backdrop-blur-sm">
-                                    {t('voice.mapYou')}
-                                  </span>
-                                </div>
-                              </div>
-                            )}
-
-                            {/* Hospital markers with drop-pin style */}
-                            {mapPoints.hospitals.map((marker, idx) => (
-                              <div
-                                key={marker.id}
-                                className="absolute -translate-x-1/2 -translate-y-full z-20"
-                                style={{ left: `${marker.x}%`, top: `${marker.y}%` }}
-                                title={marker.name}
-                              >
-                                <motion.div
-                                  initial={{ y: -20, opacity: 0 }}
-                                  animate={{ y: 0, opacity: 1 }}
-                                  transition={{ delay: idx * 0.12, type: 'spring', stiffness: 300 }}
-                                  className="relative flex flex-col items-center"
-                                >
-                                  {/* Pin head */}
-                                  <div className="flex h-8 w-8 items-center justify-center rounded-full bg-emerald-500 text-white border-[2.5px] border-white shadow-[0_2px_12px_rgba(16,185,129,0.6)]">
-                                    <HeartPulse size={13} strokeWidth={2.5} />
-                                  </div>
-                                  {/* Pin tail */}
-                                  <div className="h-2 w-0.5 bg-white/60" />
-                                  <div className="h-1.5 w-1.5 rounded-full bg-white/40" />
-                                  {/* Hospital name tooltip */}
-                                  <span className="absolute -bottom-5 left-1/2 -translate-x-1/2 whitespace-nowrap rounded bg-black/70 px-1.5 py-0.5 text-[7px] font-bold text-white/90 backdrop-blur-sm">
-                                    {marker.name.length > 18 ? marker.name.slice(0, 16) + '…' : marker.name}
-                                  </span>
-                                </motion.div>
-                              </div>
-                            ))}
-
-                            {/* Legend bar */}
-                            <div className="absolute bottom-2 left-3 right-3 flex items-center justify-between z-30">
-                              <div className="flex items-center gap-3 rounded-lg bg-black/50 px-3 py-1.5 backdrop-blur-md border border-white/5">
-                                <div className="flex items-center gap-1.5">
-                                  <div className="h-2 w-2 rounded-full bg-blue-500 border border-white/60" />
-                                  <span className="text-[8px] font-bold text-white/70">{t('voice.mapYou')}</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                  <div className="h-2 w-2 rounded-full bg-emerald-500 border border-white/60" />
-                                  <span className="text-[8px] font-bold text-white/70">{t('voice.mapHospital')}</span>
-                                </div>
-                                <div className="flex items-center gap-1.5">
-                                  <div className="h-0.5 w-4 border-t border-dashed border-emerald-400/60" />
-                                  <span className="text-[8px] font-bold text-white/70">{t('voice.mapRoute')}</span>
-                                </div>
-                              </div>
-                              <span className="rounded-lg bg-black/50 px-2 py-1 text-[7px] font-bold text-white/40 backdrop-blur-md border border-white/5">
-                                Lagos, NG
-                              </span>
-                            </div>
-                          </div>
-                        )}
-
-                        {isHospitalsLoading && (
-                          <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-sm font-bold text-white/70">
-                            {t('voice.status.processing')}
-                          </div>
-                        )}
-
-                        {!isHospitalsLoading && hospitalsError && (
-                          <div className="rounded-2xl border border-red-300/20 bg-red-500/10 px-4 py-5 text-sm font-bold text-red-200">
-                            {hospitalsError}
-                          </div>
-                        )}
-
-                        {!isHospitalsLoading && !hospitalsError && displayHospitals.length === 0 && (
-                          <div className="rounded-2xl border border-white/10 bg-white/5 px-4 py-5 text-sm font-bold text-white/70">
-                            {t('voice.noHospitals')}
-                          </div>
-                        )}
-
-                        {!isHospitalsLoading && !hospitalsError && displayHospitals.map((hospital, index) => {
-                          const distanceLabel = hospital.effectiveDistanceKm != null
-                            ? `${hospital.effectiveDistanceKm} km away`
-                            : t('voice.distanceUnavailable')
-
-                          return (
-                            <motion.div
-                              key={hospital.id}
-                              whileHover={{ y: -4 }}
-                              className="group flex flex-col p-4 sm:p-5 rounded-[28px] bg-white/5 border border-white/10 hover:bg-white/10 transition-all"
-                            >
-                              <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between mb-4 gap-3">
-                                <div className="flex items-center gap-4">
-                                  <div className="flex h-10 w-10 sm:h-12 sm:w-12 items-center justify-center rounded-2xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/20">
-                                    <Navigation size={20} />
-                                  </div>
-                                  <div>
-                                    <h5 className="font-black text-sm sm:text-base text-white tracking-tight leading-tight">{hospital.name}</h5>
-                                    <div className="flex items-center gap-3 text-[10px] font-bold text-emerald-400 mt-1 flex-wrap">
-                                      <span className="uppercase tracking-wider">
-                                        {hospital.is_public ? t('voice.hospitals.public') : t('voice.hospitals.private')}
-                                      </span>
-                                      <span className="h-1 w-1 rounded-full bg-white/20" />
-                                      <span>{distanceLabel}</span>
-                                      {index === 0 && hospital.effectiveDistanceKm != null && (
-                                        <>
-                                          <span className="h-1 w-1 rounded-full bg-white/20" />
-                                            <span>{t('voice.hospitals.closestToYou')}</span>
-                                        </>
-                                      )}
-                                    </div>
-                                  </div>
-                                </div>
-                                <div className="rounded-full bg-emerald-500/10 px-3 py-1 text-[8px] font-black text-emerald-400 border border-emerald-500/20 uppercase whitespace-nowrap">
-                                  {hospital.emergency_ready ? t('voice.hospitals.emergencyReady') : t('voice.hospitals.generalCare')}
-                                </div>
-                              </div>
-
-                              <div className="grid grid-cols-2 gap-2 mt-auto text-[9px] font-bold text-white/60">
-                                <div className="flex items-center gap-2">
-                                  <div className="h-1 w-1 rounded-full bg-emerald-500" />
-                                  <span>{hospital.is_24_hours ? t('voice.hospitals.hours24') : t('voice.hospitals.hoursNon24')}</span>
-                                </div>
-                                <div className="flex items-center gap-2">
-                                  <div className="h-1 w-1 rounded-full bg-emerald-500" />
-                                  <span>
-                                    {hospital.rating != null
-                                      ? t('voice.hospitals.rating', { rating: hospital.rating })
-                                      : t('voice.hospitals.noRating')}
-                                  </span>
-                                </div>
-                              </div>
-
-                              {hospital.specialties && hospital.specialties.length > 0 && (
-                                <div className="mt-3 flex flex-wrap gap-1.5">
-                                  {hospital.specialties.slice(0, 4).map((specialty, idx) => (
-                                    <span
-                                      key={idx}
-                                      className="inline-flex items-center gap-1 rounded-full bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 text-[9px] font-black text-blue-300 uppercase tracking-wider"
-                                    >
-                                      {specialty}
-                                    </span>
-                                  ))}
-                                  {hospital.specialties.length > 4 && (
-                                    <span className="inline-flex items-center rounded-full bg-blue-500/10 border border-blue-500/20 px-2 py-0.5 text-[9px] font-black text-blue-300">
-                                      +{hospital.specialties.length - 4}
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-
-                              {hospital.facilities && hospital.facilities.length > 0 && (
-                                <div className="mt-2 flex flex-wrap gap-1.5">
-                                  {hospital.facilities.slice(0, 3).map((facility, idx) => (
-                                    <span
-                                      key={idx}
-                                      className="inline-flex items-center gap-1 rounded-full bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 text-[9px] font-black text-purple-300 uppercase tracking-wider"
-                                    >
-                                      {facility}
-                                    </span>
-                                  ))}
-                                  {hospital.facilities.length > 3 && (
-                                    <span className="inline-flex items-center rounded-full bg-purple-500/10 border border-purple-500/20 px-2 py-0.5 text-[9px] font-black text-purple-300">
-                                      +{hospital.facilities.length - 3}
-                                    </span>
-                                  )}
-                                </div>
-                              )}
-
-                              {hospital.address && (
-                                <p className="mt-3 text-[11px] font-semibold text-white/50">{hospital.address}</p>
-                              )}
-
-                              {/* Get Directions button */}
-                              <button
-                                type="button"
-                                onClick={() => {
-                                  if (!hospital.lat || !hospital.lng) return
-                                  const origin = userLocation
-                                    ? `&origin=${userLocation.lat},${userLocation.lng}`
-                                    : ''
-                                  window.open(
-                                    `https://www.google.com/maps/dir/?api=1${origin}&destination=${hospital.lat},${hospital.lng}&destination_place_id=&travelmode=driving`,
-                                    '_blank'
-                                  )
-                                }}
-                                disabled={!hospital.lat || !hospital.lng}
-                                className="mt-4 w-full flex items-center justify-center gap-2 rounded-2xl bg-emerald-500/20 border border-emerald-500/30 py-3 text-[11px] font-black text-emerald-400 uppercase tracking-widest transition-all hover:bg-emerald-500/30 active:scale-95 disabled:opacity-40 disabled:cursor-not-allowed"
-                              >
-                                <Navigation size={14} />
-                                <span>{t('voice.hospitals.getDirections')}</span>
-                              </button>
-                            </motion.div>
-                          )
-                        })}
-                      </div>
-
+              {activeQuestion && sessionStatus !== 'processing' && (() => {
+                const isScale = answerType === 'scale' || /\b(0\s*[-–]\s*10|1\s*[-–]\s*10)\b/.test(activeQuestion.question)
+                const labels = isScale
+                  ? ['0', '2', '4', '6', '8', '10']
+                  : answerType === 'yes_no'
+                    ? [t('voice.quick.yes'), t('voice.quick.no'), t('voice.quick.notSure')]
+                    : []
+                if (!labels.length) return null
+                return (
+                  <div className={isScale ? 'grid grid-cols-6 gap-2' : 'flex flex-wrap gap-2'} data-quick-replies>
+                    {labels.map((label) => (
                       <button
+                        key={label}
                         type="button"
-                        onClick={() => {
-                          const first = routedHospitals[0]
-                          if (!first?.lat || !first?.lng) return
-                          const origin = userLocation
-                            ? `&origin=${userLocation.lat},${userLocation.lng}`
-                            : ''
-                          window.open(
-                            `https://www.google.com/maps/dir/?api=1${origin}&destination=${first.lat},${first.lng}&travelmode=driving`,
-                            '_blank'
-                          )
-                        }}
-                        disabled={!routedHospitals[0]?.lat || !routedHospitals[0]?.lng}
-                        className="w-full mt-8 flex items-center justify-center gap-3 rounded-2xl bg-emerald-500 py-5 text-xs font-black text-white shadow-2xl shadow-emerald-500/40 transition-all hover:bg-emerald-400 uppercase tracking-widest border border-emerald-400/20 disabled:opacity-50 disabled:cursor-not-allowed"
+                        onClick={() => submitInputIntoFlow(label, 'voice')}
+                        className="min-h-12 min-w-12 rounded-full border-2 border-slate-200 bg-white px-3 text-base font-black text-slate-700 transition-all active:scale-95 hover:border-emerald-400 hover:bg-emerald-50"
                       >
-                        <MapIcon size={18} />
-                        <span>{t('voice.hospitals.openTopHospital')}</span>
+                        {label}
                       </button>
-                    </div>
+                    ))}
                   </div>
-                </motion.div>
+                )
+              })()}
+            </>
+          )}
+
+          {consultationComplete && (
+            <>
+              <motion.div
+                initial={{ opacity: 0, y: 12 }}
+                animate={{ opacity: 1, y: 0 }}
+                className="rounded-[28px] border border-slate-100 bg-white p-4 sm:p-5"
+              >
+                <div className="mb-3 flex items-center justify-between gap-3">
+                  {aiResponse?.severity ? (
+                    <span className={`inline-flex items-center gap-2 rounded-full px-4 py-2 text-[11px] font-black uppercase tracking-widest ${severityStyle[aiResponse.severity].bg} ${severityStyle[aiResponse.severity].text} border ${severityStyle[aiResponse.severity].border}`}>
+                      {(() => {
+                        const SeverityIcon = severityStyle[aiResponse.severity!].icon
+                        return <SeverityIcon size={14} strokeWidth={3} />
+                      })()}
+                      {t(`severity.${aiResponse.severity}`)}
+                    </span>
+                  ) : <span />}
+                  <button
+                    type="button"
+                    onClick={() => { void speakText(`${aiResponse?.summary ?? ''}`, undefined, undefined, true) }}
+                    aria-label={t('voice.playAudio')}
+                    className="inline-flex h-10 w-10 items-center justify-center rounded-full bg-slate-900 text-white transition-all active:scale-90"
+                  >
+                    <Volume2 size={18} />
+                  </button>
+                </div>
+                <p className="text-base font-bold leading-snug text-slate-700">{aiResponse?.summary}</p>
+              </motion.div>
+
+              <div className="grid grid-cols-2 gap-1 rounded-full bg-slate-100 p-1">
+                {(['steps', 'hospitals'] as const).map((tab) => (
+                  <button
+                    key={tab}
+                    type="button"
+                    onClick={() => setResultTab(tab)}
+                    className={`min-h-11 rounded-full px-4 text-sm font-black transition-all ${resultTab === tab ? 'bg-slate-900 text-white' : 'text-slate-500'}`}
+                  >
+                    {t(tab === 'hospitals' ? 'voice.tabHospitals' : 'voice.tabSteps')}
+                  </button>
+                ))}
+              </div>
+
+              {resultTab === 'steps' ? (
+                <div className="space-y-3">
+                  {(() => {
+                    const sevKey = aiResponse?.severity ?? 'medium'
+                    const aiSteps = isGuided ? consultationDetail?.first_aid ?? [] : []
+                    const steps = aiSteps.length
+                      ? aiSteps
+                      : (t(`voice.firstAid.${sevKey}`, { returnObjects: true }) as string[])
+                    return (Array.isArray(steps) ? steps : []).map((step, idx) => (
+                      <div key={idx} className="flex items-start gap-3 rounded-2xl border border-slate-100 bg-white px-4 py-3">
+                        <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-emerald-500 text-xs font-black text-white">{idx + 1}</span>
+                        <p className="text-[15px] font-bold leading-snug text-slate-700">{step}</p>
+                      </div>
+                    ))
+                  })()}
+                  {consultationDetail && (
+                    <FeedbackCard
+                      consultationId={consultationDetail.id}
+                      followUpDueAt={consultationDetail.follow_up_due_at}
+                      guestToken={guestSession.isActive() ? guestSession.getToken() ?? undefined : undefined}
+                    />
+                  )}
+                </div>
+              ) : (
+                <HospitalResultsPanel
+                  hospitals={displayHospitals}
+                  userLocation={userLocation}
+                  isLoading={isHospitalsLoading}
+                  error={hospitalsError}
+                  notice={locationNotice}
+                  severity={consultationDetail?.severity ?? aiResponse?.severity}
+                />
               )}
-            </AnimatePresence>
-          </div>
+
+              <button
+                type="button"
+                onClick={() => { resetConversation(); void startListening() }}
+                className="min-h-12 rounded-full border-2 border-slate-200 bg-white px-6 text-sm font-black text-slate-600 transition-all active:scale-95 hover:border-emerald-300"
+              >
+                {t('voice.newCheck')}
+              </button>
+            </>
+          )}
         </div>
       </main>
+
+      {/* Bottom dock: mic + typing always within thumb reach, never covering the answer above. */}
+      {!consultationComplete && (
+      <div className="fixed inset-x-0 bottom-0 z-40 border-t border-slate-100 bg-white/95 px-4 pt-3 backdrop-blur-xl" style={{ paddingBottom: 'max(12px, env(safe-area-inset-bottom))' }}>
+        <div className="mx-auto max-w-xl">
+          {conversationMode === 'keyboard' ? (
+            <div className="flex items-center gap-2.5">
+              <button
+                type="button"
+                aria-label={t('voice.modeTap')}
+                onClick={() => {
+                  conversationModeRef.current = 'voice'
+                  setConversationMode('voice')
+                  setTextInput('')
+                }}
+                className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-slate-100 text-slate-600 transition-all active:scale-90"
+              >
+                <Mic size={20} />
+              </button>
+              <input
+                value={textInput}
+                onChange={(e) => setTextInput(e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === 'Enter' && textInput.trim() && sessionStatus !== 'processing') submitInlineKeyboardReply()
+                }}
+                placeholder={t('voice.inputPlaceholder')}
+                autoFocus
+                className="h-12 min-w-0 flex-1 rounded-full border-2 border-slate-100 bg-slate-50 px-5 text-base font-bold text-slate-800 outline-none transition-all placeholder:font-semibold placeholder:text-slate-400 focus:border-emerald-500 focus:bg-white"
+              />
+              <button
+                type="button"
+                onClick={submitInlineKeyboardReply}
+                disabled={!textInput.trim() || sessionStatus === 'processing'}
+                className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-emerald-600 text-white transition-all active:scale-90 disabled:cursor-not-allowed disabled:opacity-40"
+              >
+                {sessionStatus === 'processing' ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
+              </button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-3">
+              <button
+                type="button"
+                onClick={() => {
+                  conversationModeRef.current = 'keyboard'
+                  setConversationMode('keyboard')
+                  stopListening()
+                }}
+                className="inline-flex min-h-12 items-center justify-self-start gap-2 whitespace-nowrap rounded-full bg-slate-100 px-4 text-sm font-black text-slate-700 transition-all active:scale-95"
+              >
+                <Keyboard size={18} />
+                {t('voice.typeShort')}
+              </button>
+
+              <div className="flex flex-col items-center gap-1">
+                <button
+                  type="button"
+                  onClick={handleSpeakTap}
+                  onPointerDown={handleHoldStart}
+                  onPointerUp={handleHoldEnd}
+                  onPointerCancel={handleHoldEnd}
+                  onContextMenu={(e) => e.preventDefault()}
+                  aria-label={isListening ? t('voice.stop') : t('voice.speakTitle')}
+                  style={{ touchAction: 'none', WebkitTouchCallout: 'none', userSelect: 'none' }}
+                  className={`relative -mt-14 flex h-36 w-36 items-center justify-center rounded-full border-4 border-white transition-all active:scale-95 ${micPermission === 'denied'
+                    ? 'bg-red-50 text-red-500'
+                    : isListening
+                      ? `${isEmergencyMode ? 'bg-red-600' : 'bg-emerald-500'} text-white ring-[12px] ${isEmergencyMode ? 'ring-red-500/20' : 'ring-emerald-500/20'}`
+                      : isEmergencyMode ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white'
+                    }`}
+                >
+                  {micPermission === 'denied' ? <MicOff size={60} /> : isListening ? <Square size={46} fill="currentColor" /> : <Mic size={68} />}
+                </button>
+                <span className="text-[11px] font-black uppercase tracking-widest text-slate-400">
+                  {isListening
+                    ? t('voice.status.listening')
+                    : sessionStatus === 'processing'
+                      ? t('voice.status.processing')
+                      : inputMode === 'hold' ? t('voice.modeHold') : t('voice.modeTap')}
+                </span>
+              </div>
+
+              <div
+                role="group"
+                aria-label={`${t('voice.modeTap')} / ${t('voice.modeHold')}`}
+                className="flex flex-col gap-1 justify-self-end rounded-[22px] bg-slate-100 p-1"
+              >
+                {(['tap', 'hold'] as const).map((mode) => (
+                  <button
+                    key={mode}
+                    type="button"
+                    role="switch"
+                    aria-checked={inputMode === mode}
+                    onClick={() => setInputMode(mode)}
+                    className={`whitespace-nowrap rounded-full px-2.5 py-2 text-[10px] font-black uppercase tracking-wider transition-all active:scale-95 ${inputMode === mode ? (isEmergencyMode ? 'bg-red-600 text-white' : 'bg-emerald-600 text-white') : 'text-slate-400'}`}
+                  >
+                    {mode === 'tap' ? t('voice.modeTap') : t('voice.modeHold')}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+      </div>
+      )}
 
       <AnimatePresence>
         {showLanguagePanel && (
@@ -2010,11 +1900,33 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
               exit={{ opacity: 0, scale: 0.95, y: -10 }}
               className="absolute right-4 top-20 w-56 overflow-hidden rounded-[24px] bg-white p-2 shadow-2xl border border-slate-100"
             >
-              <div className="px-4 py-4 border-b border-slate-50 mb-1">
-                <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{t('common.loggedInAs')}</p>
-                <p className="text-sm font-black text-slate-900 truncate">{userName || t('common.user')}</p>
-              </div>
+              {isGuest ? (
+                <>
+                  <div className="px-4 py-4 border-b border-slate-50 mb-1">
+                    <p className="text-sm font-black text-slate-900 truncate">{t('auth.guestLabel')}</p>
+                    <p className="mt-1 text-xs font-semibold leading-snug text-slate-400">{t('auth.guestBanner')}</p>
+                  </div>
+                  <button
+                    onClick={() => { setShowUserDropdown(false); onSignIn?.() }}
+                    className="mb-1 flex w-full items-center justify-center rounded-full bg-emerald-600 px-4 py-3 text-sm font-bold text-white transition-all hover:bg-emerald-700 active:scale-[0.98]"
+                  >
+                    {t('auth.guestSignIn')}
+                  </button>
+                  <button
+                    onClick={() => { setShowUserDropdown(false); onSignUp?.() }}
+                    className="mb-1 flex w-full items-center justify-center rounded-full border border-emerald-200 px-4 py-3 text-sm font-bold text-emerald-700 transition-all hover:bg-emerald-50 active:scale-[0.98]"
+                  >
+                    {t('auth.createAccount')}
+                  </button>
+                </>
+              ) : (
+                <div className="px-4 py-4 border-b border-slate-50 mb-1">
+                  <p className="text-[10px] font-black uppercase tracking-widest text-slate-400 mb-1">{t('common.loggedInAs')}</p>
+                  <p className="text-sm font-black text-slate-900 truncate">{userName || t('common.user')}</p>
+                </div>
+              )}
 
+              {!isGuest && (
               <button
                 onClick={() => {
                   setShowUserDropdown(false)
@@ -2027,6 +1939,7 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                 </div>
                 {t('auth.profile')}
               </button>
+              )}
 
               <button
                 onClick={() => {
@@ -2038,21 +1951,12 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
                 <div className="flex h-9 w-9 items-center justify-center rounded-xl bg-red-500/10 text-red-600">
                   <LogOut size={18} />
                 </div>
-                {t('auth.logout')}
+                {isGuest ? t('auth.guestExit') : t('auth.logout')}
               </button>
             </motion.div>
           </div>
         )}
       </AnimatePresence>
-
-      {/* Footer */}
-      <footer className="fixed bottom-0 left-0 right-0 z-30 border-t border-white/50 bg-white/40 py-3 sm:py-5 backdrop-blur-xl">
-        <div className="flex flex-col items-center justify-center gap-1.5">
-          <p className="text-[9px] font-black uppercase tracking-[0.4em] text-slate-400">
-            {t('voice.footer')}
-          </p>
-        </div>
-      </footer>
 
       <AnimatePresence>
         {showProfile && (
@@ -2077,64 +1981,6 @@ export default function VoiceInteractionScreen({ userName, onLogout, onLanguageC
         )}
       </AnimatePresence>
 
-      {/* Floating Keyboard Panel - Bottom Right */}
-      <AnimatePresence>
-        {conversationMode === 'keyboard' && (
-          <motion.div
-            initial={{ opacity: 0, y: 100, x: 100 }}
-            animate={{ opacity: 1, y: 0, x: 0 }}
-            exit={{ opacity: 0, y: 100, x: 100 }}
-            transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-            className="fixed bottom-20 right-4 left-4 sm:left-auto sm:right-6 z-50 sm:w-[400px] sm:max-w-[calc(100vw-3rem)]"
-          >
-            <div className="rounded-2xl border-2 border-emerald-500/50 bg-slate-900 p-5 shadow-2xl shadow-emerald-500/20">
-              <div className="mb-3 flex items-center justify-between">
-                <div className="flex items-center gap-2">
-                  <Keyboard size={16} className="text-emerald-400" />
-                  <span className="text-xs font-black uppercase tracking-widest text-emerald-400">{t('voice.typeYourAnswer')}</span>
-                </div>
-                <motion.button
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.9 }}
-                  type="button"
-                  onClick={() => {
-                    setConversationMode('voice')
-                    conversationModeRef.current = 'voice'
-                    setTextInput('')
-                  }}
-                  className="flex h-6 w-6 items-center justify-center rounded-lg bg-white/10 text-white/60 hover:bg-white/20 transition-all"
-                >
-                  ×
-                </motion.button>
-              </div>
-              <div className="flex items-center gap-3">
-                <input
-                  value={textInput}
-                  onChange={(e) => setTextInput(e.target.value)}
-                  onKeyDown={(e) => {
-                    if (e.key === 'Enter' && textInput.trim() && sessionStatus !== 'processing') {
-                      submitInlineKeyboardReply()
-                    }
-                  }}
-                  placeholder={t('voice.inputPlaceholder')}
-                  autoFocus
-                  className="h-12 flex-1 rounded-xl border-2 border-emerald-500/30 bg-black/40 px-4 text-sm font-semibold text-white placeholder:text-white/40 outline-none focus:border-emerald-400 focus:bg-black/50 transition-all"
-                />
-                <motion.button
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  type="button"
-                  onClick={submitInlineKeyboardReply}
-                  disabled={!textInput.trim() || sessionStatus === 'processing'}
-                  className="inline-flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-emerald-500 text-white shadow-lg shadow-emerald-500/30 disabled:opacity-40 disabled:cursor-not-allowed hover:bg-emerald-600 transition-all"
-                >
-                  {sessionStatus === 'processing' ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
-                </motion.button>
-              </div>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   )
 }

@@ -16,12 +16,8 @@ class HospitalController extends Controller
             ->where('state', 'Lagos')
             ->with(['specialties', 'facilities']);
 
-        if ($request->filled('specialty')) {
-            $specialty = $request->string('specialty')->toString();
-            $query->whereHas('specialties', function ($subQuery) use ($specialty) {
-                $subQuery->where('specialty_name', $specialty);
-            });
-        }
+        // `specialty` is a ranking preference (see rankHospitals), not a filter: most hospitals
+        // have no specialty data, and a filter would hide every nearby option.
 
         if ($request->filled('facility')) {
             $facility = $request->string('facility')->toString();
@@ -132,6 +128,13 @@ class HospitalController extends Controller
                 if ($hasSpecialty) {
                     $score += $specialtyWeight;
                 }
+
+                // Imported hospitals carry no specialty data, so fall back to what the name says
+                // (an eye clinic for eye problems). Emergencies go to the nearest emergency-ready
+                // hospital instead, so no specialist boost there.
+                if ($severity !== 'CRITICAL' && $this->nameMatchesSpecialty((string) $hospital->name, $specialty)) {
+                    $score += self::NAME_SPECIALTY_BONUS;
+                }
             }
 
             if ($facility) {
@@ -155,5 +158,31 @@ class HospitalController extends Controller
 
             return $hospital;
         });
+    }
+
+    private const NAME_SPECIALTY_BONUS = 8.0;
+
+    private function nameMatchesSpecialty(string $name, string $specialty): bool
+    {
+        $patterns = [
+            'Ophthalmology' => '/\b(eye|ophthalm\w*|optic\w*|vision)\b/i',
+            'Obstetrics and Gynecology' => '/\b(matern\w*|obstet\w*|gyn\w*|women\w*|fertility|ivf)\b/i',
+            'Paediatrics' => '/\b(child\w*|paed\w*|pedia\w*)\b/i',
+            'Orthopedics' => '/\b(orthop\w*|trauma|bone|spine)\b/i',
+            'Cardiology' => '/\b(cardi\w*|heart)\b/i',
+            'Dental' => '/\b(dental|dentist\w*|dent)\b/i',
+            'Psychiatry' => '/\b(psychiat\w*|mental|neuropsych\w*)\b/i',
+            'Neurology' => '/\b(neuro\w*)\b/i',
+            'Urology' => '/\b(urolog\w*|kidney|renal|dialysis)\b/i',
+            'Dermatology' => '/\b(skin|derma\w*)\b/i',
+            'ENT' => '/\b(ent|ear|nose|throat)\b/i',
+            // Broad hospitals can treat most things.
+            'General Practice' => '/\b(general|teaching|federal medical|medical cent\w*)\b/i',
+            'Internal Medicine' => '/\b(general|teaching|federal medical|medical cent\w*)\b/i',
+        ];
+
+        $pattern = $patterns[$specialty] ?? null;
+
+        return $pattern !== null && preg_match($pattern, $name) === 1;
     }
 }

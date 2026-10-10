@@ -34,11 +34,18 @@ class SpeechController extends Controller
     {
         $data = $request->validated();
 
-        $result = $speechService->textToSpeech(
-            $data['text'],
-            $data['voice'],
-            $data['language']
-        );
+        try {
+            $result = $speechService->textToSpeech(
+                $data['text'],
+                $data['voice'],
+                $data['language']
+            );
+        } catch (\RuntimeException $e) {
+            // No cloud voice configured/available: the app falls back to the browser's voice.
+            return response()->json([
+                'error' => ['message' => 'Cloud text-to-speech is unavailable.', 'type' => 'tts_unavailable'],
+            ], 503);
+        }
 
         return response()->json([
             'audio_url' => $result['url'],
