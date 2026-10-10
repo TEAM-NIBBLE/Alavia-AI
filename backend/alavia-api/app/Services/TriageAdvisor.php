@@ -44,7 +44,7 @@ class TriageAdvisor
     public function available(string $language = 'EN'): bool
     {
         return in_array($language, ['EN', 'PIDGIN'], true)
-            && filter_var(env('TRIAGE_AI_ENABLED', false), FILTER_VALIDATE_BOOLEAN)
+            && filter_var(config('alavia.triage_ai_enabled'), FILTER_VALIDATE_BOOLEAN)
             && $this->client->configured();
     }
 

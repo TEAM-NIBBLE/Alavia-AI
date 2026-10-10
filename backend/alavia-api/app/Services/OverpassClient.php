@@ -13,8 +13,8 @@ class OverpassClient
 
     public function __construct()
     {
-        $this->baseUrl = (string) env('OVERPASS_URL', 'https://overpass-api.de/api/interpreter');
-        $this->lagosBbox = (string) env('OVERPASS_LAGOS_BBOX', '6.35,2.70,6.80,3.70');
+        $this->baseUrl = (string) config('alavia.overpass.url');
+        $this->lagosBbox = (string) config('alavia.overpass.lagos_bbox');
     }
 
     /**

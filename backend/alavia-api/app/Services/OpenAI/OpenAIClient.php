@@ -14,12 +14,12 @@ class OpenAIClient
     public function __construct()
     {
         // GROQ_API_KEY switches chat + transcription to Groq (OpenAI-compatible API).
-        if ($groq = (string) env('GROQ_API_KEY')) {
+        if ($groq = (string) config('alavia.groq_key')) {
             $this->apiKey = $groq;
             $this->baseUrl = 'https://api.groq.com/openai/v1';
         } else {
-            $this->apiKey = (string) (env('OPENAI_API_KEY') ?: env('OPENAI_KEY'));
-            $this->baseUrl = (string) env('OPENAI_BASE_URL', 'https://api.openai.com/v1');
+            $this->apiKey = (string) config('alavia.openai.key');
+            $this->baseUrl = (string) config('alavia.openai.base_url');
         }
     }
 
