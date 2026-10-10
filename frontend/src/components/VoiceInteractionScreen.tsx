@@ -17,7 +17,6 @@ import {
   Activity,
   CheckCircle2,
   Volume2,
-  ShieldCheck,
   User,
   Globe,
   ChevronDown,

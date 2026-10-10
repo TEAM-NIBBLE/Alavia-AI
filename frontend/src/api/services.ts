@@ -1,4 +1,4 @@
-import { ApiError, apiRequest, authTokenStorage } from './client'
+import { apiRequest, authTokenStorage } from './client'
 import { API } from './endpoints'
 import { guestSession } from '../utils/guest'
 
