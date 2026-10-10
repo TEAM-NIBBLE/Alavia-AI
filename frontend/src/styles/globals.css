@@ -179,23 +179,25 @@ body {
   }
 }
 
-/* Glassmorphism Cards */
-.triage-card {
-  background: rgba(255, 255, 255, 0.8);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(255, 255, 255, 0.5);
-  border-radius: 2.5rem;
-  transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
-  box-shadow:
-    0 4px 6px -1px rgba(0, 0, 0, 0.02),
-    0 10px 30px -10px rgba(0, 0, 0, 0.05);
-}
+/* Glassmorphism Cards. In the components layer so Tailwind utilities (e.g. bg-slate-900) can override them. */
+@layer components {
+  .triage-card {
+    background: rgba(255, 255, 255, 0.8);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid rgba(255, 255, 255, 0.5);
+    border-radius: 2.5rem;
+    transition: all 0.4s cubic-bezier(0.23, 1, 0.32, 1);
+    box-shadow:
+      0 4px 6px -1px rgba(0, 0, 0, 0.02),
+      0 10px 30px -10px rgba(0, 0, 0, 0.05);
+  }
 
-.triage-card:hover {
-  transform: translateY(-2px);
-  border-color: rgba(16, 185, 129, 0.2);
-  box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.08);
+  .triage-card:hover {
+    transform: translateY(-2px);
+    border-color: rgba(16, 185, 129, 0.2);
+    box-shadow: 0 30px 60px -15px rgba(0, 0, 0, 0.08);
+  }
 }
 
 .dynamic-gradient {
@@ -203,4 +205,81 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
+}
+
+/* ── Display settings (toggled on <html> from Profile → Language & Accessibility) ── */
+html.large-text {
+  font-size: 118.75%;
+}
+
+html.high-contrast {
+  filter: contrast(1.25);
+}
+
+html.theme-dark {
+  color-scheme: dark;
+  background-color: #fff;
+  filter: invert(0.92) hue-rotate(180deg);
+}
+
+html.theme-dark.high-contrast {
+  filter: invert(0.92) hue-rotate(180deg) contrast(1.25);
+}
+
+/* Keep photos, video and the map untouched by the dark-mode inversion. */
+html.theme-dark img,
+html.theme-dark video,
+html.theme-dark canvas,
+html.theme-dark iframe {
+  filter: invert(1) hue-rotate(180deg);
+}
+
+/* ── Hospital map (Leaflet) ── */
+.alavia-pin-wrap,
+.alavia-user-wrap {
+  background: transparent;
+  border: 0;
+}
+
+.alavia-pin {
+  position: relative;
+  display: flex;
+  width: 34px;
+  height: 34px;
+  align-items: center;
+  justify-content: center;
+  border-radius: 50% 50% 50% 0;
+  background: #059669;
+  border: 3px solid #fff;
+  color: #fff;
+  font-size: 13px;
+  font-weight: 800;
+  transform: rotate(-45deg);
+  transition: transform 150ms ease;
+}
+
+.alavia-pin > span {
+  transform: rotate(45deg);
+}
+
+.alavia-pin--emergency {
+  background: #dc2626;
+}
+
+.alavia-pin--selected {
+  transform: rotate(-45deg) scale(1.25);
+}
+
+.alavia-user {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #2563eb;
+  border: 3px solid #fff;
+  animation: alavia-user-pulse 2s ease-out infinite;
+}
+
+@keyframes alavia-user-pulse {
+  0% { box-shadow: 0 0 0 0 rgba(37, 99, 235, 0.45); }
+  100% { box-shadow: 0 0 0 16px rgba(37, 99, 235, 0); }
 }

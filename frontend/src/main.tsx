@@ -3,6 +3,9 @@ import { createRoot } from 'react-dom/client'
 import './styles/globals.css'
 import App from './App.tsx'
 import './i18n'
+import { applyDisplaySettings, readStoredSettings } from './utils/appSettings'
+
+applyDisplaySettings(readStoredSettings())
 
 createRoot(document.getElementById('root')!).render(
   <StrictMode>

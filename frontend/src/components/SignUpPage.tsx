@@ -7,10 +7,11 @@ import { ApiError } from '../api/client'
 interface SignUpPageProps {
   onSuccess: (user: { name: string; email: string; phone: string }) => void
   onSwitchToSignIn: () => void
+  onContinueAsGuest?: () => void
   onBack: () => void
 }
 
-export default function SignUpPage({ onSuccess, onSwitchToSignIn, onBack }: SignUpPageProps) {
+export default function SignUpPage({ onSuccess, onSwitchToSignIn, onContinueAsGuest, onBack }: SignUpPageProps) {
   const { t } = useTranslation()
   const [form, setForm] = useState({ name: '', email: '', phone: '', password: '' })
   const [showPassword, setShowPassword] = useState(false)
@@ -107,7 +108,7 @@ export default function SignUpPage({ onSuccess, onSwitchToSignIn, onBack }: Sign
       <button
         onClick={onBack}
         className="absolute top-6 left-5 flex items-center gap-1.5 rounded-xl px-3 py-2 text-sm font-medium text-slate-500 transition-all hover:bg-emerald-50 hover:text-emerald-700"
-        aria-label="Back to language selection"
+        aria-label={t('auth.backToLanguage')}
       >
         <svg className="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
           <path strokeLinecap="round" strokeLinejoin="round" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
@@ -309,6 +310,19 @@ export default function SignUpPage({ onSuccess, onSwitchToSignIn, onBack }: Sign
             </button>
           </p>
         </div>
+
+        {onContinueAsGuest && (
+          <div className="mx-auto mt-6 w-full max-w-md text-center">
+            <button
+              type="button"
+              onClick={onContinueAsGuest}
+              className="w-full rounded-full border-2 border-red-200 bg-red-50 px-6 py-3 text-sm font-bold text-red-700 transition-all hover:bg-red-100 active:scale-[0.98]"
+            >
+              {t('auth.guestContinue')}
+            </button>
+            <p className="mt-2 text-xs text-slate-400">{t('auth.guestHint')}</p>
+          </div>
+        )}
 
         {/* Footer */}
         <p className="mt-8 text-center text-xs font-bold uppercase tracking-widest text-slate-300">
