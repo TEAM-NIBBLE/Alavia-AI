@@ -5,8 +5,12 @@ import { AnimatePresence, motion } from 'framer-motion'
 import {
   ArrowLeft, User, Globe, Heart, MapPin, AlertTriangle,
   Trash2, LogOut, Eye, EyeOff, CheckCircle2, Volume2, Moon, Type,
-  ChevronRight, Save, Sun, Mic, Bell
+  ChevronRight, Save, Sun, Mic, Plus, X, Phone
 } from 'lucide-react'
+import {
+  PROFILE_SETTINGS_KEY, applyDisplaySettings, newContactId, normalizeContacts, readStoredSettings,
+  type EmergencyContact,
+} from '../utils/appSettings'
 
 type LanguageCode = 'en' | 'pcm' | 'yo' | 'ha' | 'ig'
 
@@ -35,9 +39,7 @@ interface Settings {
   condHeart: boolean
   condNone: boolean
   allergies: string
-  emergencyName: string
-  emergencyPhone: string
-  emergencyRelation: string
+  emergencyContacts: EmergencyContact[]
   useLocation: boolean
   homeArea: string
   showRedFlag: boolean
@@ -51,17 +53,27 @@ const getDefaults = (): Settings => ({
   ageBand: '', gender: '', pregnancyStatus: false,
   condAsthma: false, condDiabetes: false, condHypertension: false,
   condSickleCell: false, condHeart: false, condNone: false,
-  allergies: '', emergencyName: '', emergencyPhone: '', emergencyRelation: '',
-  useLocation: false, homeArea: '', showRedFlag: true,
+  allergies: '', emergencyContacts: [],
+  useLocation: true, homeArea: '', showRedFlag: true,
   emergencyButtonBehavior: 'call',
 })
 
 function loadSettings(): Settings {
   try {
-    const stored = localStorage.getItem('alavia.profileSettings')
+    const stored = localStorage.getItem(PROFILE_SETTINGS_KEY)
     if (!stored) return getDefaults()
-    const merged = { ...getDefaults(), ...JSON.parse(stored) } as Settings & { ttsVoice?: string }
+    const parsed = JSON.parse(stored) as Partial<Settings> & {
+      ttsVoice?: string; emergencyName?: string; emergencyPhone?: string; emergencyRelation?: string
+    }
+    const merged = { ...getDefaults(), ...parsed } as Settings & { ttsVoice?: string }
     if (merged.ttsVoice !== 'Idera') merged.ttsVoice = 'Idera'
+    // Migrate the old single emergency contact into the contacts list.
+    merged.emergencyContacts = normalizeContacts(parsed.emergencyContacts)
+    if (!merged.emergencyContacts.length && parsed.emergencyPhone?.trim()) {
+      merged.emergencyContacts = normalizeContacts([
+        { name: parsed.emergencyName, phone: parsed.emergencyPhone, relation: parsed.emergencyRelation },
+      ])
+    }
     return merged
   } catch { return getDefaults() }
 }
@@ -113,7 +125,8 @@ function Row({ label, hint, dark = false, children }: { label: string; hint?: st
 }
 
 // ── Confirm Modal ──────────────────────────────────────────────────────
-function ConfirmModal({ title, body, confirmLabel, cancelLabel, onConfirm, onCancel, danger = true }: {
+function ConfirmModal({ title, body, confirmLabel, cancelLabel, onConfirm, onCancel, danger = true, error }: {
+  error?: string
   title: string; body: string; confirmLabel: string; cancelLabel: string
   onConfirm: () => void; onCancel: () => void; danger?: boolean
 }) {
@@ -131,6 +144,7 @@ function ConfirmModal({ title, body, confirmLabel, cancelLabel, onConfirm, onCan
         </div>
         <h3 className="mb-2 text-lg font-extrabold text-slate-900">{title}</h3>
         <p className="mb-6 text-sm leading-relaxed text-slate-500">{body}</p>
+        {error && <p className="mb-4 text-xs font-semibold text-red-500">{error}</p>}
         <div className="flex flex-col gap-3">
           <button onClick={onConfirm}
             className={`w-full rounded-xl py-3 text-sm font-bold text-white transition-all active:scale-[0.98] ${danger ? 'bg-red-600 hover:bg-red-700' : 'bg-amber-500 hover:bg-amber-600'}`}>
@@ -167,12 +181,23 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
   const [showPwEye, setShowPwEye] = useState(false)
   const [pwError, setPwError] = useState('')
   const [modal, setModal] = useState<'delete' | null>(null)
-  const [toast, setToast] = useState(false)
+  const [toast, setToast] = useState<{ kind: 'ok' | 'local'; msg: string } | null>(null)
+  const [contactError, setContactError] = useState('')
+  const [pwBusy, setPwBusy] = useState(false)
+  const [deleteError, setDeleteError] = useState('')
   const [locPermission, setLocPermission] = useState<'granted' | 'denied' | 'unknown'>('unknown')
   const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null)
 
-  const dark = settings.darkMode
+  // Dark mode is applied app-wide on <html> (see applyDisplaySettings); the page itself stays light-styled.
+  const dark = false
   const langCodes: LanguageCode[] = ['en', 'pcm', 'yo', 'ha', 'ig']
+
+  // Live-preview display settings; restore whatever is saved if the user leaves without saving.
+  useEffect(() => {
+    applyDisplaySettings(settings)
+  }, [settings.largeText, settings.highContrast, settings.darkMode]) // eslint-disable-line react-hooks/exhaustive-deps
+
+  useEffect(() => () => applyDisplaySettings(readStoredSettings()), [])
 
   useEffect(() => {
     try {
@@ -196,8 +221,9 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
         setSettings((value) => ({
           ...value,
           appLanguage: (profile.language?.toLowerCase() as LanguageCode) || value.appLanguage,
-          emergencyName: profile.emergency_contact_name || value.emergencyName,
-          emergencyPhone: profile.emergency_contact_phone || value.emergencyPhone,
+          emergencyContacts: normalizeContacts(profile.emergency_contacts).length
+            ? normalizeContacts(profile.emergency_contacts)
+            : value.emergencyContacts,
         }))
       })
       .catch(() => {
@@ -208,51 +234,100 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
   const set = <K extends keyof Settings>(key: K, val: Settings[K]) =>
     setSettings(prev => ({ ...prev, [key]: val }))
 
-  const showToast = () => {
-    setToast(true)
+  const showToast = (kind: 'ok' | 'local' = 'ok', msg?: string) => {
+    setToast({ kind, msg: msg ?? t('profile.savedToast') })
     if (toastTimer.current) clearTimeout(toastTimer.current)
-    toastTimer.current = setTimeout(() => setToast(false), 3000)
+    toastTimer.current = setTimeout(() => setToast(null), 3000)
   }
 
+  const addContact = () => {
+    if (settings.emergencyContacts.length >= 5) return
+    set('emergencyContacts', [...settings.emergencyContacts, { id: newContactId(), name: '', phone: '', relation: '' }])
+  }
+  const updateContact = (id: string, patch: Partial<EmergencyContact>) =>
+    set('emergencyContacts', settings.emergencyContacts.map(c => (c.id === id ? { ...c, ...patch } : c)))
+  const removeContact = (id: string) =>
+    set('emergencyContacts', settings.emergencyContacts.filter(c => c.id !== id))
+
   const handleSave = async () => {
+    // Drop fully-empty rows; a row with a name but no number can't be called, so block the save.
+    const contacts = settings.emergencyContacts
+      .map(c => ({ ...c, name: c.name.trim(), phone: c.phone.trim(), relation: c.relation.trim() }))
+      .filter(c => c.name || c.phone)
+    if (contacts.some(c => !c.phone || !/^\+?[0-9\s()-]{7,20}$/.test(c.phone))) {
+      setContactError(t('profile.contactPhoneInvalid'))
+      return
+    }
+    setContactError('')
+    const next: Settings = { ...settings, emergencyContacts: contacts }
+    setSettings(next)
+
     // Persist user name change
     try {
       const stored = localStorage.getItem('alavia.user')
       const u = stored ? JSON.parse(stored) : {}
-      localStorage.setItem('alavia.user', JSON.stringify({ ...u, name: user.name }))
+      localStorage.setItem('alavia.user', JSON.stringify({
+        ...u,
+        name: user.name,
+        emergency_contacts: contacts.map(({ name, phone, relation }) => ({ name, phone, relation })),
+        emergency_contact_name: contacts[0]?.name ?? null,
+        emergency_contact_phone: contacts[0]?.phone ?? null,
+      }))
     } catch { /* ignore */ }
-    localStorage.setItem('alavia.profileSettings', JSON.stringify(settings))
+    localStorage.setItem(PROFILE_SETTINGS_KEY, JSON.stringify(next))
+    applyDisplaySettings(next)
+
+    if (next.appLanguage !== i18n.language) {
+      onLanguageChange(next.appLanguage)
+      void i18n.changeLanguage(next.appLanguage)
+    }
 
     try {
       await userApi.updateProfile({
         name: user.name,
-        language: settings.appLanguage.toUpperCase(),
-        emergency_contact_name: settings.emergencyName,
-        emergency_contact_phone: settings.emergencyPhone,
+        language: next.appLanguage.toUpperCase(),
+        emergency_contacts: contacts.map(({ name, phone, relation }) => ({ name, phone, relation })),
       })
+      showToast('ok')
     } catch {
-      // keep local save flow when backend is unavailable
+      showToast('local', t('profile.savedLocalOnly'))
     }
-
-    if (settings.appLanguage !== i18n.language) {
-      onLanguageChange(settings.appLanguage)
-      void i18n.changeLanguage(settings.appLanguage)
-    }
-    showToast()
   }
 
-  const handleSavePw = () => {
-    if (pw.newPw !== pw.confirm) { setPwError(t('profile.passwordMismatch')); return }
+  const handleSavePw = async () => {
+    if (!pw.current) { setPwError(t('profile.currentPassword')); return }
     if (pw.newPw.length < 6) { setPwError(t('profile.passwordMin')); return }
+    if (pw.newPw !== pw.confirm) { setPwError(t('profile.passwordMismatch')); return }
     setPwError('')
-    setPw({ current: '', newPw: '', confirm: '' })
-    setShowPwForm(false)
-    showToast()
+    setPwBusy(true)
+    try {
+      await userApi.changePassword({
+        current_password: pw.current,
+        new_password: pw.newPw,
+        new_password_confirmation: pw.confirm,
+      })
+      setPw({ current: '', newPw: '', confirm: '' })
+      setShowPwForm(false)
+      showToast('ok')
+    } catch (err) {
+      setPwError(err instanceof Error ? err.message : t('profile.passwordMismatch'))
+    } finally {
+      setPwBusy(false)
+    }
   }
 
-  const handleDeleteAccount = () => {
+  const handleDeleteAccount = async () => {
+    setDeleteError('')
+    try {
+      await userApi.deleteAccount()
+    } catch (err) {
+      setDeleteError(err instanceof Error ? err.message : 'Could not delete account.')
+      return
+    }
     localStorage.removeItem('alavia.user')
-    localStorage.removeItem('alavia.profileSettings')
+    localStorage.removeItem('alavia.authToken')
+    localStorage.removeItem(PROFILE_SETTINGS_KEY)
+    applyDisplaySettings({})
     setModal(null)
     onLogout()
   }
@@ -275,7 +350,6 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
     { key: 'condNone', label: t('profile.condNone') },
   ]
 
-  const btnRowCls = `flex w-full items-center justify-between px-5 py-4 text-sm font-semibold transition-all ${dark ? 'text-slate-300 hover:bg-slate-700' : 'text-slate-700 hover:bg-slate-50'} active:opacity-70`
 
   return (
     <div className={`min-h-full ${dark ? 'bg-slate-900' : 'bg-slate-50'}`}>
@@ -355,8 +429,8 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
                       </div>
                     ))}
                     {pwError && <p className="text-xs text-red-500">{pwError}</p>}
-                    <button onClick={handleSavePw}
-                      className="w-full rounded-xl bg-emerald-600 py-2.5 text-sm font-bold text-white transition-all hover:bg-emerald-700 active:scale-[0.98]">
+                    <button onClick={() => void handleSavePw()} disabled={pwBusy}
+                      className="w-full rounded-xl bg-emerald-600 py-2.5 disabled:opacity-60 text-sm font-bold text-white transition-all hover:bg-emerald-700 active:scale-[0.98]">
                       {t('profile.savePassword')}
                     </button>
                   </div>
@@ -498,21 +572,48 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
               className={inputCls(dark) + ' resize-none'} />
           </div>
 
-          {/* Emergency Contact */}
+          {/* Emergency Contacts */}
           <div className="px-5 pb-5 pt-4">
-            <p className={`mb-3 text-sm font-semibold ${dark ? 'text-slate-200' : 'text-slate-800'}`}>{t('profile.emergencyContact')}</p>
+            <div className="mb-3 flex items-center justify-between">
+              <p className={`text-sm font-semibold ${dark ? 'text-slate-200' : 'text-slate-800'}`}>{t('profile.emergencyContact')}</p>
+              <span className="text-xs text-slate-400">{settings.emergencyContacts.length}/5</span>
+            </div>
             <div className="space-y-3">
-              {([
-                ['emergencyName', t('profile.emergencyName'), 'text', 'name'],
-                ['emergencyPhone', t('profile.emergencyPhone'), 'tel', 'tel'],
-                ['emergencyRelation', t('profile.emergencyRelation'), 'text', 'off'],
-              ] as Array<[keyof Settings, string, string, string]>).map(([field, label, type, ac]) => (
-                <div key={field}>
-                  <label className={`mb-1 block text-xs font-semibold ${dark ? 'text-slate-400' : 'text-slate-500'}`}>{label}</label>
-                  <input type={type} autoComplete={ac} value={settings[field] as string}
-                    onChange={e => set(field, e.target.value)} className={inputCls(dark)} />
+              {settings.emergencyContacts.length === 0 && (
+                <p className="rounded-xl border border-dashed border-slate-200 px-4 py-3 text-xs text-slate-400">
+                  {t('profile.noContacts')}
+                </p>
+              )}
+              {settings.emergencyContacts.map((c, index) => (
+                <div key={c.id} className="rounded-2xl border border-slate-100 bg-slate-50/60 p-3">
+                  <div className="mb-2 flex items-center justify-between">
+                    <span className="text-[10px] font-black uppercase tracking-widest text-emerald-600">
+                      {index === 0 ? t('profile.primaryContact') : `${t('profile.emergencyContact')} ${index + 1}`}
+                    </span>
+                    <button type="button" onClick={() => removeContact(c.id)}
+                      aria-label={t('profile.removeContact')}
+                      className="flex h-7 w-7 items-center justify-center rounded-full text-slate-400 transition-all hover:bg-red-50 hover:text-red-500">
+                      <X size={14} />
+                    </button>
+                  </div>
+                  <div className="grid gap-2">
+                    <input type="text" autoComplete="off" value={c.name} placeholder={t('profile.emergencyName')}
+                      onChange={e => updateContact(c.id, { name: e.target.value })} className={inputCls(dark)} />
+                    <input type="tel" autoComplete="off" inputMode="tel" value={c.phone} placeholder={t('profile.emergencyPhone')}
+                      onChange={e => updateContact(c.id, { phone: e.target.value })} className={inputCls(dark)} />
+                    <input type="text" autoComplete="off" value={c.relation} placeholder={t('profile.emergencyRelation')}
+                      onChange={e => updateContact(c.id, { relation: e.target.value })} className={inputCls(dark)} />
+                  </div>
                 </div>
               ))}
+              {contactError && <p className="text-xs font-semibold text-red-500">{contactError}</p>}
+              {settings.emergencyContacts.length < 5 && (
+                <button type="button" onClick={addContact}
+                  className="flex w-full items-center justify-center gap-2 rounded-full border-2 border-dashed border-emerald-300 py-2.5 text-sm font-bold text-emerald-700 transition-all hover:bg-emerald-50 active:scale-[0.98]">
+                  <Plus size={16} />
+                  {t('profile.addContact')}
+                </button>
+              )}
             </div>
           </div>
         </SectionCard>
@@ -527,11 +628,9 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
           </Row>
           {locPermission === 'denied' && (
             <div className="px-5 pb-3">
-              <button onClick={() => window.open('about:preferences', '_blank')}
-                className="flex items-center gap-1.5 text-sm font-semibold text-emerald-600 hover:underline">
-                <ChevronRight size={14} />
-                {t('profile.openSettings')}
-              </button>
+              <p className="text-xs text-slate-500">
+                {t('profile.locationBlockedHelp')}
+              </p>
             </div>
           )}
           <div className={`px-5 pb-5 pt-3 border-t ${dark ? 'border-slate-700' : 'border-slate-50'}`}>
@@ -578,17 +677,18 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
             </div>
           </div>
 
-          {/* Emergency Contact quick-link */}
-          <button className={btnRowCls}>
-            <div>
-              <p className="text-sm font-semibold">{t('profile.emergencyContact')}</p>
-              <p className={`text-xs ${dark ? 'text-slate-500' : 'text-slate-400'}`}>
-                {settings.emergencyName ? settings.emergencyName : t('common.empty')}
-                {settings.emergencyPhone ? ` · ${settings.emergencyPhone}` : ''}
+          {/* Emergency contacts summary */}
+          <div className="flex items-center justify-between px-5 py-4">
+            <div className="min-w-0">
+              <p className={`text-sm font-semibold ${dark ? 'text-slate-200' : 'text-slate-800'}`}>{t('profile.emergencyContact')}</p>
+              <p className="truncate text-xs text-slate-400">
+                {settings.emergencyContacts.filter(c => c.phone.trim()).length === 0
+                  ? t('common.empty')
+                  : settings.emergencyContacts.filter(c => c.phone.trim()).map(c => c.name || c.phone).join(', ')}
               </p>
             </div>
-            <Bell size={15} className="text-slate-400 shrink-0" />
-          </button>
+            <Phone size={15} className="shrink-0 text-slate-400" />
+          </div>
         </SectionCard>
 
         {/* ── 7 · DANGER ZONE ──────────────────────────────────────── */}
@@ -618,9 +718,9 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
             initial={{ y: 80, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: 80, opacity: 0 }}
             className="fixed bottom-6 left-1/2 z-40 -translate-x-1/2"
           >
-            <div className="flex items-center gap-2 rounded-2xl bg-emerald-600 px-5 py-3 text-sm font-bold text-white shadow-xl shadow-emerald-300/50">
-              <CheckCircle2 size={16} />
-              {t('profile.savedToast')}
+            <div className={`flex items-center gap-2 rounded-2xl px-5 py-3 text-sm font-bold text-white shadow-xl ${toast.kind === 'ok' ? 'bg-emerald-600 shadow-emerald-300/50' : 'bg-amber-500 shadow-amber-300/50'}`}>
+              {toast.kind === 'ok' ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}
+              {toast.msg}
             </div>
           </motion.div>
         )}
@@ -630,11 +730,12 @@ export default function ProfilePage({ onBack, onLogout, onLanguageChange }: Prof
       <AnimatePresence>
         {modal === 'delete' && (
           <ConfirmModal
+            error={deleteError}
             title={t('profile.deleteAccount')}
             body={t('profile.deleteWarning')}
             confirmLabel={t('profile.confirmDelete')}
             cancelLabel={t('profile.cancel')}
-            onConfirm={handleDeleteAccount}
+            onConfirm={() => void handleDeleteAccount()}
             onCancel={() => setModal(null)}
             danger
           />

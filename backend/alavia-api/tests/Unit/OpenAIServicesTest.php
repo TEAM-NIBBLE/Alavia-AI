@@ -58,3 +58,39 @@ it('chat service throws on failure', function () {
     expect(fn () => $service->phrase('hello', 'EN'))
         ->toThrow(\RuntimeException::class);
 });
+
+it('speech service uses YarnGPT streaming when a key is configured', function () {
+    setYarnKey('sk_test_key');
+
+    Http::fake([
+        'api.yarngpt.ai/api/v1/tts/prepare' => Http::response([
+            'ticket' => 't', 'stream_url' => '/api/v1/tts/stream/t', 'expires_in' => 300,
+        ], 200),
+    ]);
+
+    $result = (new SpeechService(new OpenAIClient()))->textToSpeech('Bawo ni', 'Idera', 'YORUBA');
+
+    expect($result['url'])->toBe('https://api.yarngpt.ai/api/v1/tts/stream/t');
+    Http::assertSent(fn ($request) => $request->hasHeader('Authorization', 'Bearer sk_test_key')
+        && $request['text'] === 'Bawo ni');
+
+    setYarnKey('');
+});
+
+it('speech service throws when YarnGPT refuses', function () {
+    setYarnKey('sk_test_key');
+
+    Http::fake(['api.yarngpt.ai/api/v1/tts/prepare' => Http::response(['error' => 'x'], 401)]);
+
+    expect(fn () => (new SpeechService(new OpenAIClient()))->textToSpeech('Bawo ni', 'Idera', 'YORUBA'))
+        ->toThrow(\RuntimeException::class);
+
+    setYarnKey('');
+});
+
+function setYarnKey(string $value): void
+{
+    putenv('YARNGPT_API_KEY=' . $value);
+    $_ENV['YARNGPT_API_KEY'] = $value;
+    $_SERVER['YARNGPT_API_KEY'] = $value;
+}

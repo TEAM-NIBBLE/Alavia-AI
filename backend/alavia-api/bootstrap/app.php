@@ -6,8 +6,10 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Http\Request;
 use App\Http\Middleware\ForceJsonResponse;
 use App\Http\Middleware\EnsureAdmin;
+use Illuminate\Auth\AuthenticationException;
 use Illuminate\Validation\ValidationException;
 use Symfony\Component\HttpKernel\Exception\HttpExceptionInterface;
+use App\Console\Commands\InferHospitalFlags;
 use App\Console\Commands\SyncLagosHospitals;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -19,6 +21,7 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withCommands([
         SyncLagosHospitals::class,
+        InferHospitalFlags::class,
     ])
     ->withMiddleware(function (Middleware $middleware): void {
         $middleware->append(ForceJsonResponse::class);
@@ -42,8 +45,12 @@ return Application::configure(basePath: dirname(__DIR__))
                 ], 422);
             }
 
-            $status = $e instanceof HttpExceptionInterface ? $e->getStatusCode() : 500;
-            $message = $status === 500 ? 'Server Error' : $e->getMessage();
+            $status = match (true) {
+                $e instanceof AuthenticationException => 401,
+                $e instanceof HttpExceptionInterface => $e->getStatusCode(),
+                default => 500,
+            };
+            $message = $status === 500 ? 'Server Error' : ($status === 401 ? 'Unauthenticated.' : $e->getMessage());
 
             $payload = [
                 'error' => [

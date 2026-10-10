@@ -26,17 +26,31 @@ Route::prefix('auth')->group(function () {
 Route::prefix('user')->middleware('auth:sanctum')->group(function () {
     Route::get('/profile', [ProfileController::class, 'show']);
     Route::patch('/profile', [ProfileController::class, 'update']);
+    Route::delete('/profile', [ProfileController::class, 'destroy']);
+    Route::put('/password', [ProfileController::class, 'updatePassword']);
 });
 
 Route::get('/hospitals', [HospitalController::class, 'index']);
 Route::get('/hospitals/{id}', [HospitalController::class, 'show']);
 
-Route::middleware('auth:sanctum')->prefix('consultations')->group(function () {
-    Route::post('/start', [ConsultationController::class, 'start']);
-    Route::post('/{id}/message', [ConsultationController::class, 'message']);
-    Route::get('/history', [ConsultationController::class, 'history']);
-    Route::get('/{id}', [ConsultationController::class, 'show']);
-    Route::delete('/{id}', [ConsultationController::class, 'destroy']);
+// Triage works for guests too (emergencies). Guests prove ownership with X-Guest-Token.
+Route::prefix('consultations')->group(function () {
+    Route::post('/start', [ConsultationController::class, 'start'])
+        ->middleware('throttle:30,1');
+    Route::post('/{id}/message', [ConsultationController::class, 'message'])
+        ->whereNumber('id');
+    Route::get('/{id}', [ConsultationController::class, 'show'])
+        ->whereNumber('id');
+    Route::post('/{id}/feedback', [ConsultationController::class, 'feedback'])
+        ->whereNumber('id');
+    Route::post('/{id}/follow-up', [ConsultationController::class, 'followUp'])
+        ->whereNumber('id');
+
+    Route::middleware('auth:sanctum')->group(function () {
+        Route::get('/history', [ConsultationController::class, 'history']);
+        Route::delete('/{id}', [ConsultationController::class, 'destroy'])
+            ->whereNumber('id');
+    });
 });
 
 Route::prefix('speech')->group(function () {

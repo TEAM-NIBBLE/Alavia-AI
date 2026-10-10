@@ -22,6 +22,14 @@ class UserResource extends JsonResource
             'language' => $this->language,
             'emergency_contact_name' => $this->emergency_contact_name,
             'emergency_contact_phone' => $this->emergency_contact_phone,
+            'emergency_contacts' => $this->emergency_contacts
+                ?? ($this->emergency_contact_phone
+                    ? [[
+                        'name' => $this->emergency_contact_name ?? '',
+                        'phone' => $this->emergency_contact_phone,
+                        'relation' => '',
+                    ]]
+                    : []),
             'created_at' => $this->created_at,
             'updated_at' => $this->updated_at,
         ];

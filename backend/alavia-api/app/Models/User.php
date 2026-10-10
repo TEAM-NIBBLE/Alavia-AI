@@ -26,6 +26,7 @@ class User extends Authenticatable
         'language',
         'emergency_contact_name',
         'emergency_contact_phone',
+        'emergency_contacts',
         'refresh_token_hash',
     ];
 
@@ -48,6 +49,7 @@ class User extends Authenticatable
     {
         return [
             'password' => 'hashed',
+            'emergency_contacts' => 'array',
         ];
     }
 }
