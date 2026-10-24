@@ -1,0 +1,877 @@
+[
+ {
+  "alternate_names": [
+   "swelling on the throat",
+   "lump on the throat",
+   "thyroid swelling"
+  ],
+  "citation": "Chapter 11: Goiter",
+  "danger_signs": [
+   "trembling a lot, very nervous, eyes bulging out, which may be a different toxic kind of goiter"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 11"
+  ],
+  "status": "ok",
+  "summary": "A goiter is a swelling or big lump on the throat from abnormal growth of the thyroid gland, most often caused by lack of iodine in the diet. Lack of iodine in a pregnant woman's diet can also cause babies to die or be born with cognitive delay or hearing loss, even if the mother has no goiter. Prevention and cure are through iodized salt, which the book calls the easiest way, with iodine oil or iodine in water as alternatives where iodized salt is unavailable, and avoiding much cassava or cabbage where goiters are common.",
+  "symptom": "goiter",
+  "when_to_seek_care": "If a person with a goiter trembles a lot, is very nervous, and has eyes that bulge out, seek medical advice."
+ },
+ {
+  "symptom": "gradual deafness without pain or other symptoms, most often in men over 40; or deafness with loud ringing or buzzing, severe dizziness, nausea, vomiting and sweating (Meniere's disease)",
+  "alternate_names": [
+   "deafness",
+   "hearing loss",
+   "Meniere's disease",
+   "ringing ears with dizziness"
+  ],
+  "source_chapters": [
+   "Chapter 22"
+  ],
+  "citation": "Chapter 22: Health and Sicknesses of Older People",
+  "summary": "Deafness that comes on gradually without pain or other symptoms occurs most often in men over forty, is usually incurable though a hearing aid may help, and sometimes results from ear infections, a head injury, or a plug of dry wax, with wax removal cross-referred to another section. Separately, if an older person loses hearing in one or both ears, occasionally with severe dizziness, and hears a loud ringing or buzzing, the person probably has Meniere's disease, and may also feel nauseous or vomit and sweat a lot. The book advises taking an antihistamine as directed on its medicine pages and going to bed until signs go away, having no salt in food and avoiding caffeine such as coffee, cola and chocolate.",
+  "danger_signs": [],
+  "when_to_seek_care": "For Meniere's disease, if the person does not get better soon or if the problem returns, seek medical advice; no referral threshold is stated for gradual painless deafness.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "slowly growing lump",
+   "lump in the body",
+   "hard lump"
+  ],
+  "citation": "Chapter 2: Sicknesses that Are Often Confused; Chapter 4: How to Take Care of a Sick Person",
+  "danger_signs": [
+   "a lump in any part of the body that keeps getting bigger"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 2",
+   "Chapter 3",
+   "Chapter 4"
+  ],
+  "status": "ok",
+  "summary": "A hard, painless, slowly growing lump in any part of the body is presented as a possible sign of cancer in Chapter 2, which notes that cancer in modern medical language is an abnormal growth or lump, not an infection, unlike the village use of the word cancer for severe skin infection or gangrene. Common types to watch for are listed as skin cancer, breast cancer, and cancer of the womb or ovaries. Chapter 3 advises examining the whole body for new lumps or masses and feeling the belly for new lumps and hardened areas. Chapter 4 lists a lump that keeps getting bigger among signs of dangerous illness.",
+  "symptom": "hard, painless lump",
+  "when_to_seek_care": "At the first suspicion of cancer seek medical help; seek help as soon as possible for a lump that keeps getting bigger."
+ },
+ {
+  "symptom": "hard, thick, very painful skin on the foot where shoes press (corns)",
+  "alternate_names": [
+   "corns"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "A corn is a hard, thick part of the skin that forms where sandals or shoes push against the skin, or one toe presses against another, and corns can be very painful. The book advises getting sandals or shoes that do not press on the corns, and to make corns hurt less, soaking the foot in warm water, trimming the corn down with a file until it is thin, and padding the foot around the corn so it will not press against the shoe or another toe.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "allergic runny nose",
+   "itchy eyes from allergy"
+  ],
+  "citation": "Chapter 13: Hay Fever (Allergic Rhinitis)",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "Hay fever is runny nose and itchy eyes caused by an allergic reaction to something breathed in, often worse at certain times of year. The book advises an antihistamine for treatment, and prevention by finding what causes the reaction, for example dust, chicken feathers, pollen or mold, and trying to avoid it wherever possible in daily life. The broader allergy section notes that an allergy is not an infection and cannot be passed from one person to another.",
+  "symptom": "hay fever",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "bad headache",
+   "head pain",
+   "migraine headache",
+   "simple headache"
+  ],
+  "citation": "Chapter 1: Home Cures and Popular Beliefs; Chapter 13: Headaches and Migraines, Simple Headache",
+  "danger_signs": [
+   "headaches that keep coming back",
+   "severe headache, check for signs of meningitis"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1",
+   "Chapter 13",
+   "Chapter 2"
+  ],
+  "status": "ok",
+  "summary": "Headache appears in Chapter 1 among problems that may be helped partly by belief, reassurance, and the manner of the healer, especially when worry, fear, or stressful times contribute. Migraine headaches are listed in the same group of illnesses that may be partly in a person's mind or caused in part by beliefs, worry, or fears. The chapter gives an example of a very bad headache easing after a person was given a harmless item he believed was a strong painkiller. Willow bark tea is also described as helping to bring fever down and stop pain, because it contains a natural medicine much like aspirin.",
+  "symptom": "headache",
+  "when_to_seek_care": "If headache is severe, check for signs of meningitis; if headaches do not go away or chemicals could be causing them, talk with a health worker."
+ },
+ {
+  "symptom": "heart trouble in an older person: anxiety and difficulty breathing after exercise, asthma-like attacks worse lying down, rapid weak or irregular pulse, swollen feet worse in afternoons, shortness of breath without exercise, unexplained tiredness, weakness, dizziness, chest pain or tightness, and in women indigestion-like feeling, nausea, clamminess, spasms or jaw pain",
+  "alternate_names": [
+   "heart trouble",
+   "heart disease",
+   "angina",
+   "heart attack"
+  ],
+  "source_chapters": [
+   "Chapter 22"
+  ],
+  "citation": "Chapter 22: Health and Sicknesses of Older People",
+  "summary": "Heart disease is more frequent in older people, especially those who are fat, smoke, or have high blood pressure. Men and women share many signs, but women more often have unexplained tiredness, sleeping problems and shortness of breath, and feel an ache or tightness in the chest more than the sharper pains felt by men. Signs listed are anxiety and difficulty breathing after exercise, asthma-like attacks worse when lying down, a rapid, weak or irregular pulse, swelling of the feet worse in the afternoons, shortness of breath without exercise, unexplained tiredness, weakness and dizziness, sudden painful attacks in the chest, left shoulder or arm when exercising that go away after resting for a few minutes, a sharp pain like a great weight crushing the chest that does not go away with rest, and in women a feeling like indigestion, nausea, clamminess, spasms and jaw pain. Different heart diseases may require different specific medicines used with great care.",
+  "danger_signs": [
+   "sharp pain like a great weight crushing the chest, not going away with rest",
+   "signs of shock"
+  ],
+  "when_to_seek_care": "If you think a person has heart trouble, seek medical help, as the right medicine matters; if chest pain is very strong and does not go away with rest, or the person shows signs of shock, the heart has probably been severely damaged, and the person should stay very quiet, with medical help considered.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "heartburn",
+   "acid indigestion",
+   "burning stomach pain",
+   "stomach ulcer pain"
+  ],
+  "citation": "Chapter 11: Acid Indigestion, Heartburn, and Stomach Ulcers",
+  "danger_signs": [
+   "vomiting, sometimes with fresh blood or digested blood like coffee grounds",
+   "black tar-like stools with blood",
+   "painless ulcer whose first sign is blood in vomit or black sticky stools"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 11"
+  ],
+  "status": "ok",
+  "summary": "Acid indigestion and heartburn often come from too much heavy or greasy food or too much alcohol, causing extra stomach acid and discomfort or a burning feeling in the stomach or mid chest, sometimes mistaken for a heart problem. Frequent or lasting indigestion warns of an ulcer, a chronic sore in the digestive system that causes dull or sometimes sharp pain in the pit of the stomach, often lessened by food or water, worse an hour or more after eating, if a meal is missed, or after alcohol or fatty or spicy foods, and often worse at night.",
+  "symptom": "heartburn and stomach ulcer pain",
+  "when_to_seek_care": "If an ulcer is severe with blood in vomit or black stools, get medical help fast, as the person can quickly bleed to death."
+ },
+ {
+  "alternate_names": [
+   "painful cramps in hot weather",
+   "muscle cramps after sweating"
+  ],
+  "citation": "Chapter 10: Emergencies Caused by Heat, Heat Cramps",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "In hot weather, people who work hard and sweat a lot sometimes get painful cramps in the legs, arms or stomach because the body lacks salt. The book advises giving salt water or Rehydration Drink, repeating it until the cramps are gone, having the person sit or lie down in a cool place, and gently massaging the painful areas until the cramps settle.",
+  "symptom": "heat cramps",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "pale, weak and nauseous in heat",
+   "faint feeling in hot weather"
+  ],
+  "citation": "Chapter 10: Emergencies Caused by Heat, Heat Exhaustion",
+  "danger_signs": [
+   "faintness",
+   "rapid weak pulse"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "Heat exhaustion can follow working and sweating a lot in hot weather. The person may become very pale, weak and nauseous, perhaps feel faint, with cool moist skin, a rapid weak pulse, and body temperature that may rise but is usually unchanged. The book advises lying down in a cool place, raising the feet, rubbing the legs, and giving salt water or Rehydration Drink, with nothing by mouth if the person is unconscious.",
+  "symptom": "heat exhaustion",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "hot dry skin with very high fever",
+   "collapse in heat"
+  ],
+  "citation": "Chapter 10: Emergencies Caused by Heat, Heat Stroke",
+  "danger_signs": [
+   "very high fever",
+   "rapid heartbeat",
+   "fast breathing",
+   "unconsciousness",
+   "person is very ill"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "Heat stroke is uncommon but very dangerous, and more likely in the very young or very old, pregnant people, people with heart disease or diabetes, and people who drink large amounts of alcohol. Signs are red, very hot, dry skin with no moisture even in the armpits, very high fever, rapid heartbeat, and often unconsciousness. The book advises lowering body temperature immediately in the shade by soaking with cold water and fanning until the fever drops.",
+  "symptom": "heat stroke",
+  "when_to_seek_care": "Seek medical help."
+ },
+ {
+  "alternate_names": [
+   "yellow skin and eyes",
+   "tiredness with nausea and dark urine"
+  ],
+  "citation": "Chapter 13: Hepatitis",
+  "danger_signs": [
+   "yellow skin and eyes",
+   "dark urine and whitish stools"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "Hepatitis is inflammation of the liver usually caused by a virus, though it can also be caused by bacteria, alcohol or chemical poisoning, and it can spread even when someone has no signs. Signs are tiredness, loss of appetite, pain in the right side near the liver, muscle or joint pain, fever, yellow skin and eyes, nausea and vomiting, and dark urine with whitish stools. There is no treatment for hepatitis A or E, but most people recover on their own after several weeks, while other types need specific medical treatment and antibiotics do not work.",
+  "symptom": "hepatitis signs",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "rupture",
+   "lump in the groin",
+   "lump that gets bigger when coughing"
+  ],
+  "citation": "Chapter 13: Hernia (Rupture)",
+  "danger_signs": [
+   "hernia suddenly becomes large or painful and will not go back",
+   "hernia becomes very painful, causes vomiting, and the person cannot have a bowel movement"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "A hernia is an opening or tear in the muscles covering the belly that lets a loop of gut push through and form a lump under the skin, usually from lifting something heavy or straining, and in men commonly in the groin. Unlike swollen lymph nodes, a hernia usually gets bigger when the person coughs or lifts. Living with a hernia means avoiding heavy lifting and using a truss to hold it in. The book gives a plan for a simple truss with a cushion pressing against the groin.",
+  "symptom": "hernia",
+  "when_to_seek_care": "If a hernia will not go back in, seek medical help; if it becomes very painful, causes vomiting, and the person cannot have a bowel movement, seek medical help fast, as surgery may be necessary."
+ },
+ {
+  "alternate_names": [
+   "high blood pressure",
+   "hypertension"
+  ],
+  "citation": "Chapter 11: High Blood Pressure (Hypertension)",
+  "danger_signs": [
+   "frequent headaches",
+   "pounding of the heart and shortness of breath with mild exercise",
+   "weakness and dizziness",
+   "occasional pain in the left shoulder and chest"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 11"
+  ],
+  "status": "ok",
+  "summary": "High blood pressure can cause heart disease, kidney disease and stroke, but at first it often causes no signs, so the book advises having blood pressure checked regularly before danger signs develop. Signs of dangerously high blood pressure are frequent headaches, pounding of the heart and shortness of breath with mild exercise, weakness and dizziness, and occasional pain in the left shoulder and chest. Care includes exercise, little or no salt, avoiding fatty meats and excess sugars, not smoking or drinking much alcohol, and seeing a health worker about medicines for very high pressure.",
+  "symptom": "high blood pressure",
+  "when_to_seek_care": "If a person suspects high blood pressure, see a health worker and have blood pressure measured; see a health worker about medicines for very high blood pressure."
+ },
+ {
+  "symptom": "high-risk pregnancy situations named in the family planning chapter: pregnancy under age 18, in older women, too close together, or after more than four children",
+  "alternate_names": [
+   "high-risk pregnancy"
+  ],
+  "source_chapters": [
+   "Chapter 20"
+  ],
+  "citation": "Chapter 20: Family Planning",
+  "summary": "The chapter frames family planning as preventing dangers from pregnancies that are high risk, and lists four situations it names as dangerous. Women under eighteen are more likely to die while giving birth because their bodies are not fully grown, and their babies have a greater chance of dying in the first year. Older women face more danger in childbearing, especially with other health problems or many previous children. A woman's body needs time to recover between pregnancies, so pregnancies too close together are dangerous. A woman with more than four children has a greater risk of death after giving birth from bleeding and other causes. This entry records the chapter's risk framing only and is not a symptom in itself.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "NEEDS-REVIEW",
+  "review_note": "Included only because the chapter itself frames these as danger situations; this is a risk presentation, not a symptom a person complains of, and a reviewer may prefer to drop it from a symptom index."
+ },
+ {
+  "alternate_names": [
+   "puncture wound",
+   "deep wound",
+   "bite wound",
+   "bullet wound"
+  ],
+  "citation": "Chapter 10: Wounds That Are Likely to Become Dangerously Infected; Bullet, Knife, and Other Serious Wounds",
+  "danger_signs": [
+   "deep or bullet wound",
+   "bite wound",
+   "risk of tetanus",
+   "risk of rabies after an animal bite"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "Puncture and other deep wounds that do not bleed much, wounds made where animals are kept, large wounds with severe mashing or bruising, bites from pigs, dogs or people, and bullet wounds are most likely to become dangerously infected. The book advises washing well with boiled water and soap, removing dirt and damaged flesh, giving an antibiotic for very deep, knife or bullet wounds and for bites, never closing this type of wound, and considering tetanus vaccination and rabies injections where relevant.",
+  "symptom": "high-risk wound and animal bite",
+  "when_to_seek_care": "If possible, seek medical help for bullet and knife wounds; for a bite with a chance of rabies, get rabies vaccine and immunoglobulin right away."
+ },
+ {
+  "alternate_names": [
+   "hookworm anemia",
+   "pale child who eats dirt",
+   "red marks on feet"
+  ],
+  "citation": "Chapter 12: Hookworm",
+  "danger_signs": [
+   "weakness and severe anemia from many worms"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 12"
+  ],
+  "status": "ok",
+  "summary": "Hookworms are red worms about one centimeter long that cannot usually be seen in feces, so a stool analysis is needed to prove they are present. Baby hookworms enter through bare feet, causing red marks and itching, reach the lungs through the bloodstream and may cause a dry cough rarely with blood, then are swallowed and attach to the gut walls. Many worms can cause weakness and severe anemia. The book notes any child who is anemic, very pale or eats dirt may have hookworms.",
+  "symptom": "hookworm infection",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "symptom": "hot, bright red, swollen patch with a sharp border that spreads rapidly, often starting on the face (erysipelas); or a deeper, very painful skin infection with less clear borders (cellulitis)",
+  "alternate_names": [
+   "erysipelas",
+   "cellulitis",
+   "St. Anthony's fire"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Erysipelas is a very painful sudden infection in the skin forming a hot, bright red, swollen patch with a sharp border that spreads rapidly over the skin, often beginning on the face at the edge of the nose, and usually causing swollen lymph nodes, fever and chills. Cellulitis is also a very painful sudden infection of the skin that can appear anywhere on the body, usually after a break in the skin, and is deeper with less clear borders than erysipelas. For both, the book advises beginning treatment as soon as possible with an antibiotic as directed on its medicine pages, plus hot compresses and pain relief.",
+  "danger_signs": [
+   "swollen lymph nodes",
+   "fever",
+   "chills"
+  ],
+  "when_to_seek_care": "Begin treatment as soon as possible; the book does not state a separate referral threshold for these two conditions in this chapter.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "hot, painful, swollen skin that oozes pus (infected skin)",
+  "alternate_names": [
+   "skin infection",
+   "small sores with pus",
+   "infected insect bites"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "The chapter gives general rules for skin problems: a hot, painful area that oozes pus is treated with hot, moist compresses, keeping the part still and raised, while itching, stinging or clear oozing skin is treated with cold. Small sores with pus often result from scratching insect bites, scabies or other irritations with dirty fingernails. Sores should be washed with soap and cooled boiled water, small sores left open to the air and large ones bandaged with frequent changes, and scratching avoided because it worsens sores and spreads infection.",
+  "danger_signs": [
+   "swollen lymph nodes",
+   "a red or dark line above the infected area",
+   "a bad smell",
+   "red and hot skin around a sore",
+   "fever",
+   "red lines coming from the sore"
+  ],
+  "when_to_seek_care": "Seek medical help quickly if the danger signs do not get better with treatment, and seek medical help if a skin problem is serious or gets worse in spite of treatment.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "upset stomach",
+   "indigestion",
+   "stomach discomfort"
+  ],
+  "citation": "Chapter 1: Home Cures and Popular Beliefs",
+  "danger_signs": [
+   "black stools like tar, or vomit with blood or feces, listed in Chapter 4 among signs of dangerous illness"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1",
+   "Chapter 2"
+  ],
+  "status": "ok",
+  "summary": "Indigestion is listed among problems that may be helped by belief, reassurance, and relaxation, especially when worry or fear contributes. Ripe papayas are described as aiding digestion and as especially helpful for weak or older people who complain of upset stomach when eating meat, chicken, or eggs, because papaya makes these foods easier to digest. In the folk-name discussion, indigestion or stomach ulcer is one of the illnesses that may be called empacho when it causes stomach pain or discomfort. The chapters here do not give a full account of ulcer care, which is pointed to elsewhere in the book.",
+  "symptom": "indigestion and upset stomach",
+  "when_to_seek_care": "Seek medical help as soon as possible if there are black tar-like stools or vomit containing blood or feces."
+ },
+ {
+  "alternate_names": [
+   "red swollen painful wound",
+   "wound with pus",
+   "smelly wound"
+  ],
+  "citation": "Chapter 10: Infected Wounds: How to Recognize and Treat Them",
+  "danger_signs": [
+   "fever",
+   "red line above the wound",
+   "swollen tender lymph nodes",
+   "bad smell, brown or gray liquid oozing, skin turning black with air bubbles or blisters, which may be gangrene"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "A wound is infected if it becomes red, swollen, hot and painful, has pus, or begins to smell bad. Infection is spreading if it causes fever, a red line above the wound, or swollen tender lymph nodes. The book advises hot compresses several times a day or soaking an infected hand or foot in hot water, resting and elevating the part, and using an antibiotic for severe infection, with the book pointing to its medicine pages for which antibiotic to use.",
+  "symptom": "infected wound",
+  "when_to_seek_care": "Seek medical help fast if there is a bad smell, brown or gray liquid, or skin turning black with air bubbles or blisters, which may be gangrene."
+ },
+ {
+  "symptom": "injury to the eyeball, including a cut, a deep wound, or blood inside the eye after a blow",
+  "alternate_names": [
+   "eye injury",
+   "cut eyeball",
+   "blunt eye injury"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "All injuries to the eyeball must be considered dangerous because they may cause blindness, and even small cuts on the cornea may get infected and harm vision if not cared for correctly. A wound so deep it reaches the black layer beneath the outer white layer is especially dangerous, and if a blunt injury such as a fist causes the eyeball to fill with blood, the eye is in danger. Danger is especially great if pain suddenly gets much worse after a few days, which is probably acute glaucoma. The book advises antibiotic eye ointment and a soft thick bandage if the person still sees well, and a clean bandage with immediate medical help, without pressing on the eye, if vision is poor, the wound is deep, or there is blood inside the eye.",
+  "danger_signs": [
+   "any injury that cuts or ruptures the eyeball",
+   "blood behind the cornea inside the eyeball",
+   "pain suddenly getting much worse a few days after a blunt injury",
+   "loss of vision in one or both eyes"
+  ],
+  "when_to_seek_care": "Go for medical help at once if the person cannot see well with the injured eye, the wound is deep, or there is blood inside the eye behind the cornea; if the eye is not better in a day or two with ointment and bandage, get medical help.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "worms",
+   "pinworms",
+   "gut worms"
+  ],
+  "citation": "Chapter 1: Home Cures and Popular Beliefs; Chapter 2: Sicknesses that Are Often Confused",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1",
+   "Chapter 2"
+  ],
+  "status": "ok",
+  "summary": "Intestinal worms appear in Chapter 1 through plant remedies, including a garlic drink described as possibly helping to get rid of pinworms, and papaya milk or dried crushed papaya seeds described as possibly helping, while modern medicines are said to work better. Chapter 2 lists a large number of roundworms, usually together with malnutrition, among possible causes of a child who slowly becomes thin and wasted while the belly becomes more swollen. Worms are also listed among illnesses that may be called empacho when they cause stomach pain or diarrhea. Prevention through safe water and hand washing is stressed in Chapter 5.",
+  "symptom": "intestinal worms",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "symptom": "irregular, missed, late, heavy or prolonged menstrual bleeding",
+  "alternate_names": [
+   "irregular periods",
+   "missed period",
+   "heavy periods",
+   "late period"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Young people whose periods have just started, and people who recently gave birth or stopped breastfeeding, may bleed only every few months, bleed very little, or bleed heavily, and their cycles usually become more regular with time. For other people, cycles that are not regular can be a sign of an illness such as anemia, malnutrition or a problem in the womb. Periods can be late or not come for many reasons, including youth, hormonal family planning methods, being close to menopause, worry or emotional upset, and a missed period may be a sign of pregnancy. If a period comes later than expected, is more severe and lasts longer, it may be a miscarriage.",
+  "danger_signs": [],
+  "when_to_seek_care": "If the menstrual period lasts more than eight days, results in unusually heavy bleeding, or comes more than once a month, seek medical advice.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "itching of the scalp, neck or ears with lice in the hair",
+  "alternate_names": [
+   "head lice",
+   "body lice",
+   "pubic lice",
+   "crabs"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Lice live in hair on the head, body and pubic area and cause skin irritation and itching. Head lice most often affect children and have nothing to do with personal cleanliness. A child with red, itchy skin on the scalp, the back of the neck or around the ears should have the hair checked for lice. Lice spread by person-to-person contact or through shared clothes and personal items. Body lice are treated with daily hot baths and clean clothing and bedding. The book warns against shampoos containing lindane, describing lindane as a poison.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "itchy ring-shaped rash, scaly patches with hair loss, or rough thick nails (fungus infection, ringworm)",
+  "alternate_names": [
+   "ringworm",
+   "tinea",
+   "athlete's foot",
+   "jock itch"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Fungus infections may appear on any part of the body but occur most frequently on the scalp, the parts without hair, between the toes or fingers, and between the legs. Most grow in the form of a ring and often itch. Ringworm of the head can produce round patches with scales and loss of hair, and infected finger and toe nails become rough and thick. The book advises daily washing with soap and water, keeping affected areas dry and exposed to air or sunlight, changing underwear or socks often when sweaty, and using antifungal creams or powders as directed on its medicine pages.",
+  "danger_signs": [
+   "large swollen patches with pus on the scalp"
+  ],
+  "when_to_seek_care": "Seek medical advice for a severe scalp infection or any fungus infection that is widespread or does not get better with the measures described.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "labour that stops, slows down or lasts a very long time after being strong or after the waters break",
+  "alternate_names": [
+   "prolonged labour",
+   "labour stops",
+   "slow labour"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Labour stopping or slowing down or lasting a very long time after being strong or after the waters break has several possible causes in the chapter. The woman may be frightened or upset, which can slow or stop contractions, and talking to her, helping her relax, encouraging position changes, drinking, eating and urinating, and nipple stimulation can help. The baby may be lying sideways, in which case the baby cannot be born without medical help and the mother should be taken to a hospital right away, without trying to turn the baby once labour has started. The baby may be facing forward rather than backward, making labour longer with more back pain, helped by position changes including hands and knees. The baby's head may be too large to fit through the hip bones, more likely with very narrow hips or a young woman whose body is not fully grown, in which case hospital help and possibly an operation may be needed. Dehydration from vomiting or not drinking can also slow or stop contractions, helped by sipping rehydration drink or other liquids after each contraction.",
+  "danger_signs": [
+   "baby lying sideways",
+   "baby's head not moving down, suggesting it is too large for the pelvis"
+  ],
+  "when_to_seek_care": "Get medical help as quickly as possible when there is any serious problem during labour; for a sideways baby or a head that will not fit, get the mother to a hospital right away.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "large chronic open sore on or near the ankle of an older person, surrounded by purplish skin, often with varicose veins and a swollen foot (leg ulcer from poor circulation)",
+  "alternate_names": [
+   "leg ulcer",
+   "skin ulcer",
+   "venous ulcer"
+  ],
+  "source_chapters": [
+   "Chapter 15",
+   "Chapter 22"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Chronic ulcers on the ankles of older people, especially women with varicose veins, usually come from poor circulation, where blood is not moved fast enough through the legs. Such ulcers may become very large, the skin around the ulcer is dark blue, shiny and very thin, and often the foot is swollen. Chapter 22 repeats this presentation for older people, noting that sores from poor circulation heal very slowly and that diabetes is sometimes part of the cause. The book stresses keeping the foot up high as often as possible, warm salt-water compresses, a loose clean covering, and supporting varicose veins with elastic stockings or bandages.",
+  "danger_signs": [
+   "signs of infection (the book cross-refers to its infection signs)"
+  ],
+  "when_to_seek_care": "Care for varicose veins early to prevent ulcers; no separate referral threshold is stated for the ulcer itself in these chapters.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "Hansen's disease",
+   "skin patch with loss of feeling",
+   "numb hands and feet"
+  ],
+  "citation": "Chapter 14: Leprosy (Hansen's Disease)",
+  "danger_signs": [
+   "loss of feeling in hands or feet or in skin patches",
+   "weakness or deformity in hands and feet",
+   "thick swollen nerves",
+   "advanced signs: burns and scars where feeling is lost, loss of eyebrows, blindness, collapsed nostrils, painless sores, paralysis and deformity"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 14"
+  ],
+  "status": "ok",
+  "summary": "Leprosy is a mildly infectious disease that develops slowly, often over many years, spreading only from untreated people to people with low resistance to it. The first sign is often a slowly growing patch on the skin that does not itch or hurt, with feeling inside the patch at first normal, then reduced or absent. Later signs include tingling, numbness or loss of feeling in hands, feet or skin patches, slight weakness or deformity, swollen nerves forming thick cords under the skin, and painless swelling or lumps on the face or ears.",
+  "symptom": "leprosy",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "unconsciousness",
+   "fainting",
+   "being knocked out"
+  ],
+  "citation": "Chapter 10: Loss of Consciousness",
+  "danger_signs": [
+   "not breathing well",
+   "losing a lot of blood",
+   "signs of shock",
+   "signs of heat stroke"
+  ],
+  "review_note": "The seek-care wording is assembled from the chapter's emergency steps rather than a single stated sentence for unconsciousness alone, so a reviewer should confirm whether a shorter 'not stated in the book' wording is preferred.",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "NEEDS-REVIEW",
+  "summary": "Loss of consciousness can follow drugs or alcohol, a hit on the head, fainting, shock, heat stroke, seizures, stroke, poisoning or a heart attack. The book advises checking breathing, heavy bleeding, shock and heat stroke in turn, clearing the mouth if the person has vomited, laying an unconscious person on the side with the head low unless neck or spine injury is possible, giving nothing by mouth, and moving a badly injured person as little as possible.",
+  "symptom": "loss of consciousness",
+  "when_to_seek_care": "The book directs immediate checks and first aid for breathing, bleeding, shock and heat stroke, and urgent medical help in the shock section; for an unconscious person generally it does not give a separate seek-care timing beyond these emergency steps, so the general emergency action is to seek medical help fast."
+ },
+ {
+  "symptom": "loss of sleep in an older person: sleeping less, waking more often at night, spending hours unable to sleep (insomnia)",
+  "alternate_names": [
+   "insomnia",
+   "loss of sleep",
+   "sleeplessness in older people"
+  ],
+  "source_chapters": [
+   "Chapter 22"
+  ],
+  "citation": "Chapter 22: Health and Sicknesses of Older People",
+  "summary": "Older people usually sleep less than younger people and wake up more often at night, and during long winter nights older people may spend hours without being able to sleep. The book advises that certain medicines may help bring sleep but it is better not to use them if not absolutely necessary. Suggestions given are getting plenty of exercise during the day, not drinking coffee or black tea especially in the afternoon or evening, drinking a glass of warm milk or milk with honey before bed, taking a warm bath before bed, relaxing each part of the body then the whole body and mind in bed while remembering good times, and if still unable to sleep, taking an antihistamine as directed on its medicine pages half an hour before bed, described as less habit-forming than stronger drugs.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "low back pain in pregnancy",
+  "alternate_names": [
+   "back pain in pregnancy",
+   "backache in pregnancy"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Low back pain is common in pregnancy and can be helped by exercise and taking care to stand and sit with the back straight, and by asking family for help lifting things and to rub the back. The chapter cross-refers to its back pain section for posture advice. No danger signs or referral threshold are stated for ordinary low back pain in pregnancy in this section, distinct from pain high in the belly, which the book lists as a sign of pre-eclampsia and which is indexed separately.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "lump or growth in the lower belly, or abnormal vaginal bleeding and anemia as a possible first sign of womb, cervix or ovary cancer",
+  "alternate_names": [
+   "lower belly lump",
+   "pelvic mass",
+   "womb cancer signs"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "The most common lump in the lower belly is of course a developing baby, but abnormal lumps or masses may be caused by a cyst or fluid-filled swelling often in the ovaries, a fertilised egg developing outside the womb, or cancer. All three are usually painless or mildly uncomfortable at first and become very painful later, and all require medical attention. The first sign of cancer of the uterus, cervix or ovaries may be anemia or unexplained bleeding from the vagina, and later an uncomfortable or painful lump in the belly may be noticed. Cancer of the cervix can be cured if found early but there are no warning signs that can be seen, and the book advises regular screening tests as described in its women's health cross-reference.",
+  "danger_signs": [
+   "unusual, gradually growing lump",
+   "unexplained vaginal bleeding",
+   "anemia"
+  ],
+  "when_to_seek_care": "If you find any unusual, gradually growing lump, seek medical advice; at the first suspicion of cancer, seek medical help.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "fever and chills from mosquitoes",
+   "shaking and sweating fever"
+  ],
+  "citation": "Chapter 14: Malaria and Other Mosquito-Borne Illnesses",
+  "danger_signs": [
+   "too weak to sit or stand, cannot stay awake",
+   "mental confusion, convulsions or loss of consciousness",
+   "repeated vomiting, cannot drink or breastfeed",
+   "rapid breathing",
+   "low blood pressure and other signs of shock",
+   "dark urine and less urine as kidneys begin to fail"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 14"
+  ],
+  "status": "ok",
+  "summary": "Malaria is an infection of the blood spread by mosquitoes, causing fever and chills, with sickness seven to thirty days after the bite. Falciparum malaria is the most dangerous type. Signs of uncomplicated malaria are fever often as high as thirty-nine degrees with chills, shivers and sometimes headache, fever and sweating returning every few days or weeks, vomiting, lack of appetite, anemia, body pain, diarrhea and cough especially in children, and yellow eyes. It is especially dangerous for pregnant women and can cause anemia, miscarriage and babies born too small.",
+  "symptom": "malaria",
+  "when_to_seek_care": "Get help right away for signs of severe malaria; if malaria is suspected, ask a health worker for a rapid blood test."
+ },
+ {
+  "symptom": "malnourished child: thin body, big belly, thin arms and legs, loss of appetite and energy, paleness, sores in mouth corners, frequent infections, swollen feet, dark spots or peeling sores, hair loss, lack of desire to laugh or play",
+  "alternate_names": [
+   "child malnutrition",
+   "marasmus",
+   "kwashiorkor",
+   "underweight child"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Many children are malnourished because they do not get enough to eat, or eat mainly foods with a lot of water and fibre such as cassava, taro root or maize gruel so their bellies get full before they get enough energy food, or lack things like vitamin A or iodine. In mild cases signs include slower growth, swollen belly, thin body, loss of appetite, loss of energy, paleness, desire to eat dirt, sores in corners of the mouth, frequent colds and other infections, and night blindness. In more serious cases there is little or no weight gain, swelling of feet and sometimes face, dark spots, bruises or open peeling sores, thinness or loss of hair, lack of desire to laugh or play, sores inside the mouth, cognitive delay, dry eyes and blindness. Severe forms are dry malnutrition and wet malnutrition, and signs are often first seen after an acute illness like diarrhea or measles.",
+  "danger_signs": [
+   "swelling of feet or face",
+   "dark spots, bruises or open peeling sores",
+   "dry eyes",
+   "blindness"
+  ],
+  "when_to_seek_care": "A seriously underweight child should be given more energy-rich foods more often and checked or tested for possible illnesses, visiting a health worker frequently until gaining weight well.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "poor growth",
+   "child not gaining weight",
+   "weak and sick from poor food"
+  ],
+  "citation": "Chapter 11: Sicknesses Caused by Not Eating Well; How to Recognize Malnutrition",
+  "danger_signs": [
+   "swelling of feet, face and hands with sores or marks on the skin",
+   "illnesses that last longer, are more severe, and more often cause death",
+   "signs of severe malnutrition after diarrhea or another infection"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 11"
+  ],
+  "status": "ok",
+  "summary": "Malnutrition means a person is weak or sick because he does not eat enough, or does not eat the foods his body needs. In children it can show as slower growth or weight gain, delayed walking, talking or thinking, big bellies with thin arms and legs, lack of energy, sadness and not playing, and infections that last longer and are more severe. In anyone it can show as weakness, tiredness, loss of appetite, anemia, sores at the corners of the mouth, a sore tongue, and burning or numbness of the feet.",
+  "symptom": "malnutrition",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "symptom": "measles in a child: cold-like start with fever, runny nose, red sore eyes and cough, sore mouth, diarrhea, tiny white spots like salt grains in the mouth, then rash behind ears and neck spreading to face, body, arms and legs",
+  "alternate_names": [
+   "measles"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Measles is a severe virus infection especially dangerous in children who are poorly nourished or have tuberculosis. Ten days after being near a person with measles it begins with signs of a cold: fever, runny nose, red sore eyes and cough. The child becomes increasingly ill, the mouth may become very sore and the child may develop diarrhea. After two or three days a few tiny white spots like salt grains appear in the mouth, and a day or two later the rash appears, first behind the ears and on the neck, then on the face and body, and last on the arms and legs. After the rash appears the child usually begins to get better, and the rash lasts about five days. Sometimes there are scattered black spots caused by bleeding into the skin, called black measles, meaning the attack is very severe.",
+  "danger_signs": [
+   "scattered black spots from bleeding into the skin (black measles)",
+   "signs of pneumonia, meningitis, or severe pain in the ear or stomach"
+  ],
+  "when_to_seek_care": "Get medical help if there are black spots, or if signs of pneumonia, meningitis, or severe pain in the ear or stomach develop; also give vitamin A as directed on the book's medicine pages to prevent eye damage, and an antibiotic if earache develops.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "stiff neck with fever and severe headache",
+   "bulging soft spot in a baby"
+  ],
+  "citation": "Chapter 14: Meningitis",
+  "danger_signs": [
+   "fever, severe headache, stiff neck",
+   "back too stiff to put the head between the knees",
+   "bulging fontanel in babies under a year",
+   "vomiting, seizures or strange movements",
+   "child getting worse until losing consciousness completely"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 14"
+  ],
+  "status": "ok",
+  "summary": "Meningitis is a very serious infection of the brain, more common in children, which may begin as a complication of measles, mumps, whooping cough, malaria or an ear infection, and in children of mothers with tuberculosis it may be tubercular meningitis in the first few months of life. Signs are fever, severe headache, stiff neck with the head and neck bent back, vomiting, and in babies a bulging soft spot, a strange meningitis cry, or unusual sleepiness. Tubercular meningitis develops slowly over days or weeks, while other forms come on in hours or days.",
+  "symptom": "meningitis",
+  "when_to_seek_care": "Get medical help fast, every minute counts; if possible take the person to a hospital."
+ },
+ {
+  "symptom": "menopause symptoms: irregular periods stopping, hot flashes, anxiety, distress, pains travelling all over the body, sadness; and bleeding again after periods have stopped",
+  "alternate_names": [
+   "menopause",
+   "change of life",
+   "climacteric"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Menopause is the time when menstrual periods stop and pregnancy is no longer possible, generally happening between the ages of forty and fifty, with periods often becoming irregular for several months before they stop completely. During menopause people often feel discomforts such as anxiety, distress, hot flashes described as suddenly feeling uncomfortably hot, pains that travel all over the body, and sadness, and after menopause is over most women feel better again. After menopause a woman's bones may become weaker and break more easily, and eating foods with calcium helps prevent this. The book advises continuing birth control for twelve months after periods stop if no more children are wanted.",
+  "danger_signs": [
+   "severe bleeding or a lot of pain in the belly during menopause",
+   "bleeding again after bleeding has stopped for months or years"
+  ],
+  "when_to_seek_care": "Women who have severe bleeding or a lot of belly pain during menopause, or who begin to bleed again after bleeding has stopped for months or years, should seek medical help, as an examination is needed to make sure they do not have cancer or another serious problem.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "throbbing one-sided headache",
+   "headache with blurred vision and vomiting"
+  ],
+  "citation": "Chapter 13: Headaches and Migraines, Migraine",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "A migraine is a severe throbbing headache often on one side of the head only, coming often or months or years apart. A typical attack begins with blurring of vision, seeing strange spots of light, or numbness of one hand or foot, followed by severe headache lasting hours or days, often with vomiting. The book says migraines are very painful but not dangerous. At the first sign it advises pain relief with strong coffee or black tea, lying down in a dark quiet place, relaxing, and for especially bad attacks, stronger pain relief as directed on its medicine pages.",
+  "symptom": "migraine",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "burns",
+   "small burns"
+  ],
+  "citation": "Chapter 1: Home Cures and Popular Beliefs; Chapter 5: Healing Without Medicines",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1",
+   "Chapter 5"
+  ],
+  "status": "ok",
+  "summary": "Minor burns are presented as a case where simple care helps and where harmful folk remedies must be avoided. Aloe vera is described as useful for minor burns and wounds, with its thick juice calming pain and itching, aiding healing, and helping prevent infection when applied directly. Chapter 5 advises holding a minor burn in cold water at once. Chapter 1 warns that droppings of rabbits or other animals do not help heal burns and that using them is very dangerous. The chapters here do not distinguish minor from severe burns in detail, and severe burns are not covered by this entry.",
+  "symptom": "minor burns",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "symptom": "mumps in a child: fever and pain on opening the mouth or eating, then soft swelling below the ears at the angle of the jaw, often one side then the other",
+  "alternate_names": [
+   "mumps"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Mumps begins two or three weeks after being exposed to someone with mumps, starting with fever and pain on opening the mouth or eating. In two days a soft swelling appears below the ears at the angle of the jaw, often first on one side and later on the other side. The swelling goes away by itself in about ten days without need for medicine, with pain and fever relief as directed on the book's medicine pages, soft nourishing foods, and keeping the mouth clean. In adults and children over eleven, after the first week there may be pain in the belly or a painful swelling of the testicles in men, helped by staying quiet and putting ice packs or cold wet cloths on the swollen parts.",
+  "danger_signs": [
+   "signs of meningitis or hearing problems"
+  ],
+  "when_to_seek_care": "If signs of meningitis or hearing problems appear, get medical help.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "narrow sores or cracks at the corners of a child's mouth",
+  "alternate_names": [
+   "mouth-corner sores"
+  ],
+  "source_chapters": [
+   "Chapter 17"
+  ],
+  "citation": "Chapter 17: The Teeth, Gums, and Mouth",
+  "summary": "Narrow sores at the corners of children's mouths are often a sign of malnutrition. The book advises that children with these sores should eat foods rich in vitamins and proteins, such as milk, meat, fish, nuts, eggs, fruits and green vegetables. This is a short section with no danger signs or referral threshold stated, and it is indexed as a nutritional presentation rather than as an infection.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "nausea, headaches, changes in monthly bleeding, heavy and painful monthly bleeding, or skin allergy from a family planning method",
+  "alternate_names": [
+   "contraceptive side effects",
+   "birth control side effects"
+  ],
+  "source_chapters": [
+   "Chapter 20"
+  ],
+  "citation": "Chapter 20: Family Planning",
+  "summary": "The chapter's method chart lists possible side effects by method, and this entry records only those the chapter itself states. Hormonal methods, meaning the birth control pill, patch, injections and vaginal ring, may cause nausea, headaches and changes in monthly bleeding. The intrauterine device may cause heavy and painful monthly bleeding. Spermicide or a sponge may cause skin allergy, and if spermicide is used frequently it can irritate the vagina, making it easier to get an infection including HIV. External and internal condoms are stated to have no side effects in the hormonal sense, with the chart noting condoms are safe, and this entry does not invent side effects for methods the chapter does not list.",
+  "danger_signs": [],
+  "when_to_seek_care": "The chapter advises talking with a midwife, health worker or doctor about what methods are available and likely to work best, and whether side effects would create difficulties; no separate care threshold is stated for ordinary side effects.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "nausea or vomiting in pregnancy, often worse in the morning in the second or third month (morning sickness)",
+  "alternate_names": [
+   "morning sickness",
+   "nausea in pregnancy",
+   "vomiting in pregnancy"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Nausea or vomiting in pregnancy is often worse in the morning during the second or third month. The book advises eating something dry such as crackers or dry bread before going to bed at night and when waking up in the morning, not eating large meals but rather smaller amounts of food several times a day, and notes that ginger, cinnamon or mint tea also helps. In severe cases the book points to an antihistamine on its medicine pages, taken when going to bed and when getting up in the morning. No danger threshold is given for ordinary morning sickness in this section, distinct from the danger signs of pregnancy indexed separately.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ }
+]
