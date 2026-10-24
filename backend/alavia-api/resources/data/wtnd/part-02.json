@@ -1,0 +1,876 @@
+[
+ {
+  "symptom": "child with spasticity: tight stiff muscles difficult to control, face, neck or body twisting, jerky movements, legs crossing like scissors (cerebral palsy)",
+  "alternate_names": [
+   "cerebral palsy",
+   "spasticity"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "A child with spasticity has tight, stiff muscles that are difficult to control, the face, neck or body may twist, movements may be jerky, and often tight muscles on the inside of the legs cause them to cross like scissors. At birth the child may seem typical or perhaps floppy, and stiffness comes as the child gets older, with or without cognitive delay. Cerebral palsy often results from brain injury at birth, caused by the baby not breathing soon enough, or from meningitis in early childhood. There are no medicines that cure the brain injury causing spasticity, but the child needs special care, including slowly straightening and bending legs or feet several times a day to help prevent tightening, and help learning to roll over, sit, stand and if possible walk, using mind and body as much as possible.",
+  "danger_signs": [],
+  "when_to_seek_care": "If a child is born with a disability, take the child to a health centre; there are many ways a child can be helped.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "something stuck in the throat",
+   "cannot breathe after swallowing"
+  ],
+  "citation": "Chapter 10: When Something Gets Stuck in the Throat",
+  "danger_signs": [
+   "cannot breathe"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "When food or another object sticks in the throat and the person cannot breathe, the book advises acting quickly: bend the person over and give firm blows to the middle of the back, then, if that fails, stand behind the person and press suddenly and strongly upward into the belly. For larger, unconscious, pregnant, wheelchair-using or small-child cases it gives chest or lying-down variants, and mouth-to-mouth breathing if breathing still does not return.",
+  "symptom": "choking",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "rice water stools",
+   "cholera diarrhea"
+  ],
+  "citation": "Chapter 13: Diarrhea like rice water (Cholera)",
+  "danger_signs": [
+   "severe dehydration developing quickly, especially with vomiting"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "Rice water stools in very large quantities may be a sign of cholera, a dangerous disease that often comes in epidemics striking many people at once, and is usually worse in older children and adults. Severe dehydration can develop quickly, especially if there is vomiting also. The book stresses treating dehydration continuously with Rehydration Drink and other liquids, giving the drink almost continuously and watching how much liquid the person is losing, and reporting cholera to the health authorities.",
+  "symptom": "cholera",
+  "when_to_seek_care": "Seek medical help."
+ },
+ {
+  "alternate_names": [
+   "long-term cough with mucus",
+   "barrel chest",
+   "emphysema"
+  ],
+  "citation": "Chapter 13: Chronic Bronchitis",
+  "danger_signs": [
+   "emphysema, in which tiny air pockets of the lungs break down and breathing becomes hard especially with exercise"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "Chronic bronchitis is a cough with mucus lasting for months or years, sometimes getting worse with fever, in a person who does not have another long-term illness such as tuberculosis or asthma. It occurs most frequently in older people who have been heavy smokers. It can lead to emphysema, a very serious incurable condition in which the tiny air pockets of the lungs break down, the person has a hard time breathing especially with exercise, and the chest becomes big like a barrel. Treatment stresses stopping smoking and anti-asthma medicine.",
+  "symptom": "chronic cough and difficulty breathing",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "symptom": "chronic cough in an older person, with wheezing or trouble breathing, coughing up blood, or swollen feet",
+  "alternate_names": [
+   "chronic cough in older people",
+   "persistent cough in old age"
+  ],
+  "source_chapters": [
+   "Chapter 22"
+  ],
+  "citation": "Chapter 22: Health and Sicknesses of Older People",
+  "summary": "Older people who cough a lot should not smoke and should seek medical advice. If they had symptoms of tuberculosis when younger, or have ever coughed up blood, they may have tuberculosis. If an older person develops a cough with wheezing or trouble breathing such as asthma, or if the feet also swell, the person may have heart trouble, cross-referred to the heart trouble section of the same chapter. This entry records only the older-person framing Chapter 22 gives, since the fuller cough, tuberculosis and asthma presentations belong to chapters outside this fragment's assignment and are not summarised here.",
+  "danger_signs": [
+   "coughing up blood",
+   "cough with wheezing or trouble breathing",
+   "swollen feet with cough"
+  ],
+  "when_to_seek_care": "Older people who cough a lot should seek medical advice.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "chronic open sores over bones and joints in a very sick person who cannot get out of bed (bed sores)",
+  "alternate_names": [
+   "bed sores",
+   "pressure sores"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Bed sores are chronic open sores appearing in people so ill they cannot roll over in bed, especially sick old people who are very thin and weak. The sores form over bony parts of the body where the skin is pressed against the bedding, most often on the buttocks, back, shoulders, elbows or feet. Prevention in the book is turning the sick person over every hour, bathing daily and rubbing the skin with baby oil, using soft bed sheets and padding changed daily and whenever soiled, cushioning bony parts, and feeding the sick person as well as possible.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "chronic red, watery, sore eyes with small lumps inside the upper eyelids, sensitivity to light and discharge, leading to scarring and eyelashes scratching the eye (trachoma)",
+  "alternate_names": [
+   "trachoma"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "Trachoma is a chronic eye problem caused by repeated infection of the inside of the eyelid and the surface of the eye itself, which if not treated early can cause blindness. It is spread by touch or by flies and is most common where people live in poor, crowded conditions. It may begin with red, watery, sore eyes or develop for months with few or no early signs, then after a month or more small whitish, grey or yellow lumps form inside the upper eyelids. The white of the eye may look red and swollen, the eye may be painful, sensitive to light or have discharge, and after years the lumps are replaced by whitish scars that thicken the eyelids or pull eyelashes down into the eye, scratching the cornea and causing loss of vision.",
+  "danger_signs": [
+   "loss of vision"
+  ],
+  "when_to_seek_care": "Seek medical testing and treatment when the first signs appear in areas where the disease is known; all people living with someone who has trachoma, especially children, should have their eyes examined often and be treated as soon as signs appear.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "chronic sore that does not heal, often a small pearl-coloured ring with a hole in the centre on sun-exposed skin (possible skin cancer)",
+  "alternate_names": [
+   "skin cancer"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Skin cancer is most frequent in light-skinned people who spend a lot of time in the sun and usually appears where the sun hits with most force, especially the ear, cheekbone or temple, nose and lips. It may take many forms but usually begins as a little ring the colour of pearl with a hole in the centre and grows little by little. The book states that most skin cancers are not dangerous if treated in time and that surgery is needed to remove them. Light-skinned people should protect themselves from the sun and always wear a hat.",
+  "danger_signs": [],
+  "when_to_seek_care": "See a health worker if you have a chronic sore that might be skin cancer.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "cirrhosis of the liver in a person over 40: weakness, loss of appetite, upset stomach, pain on the right side below the ribs, getting thinner, vomiting blood, swollen feet, belly swelling with liquid, yellow eyes and skin",
+  "alternate_names": [
+   "cirrhosis",
+   "liver cirrhosis"
+  ],
+  "source_chapters": [
+   "Chapter 22"
+  ],
+  "citation": "Chapter 22: Health and Sicknesses of Older People",
+  "summary": "Cirrhosis usually occurs in men over forty who for years have been drinking a lot of alcohol and eating poorly. It starts like hepatitis, with weakness, loss of appetite, upset stomach and pain on the person's right side below the ribs. As the illness gets worse the person gets thinner and thinner, may vomit blood, and in serious cases the feet swell and the belly swells with liquid until it looks like a drum, and the eyes and skin may turn yellowish. The book states that when cirrhosis is severe it is hard to cure, there are no medicines that help much, and most people with severe cirrhosis die from it. At the first sign the book advises never drinking alcohol again, eating as well as possible with vegetables, fruit and some protein but not a lot of protein, and no salt if there is swelling.",
+  "danger_signs": [
+   "vomiting blood",
+   "feet swelling",
+   "belly swelling with liquid",
+   "yellow eyes and skin"
+  ],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "cloudy lens behind the pupil, with gradual loss of vision, common in older people and rarely in babies (cataract)",
+  "alternate_names": [
+   "cataract"
+  ],
+  "source_chapters": [
+   "Chapter 16",
+   "Chapter 22"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "In cataract the lens of the eye behind the pupil becomes cloudy, which can be seen when a light is shone into it. Cataract is common in older people but also occurs rarely in babies. If a blind person with cataracts can still tell light from dark and notice movement, surgery may let the person see again, during which an artificial lens is put inside the eye to restore vision without the need to wear glasses afterwards. The book states plainly that medicines do not help cataracts, and Chapter 22 lists cataracts among the common problems of old age.",
+  "danger_signs": [
+   "a white glow or reflection in the pupil",
+   "loss of vision"
+  ],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "cold",
+   "flu",
+   "runny nose cough sore throat"
+  ],
+  "citation": "Chapter 13: Colds and the Flu",
+  "danger_signs": [
+   "cold or flu lasting more than a week",
+   "fever with coughing up a lot of phlegm",
+   "shallow fast breathing or chest pain, possibly developing bronchitis or pneumonia"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "Colds and flu are common virus infections that may cause runny nose, cough, sore throat, and sometimes fever or pain in the joints, with mild diarrhea especially in young children. They almost always go away without medicine, and antibiotics will not help and may cause harm. The book advises drinking plenty of water, resting, using simple pain and fever relief, and fruit juices, especially orange juice or lemonade. Sore throat is often part of a cold, but a sudden sore throat with high fever could be strep throat needing special treatment.",
+  "symptom": "cold and flu",
+  "when_to_seek_care": "If a cold or flu lasts more than a week, or there is fever, coughing up a lot of phlegm, shallow fast breathing or chest pain, the person could be developing bronchitis or pneumonia and an antibiotic may be called for."
+ },
+ {
+  "alternate_names": [
+   "cold",
+   "stuffy cold"
+  ],
+  "citation": "Chapter 1: Home Cures and Popular Beliefs; Chapter 7: Antibiotics",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1",
+   "Chapter 5",
+   "Chapter 6",
+   "Chapter 7",
+   "Chapter 9"
+  ],
+  "status": "ok",
+  "summary": "The book treats the common cold as an illness the body often overcomes by itself without medicines, with rest, good food, and plenty of liquids as the main help. Fruits and juices are described as helpful during a cold or fever and as not causing congestion or harm. Antibiotics are stated to do no good for the common cold, and penicillin and other antibiotics are said not to help colds. Injections are never to be given for a cold or flu. The book also warns that an injection given unnecessarily for a cold can itself cause suffering and harm.",
+  "symptom": "common cold",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "difficulty passing stools",
+   "dry stools",
+   "hard stools",
+   "no bowel movement",
+   "no bowel movement for days"
+  ],
+  "citation": "Chapter 1: Home Cures and Popular Beliefs; Chapter 5: Healing Without Medicines; Chapter 11: Constipation",
+  "danger_signs": [
+   "a bullet wound or other injury to the gut, where enemas and laxatives must never be used",
+   "severe stomach-ache or any sign of appendicitis or acute abdomen, in which case enemas and laxatives must never be used",
+   "sharp pain in the stomach"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1",
+   "Chapter 11",
+   "Chapter 5"
+  ],
+  "status": "ok",
+  "summary": "Constipation is described as dry, hard, difficult stools, and simple enemas with warm water only are presented as one correct use of enemas for relief. Laxatives in small doses may soften and hurry bowel movement, while purges in large doses cause diarrhea and are always harmful, so frequent laxative use is discouraged. The healthier and gentler way presented is drinking plenty of water and eating foods with natural fibre, such as cassava, yam, bran, whole grains, fruits, and vegetables, while avoiding refined foods. People who traditionally eat high-fibre foods are described as suffering much less from piles, constipation, and gut cancer.",
+  "symptom": "constipation",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "symptom": "constipation in pregnancy",
+  "alternate_names": [
+   "constipation in pregnancy"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "For constipation in pregnancy the book advises drinking plenty of water, eating fruits and food with a lot of natural fibre such as cassava or bran, and getting plenty of exercise, and warns not to take strong laxatives. This is listed among the minor problems of pregnancy with no danger signs or referral threshold stated in this section.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "cough with mucus",
+   "cough with phlegm",
+   "coughing",
+   "coughing up blood",
+   "dry cough"
+  ],
+  "citation": "Chapter 1: Home Cures and Popular Beliefs; Chapter 5: Healing Without Medicines; Chapter 13: Cough",
+  "danger_signs": [
+   "blood, pus, or smelly phlegm in the cough",
+   "cough lasting a long time",
+   "coughing up blood",
+   "fast, shallow breathing together with fever, which the book links with possible pneumonia in a person confined to bed",
+   "losing weight or continual difficulty breathing"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1",
+   "Chapter 13",
+   "Chapter 3",
+   "Chapter 5",
+   "Chapter 7"
+  ],
+  "status": "ok",
+  "summary": "Coughing is not a sickness itself but a sign of many sicknesses affecting the throat, lungs or bronchi. A dry cough with little or no phlegm can come from a cold, flu, worms passing through the lungs, measles or smoking. Cough with much or little phlegm can come from bronchitis, pneumonia or asthma. Cough with a wheeze or whoop and trouble breathing can come from asthma, whooping cough, diphtheria, heart trouble or something stuck in the throat. Chronic cough can come from tuberculosis, smoking, asthma, chronic bronchitis or emphysema, and coughing blood can come from tuberculosis, pneumonia, severe worms or lung or throat cancer.",
+  "symptom": "cough",
+  "when_to_seek_care": "Seek medical help immediately if the person coughs up blood or has great difficulty breathing that does not improve with rest."
+ },
+ {
+  "alternate_names": [
+   "blood in cough",
+   "coughing blood"
+  ],
+  "citation": "Chapter 4: How to Take Care of a Sick Person; Chapter 3: How to Examine a Sick Person",
+  "danger_signs": [
+   "coughing up blood itself is listed as a sign of dangerous illness"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 3",
+   "Chapter 4"
+  ],
+  "status": "ok",
+  "summary": "Coughing up blood is presented not as a minor cough variant but as a danger sign in its own right. Chapter 3 advises asking a person with a cough whether they cough up mucus, how much, its colour, and whether there is blood in it. Chapter 4 lists coughing up blood first among signs of dangerous illness, alongside loss of large amounts of blood from anywhere in the body, and states that a person with one or more of these signs is probably too sick to be treated at home without skilled medical help and that life may be in danger. No cause is assigned in these chapters, and the finding should prompt urgent help rather than home treatment alone.",
+  "symptom": "coughing up blood",
+  "when_to_seek_care": "Seek medical help as soon as possible; the book states a person with this sign is probably too sick to be treated at home without skilled medical help."
+ },
+ {
+  "alternate_names": [
+   "small wounds",
+   "scrapes",
+   "minor cuts"
+  ],
+  "citation": "Chapter 10: Cuts, Scrapes, and Small Wounds",
+  "danger_signs": [
+   "signs of infection on checking the wound"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "Cleanliness is the first priority for cuts and scrapes, to prevent infection and help healing. The book advises washing hands, washing the skin around the wound and then the wound itself with cool boiled water, removing all dirt, including under skin flaps, and covering with clean gauze light enough for air to reach the wound, changed daily while watching for infection. It warns never to put feces or mud on a wound, or alcohol or iodine directly into it.",
+  "symptom": "cuts and scrapes",
+  "when_to_seek_care": "If it is a dirty or puncture wound and the person has never had a tetanus immunization, get one within 2 days."
+ },
+ {
+  "symptom": "dark patches on the forehead and cheeks in pregnancy (mask of pregnancy)",
+  "alternate_names": [
+   "mask of pregnancy"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "During pregnancy many women develop dark, olive-coloured areas on the skin of the face, breasts and down the middle of the belly. These sometimes disappear after the birth and sometimes do not, and they also appear sometimes in women taking birth control pills. The book states clearly that they do not indicate weakness or sickness and that no treatment is needed. This presentation is included so it is not mistaken for a disease or a sign of poor health.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "wound in the chest",
+   "air sucked through a chest wound"
+  ],
+  "citation": "Chapter 10: Deep Chest Wounds",
+  "danger_signs": [
+   "air sucked through the wound on breathing",
+   "signs of shock"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "Chest wounds can be very dangerous, especially if the wound has reached the lungs and air is sucked through the hole when the person breathes. The book advises covering the wound at once so no more air enters, using a greased gauze pad or clean bandage wrapped tightly, loosening it if it makes breathing more difficult, placing the person in the most comfortable position, treating any shock, and giving antibiotics and painkillers.",
+  "symptom": "deep chest wound",
+  "when_to_seek_care": "Seek medical help at once."
+ },
+ {
+  "alternate_names": [
+   "belly wound",
+   "guts outside the wound",
+   "wound into the gut"
+  ],
+  "citation": "Chapter 10: Deep Wounds in the Abdomen",
+  "danger_signs": [
+   "wound into the belly or gut",
+   "guts partly outside the wound",
+   "shock"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "Any wound that goes into the belly or gut is dangerous. The book advises covering the wound with a clean bandage, and if the guts are partly outside, covering them with a clean cloth soaked in lightly salted cool boiled water without pushing them back in, keeping the cloth wet. It advises giving absolutely nothing by mouth except small sips of water if help will take more than two days, never giving an enema, and giving antibiotics while getting the person to care.",
+  "symptom": "deep wound in the abdomen",
+  "when_to_seek_care": "Immediately take the injured person to the closest health center or hospital, without waiting for a health worker; surgery will be needed."
+ },
+ {
+  "alternate_names": [
+   "lack of water in the body",
+   "dry mouth and sunken eyes",
+   "little or no urine"
+  ],
+  "citation": "Chapter 13: Dehydration",
+  "danger_signs": [
+   "rapid weak pulse",
+   "fast deep breathing",
+   "fever",
+   "seizures",
+   "dehydration getting worse"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "Dehydration is lack of water in the body when it loses more liquid than it takes in, often with severe diarrhea especially when there is vomiting too, or in very serious illness when a person is too sick to take much food or liquid. It develops more quickly and is most dangerous in very young children. Signs are thirst, little or no urine that is dark yellow, sudden weight loss, dry mouth, sunken tearless eyes, sagging of the soft spot in infants, and loss of skin elasticity.",
+  "symptom": "dehydration",
+  "when_to_seek_care": "If dehydration gets worse or other danger signs appear, go for medical help; liquid in a vein may be necessary."
+ },
+ {
+  "alternate_names": [
+   "breakbone fever",
+   "sudden high fever with severe muscle and joint ache"
+  ],
+  "citation": "Chapter 14: Dengue, Zika, Chikungunya, and Yellow Fever, Dengue",
+  "danger_signs": [
+   "severe dengue: bleeding from the skin, nose or gums, or inside the body"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 14"
+  ],
+  "status": "ok",
+  "summary": "Dengue is spread by mosquitoes that breed in the home and bite during the day. It causes a sudden high fever lasting up to a week, usually with two or more of severe muscle and joint ache, headache, pain behind the eyes, nausea or vomiting, and rash. There are no medicines that cure it; for a week or two the person needs rest, liquids, and acetaminophen for pain and fever, not aspirin or ibuprofen. Preventing bites and breeding places around the home is stressed.",
+  "symptom": "dengue",
+  "when_to_seek_care": "For severe dengue with bleeding from the skin, nose or gums, or inside the body, go to a hospital immediately; for severe bleeding, treat for shock and get medical help fast."
+ },
+ {
+  "alternate_names": [
+   "always thirsty and urinating a lot",
+   "sugar in the blood",
+   "weight loss with thirst"
+  ],
+  "citation": "Chapter 11: Diabetes",
+  "danger_signs": [
+   "later signs: itchy skin, blurry eyesight, loss of feeling in hands or feet, frequent vaginal infections, sores on feet that do not heal, loss of consciousness in extreme cases"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 11"
+  ],
+  "status": "ok",
+  "summary": "People with diabetes have too much sugar in their blood. Early signs are always being thirsty, urinating often and a lot, always feeling tired, always being hungry, and weight loss. Later, more serious signs include itchy skin, periods of blurry eyesight, some loss of feeling in hands or feet, frequent vaginal infections, and sores on the feet that do not heal. The book says diabetes can often be controlled before it becomes serious by careful eating and plenty of exercise, with a lifelong diet rich in vegetables and fiber foods.",
+  "symptom": "diabetes signs",
+  "when_to_seek_care": "If the person is a child or young adult, he should be seen by an experienced health worker or doctor."
+ },
+ {
+  "alternate_names": [
+   "loose stools",
+   "loose watery stools",
+   "running stomach",
+   "watery stools"
+  ],
+  "citation": "Chapter 1: Home Cures and Popular Beliefs; Chapter 5: Healing Without Medicines; Chapter 13: Diarrhea and Dysentery",
+  "danger_signs": [
+   "a sunken soft spot on a baby's head, which the book links to losing too much liquid",
+   "child vomits everything or drinks nothing",
+   "diarrhea lasting more than 4 days and not getting better, or more than 1 day in a small child with severe diarrhea",
+   "much blood in the stools",
+   "seizures, or feet and face swelling",
+   "severe diarrhea lasting more than one day, or more than a few hours in babies",
+   "signs of dehydration"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1",
+   "Chapter 13",
+   "Chapter 2",
+   "Chapter 4",
+   "Chapter 5",
+   "Chapter 6",
+   "Chapter 7"
+  ],
+  "status": "ok",
+  "summary": "Diarrhea is presented as a frequent childhood illness in which giving plenty of liquids matters more than medicine. Rice water, teas, or sweetened drinks given by mothers are described as often safer and more helpful than modern medicine for babies, with the key point being that a baby with diarrhea must get plenty of liquids. For most diarrheas the book says medicine is usually not needed and may do more harm than good. Safe drinking water, hand washing, boiling or filtering water, and rehydration drinks are central to prevention and treatment in these chapters.",
+  "symptom": "diarrhea",
+  "when_to_seek_care": "Seek medical help as soon as possible if there is heavy vomiting or severe diarrhea lasting more than one day, or more than a few hours in babies."
+ },
+ {
+  "alternate_names": [
+   "breathing trouble",
+   "shortness of breath",
+   "fast breathing"
+  ],
+  "citation": "Chapter 3: How to Examine a Sick Person; Chapter 4: How to Take Care of a Sick Person",
+  "danger_signs": [
+   "great difficulty in breathing that does not improve with rest",
+   "marked blueness of lips and nails if new",
+   "a gurgling or snoring noise with difficult breathing in an unconscious person"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 3",
+   "Chapter 4"
+  ],
+  "status": "ok",
+  "summary": "Difficulty breathing is treated as a key examination finding, with attention to depth, rate, and whether both sides of the chest move equally. A gurgling or snoring noise with difficult breathing in an unconscious person may mean the tongue, mucus, or something else is stuck in the throat. Sucking in of skin between ribs or at the angle of the neck when breathing in means air has trouble getting through, and the book links this with something stuck in the throat, pneumonia, asthma, or bronchitis. Breathing rate is also a warning sign, with unusually fast shallow breathing in adults or newborn babies linked with pneumonia in Chapter 3.",
+  "symptom": "difficulty breathing",
+  "when_to_seek_care": "Seek medical help as soon as possible for great difficulty in breathing that does not improve with rest."
+ },
+ {
+  "symptom": "difficulty having children, being unable to become pregnant or to make another person pregnant (infertility)",
+  "alternate_names": [
+   "infertility",
+   "unable to have children"
+  ],
+  "source_chapters": [
+   "Chapter 18"
+  ],
+  "citation": "Chapter 18: The Urinary System and the Genitals",
+  "summary": "Infertility includes being unable to become pregnant and being unable to make another person pregnant, and whether something can be done depends on the cause. Common causes listed are genetic and physical factors such as a menstrual cycle that makes pregnancy difficult or making too few sperm; poor nutrition causing severe anemia or lack of iodine; untreated infections, especially pelvic inflammatory disease due to gonorrhea or chlamydia, which the book calls a common cause; medical conditions such as diabetes, malaria and tuberculosis; heavy use of coffee, alcohol, tobacco or certain drugs; and chemical exposure at work and in the environment. The book also notes non-medical ways to raise or support children, such as caring for or adopting children who need a home.",
+  "danger_signs": [],
+  "when_to_seek_care": "Treatments to address specific causes require the help of a health worker; no separate referral threshold is stated.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "difficulty passing urine in an older man, urine only dribbling or dripping or blocked completely, sometimes with fever (enlarged prostate)",
+  "alternate_names": [
+   "enlarged prostate",
+   "prostate trouble",
+   "difficulty urinating in older men"
+  ],
+  "source_chapters": [
+   "Chapter 18",
+   "Chapter 22"
+  ],
+  "citation": "Chapter 18: The Urinary System and the Genitals",
+  "summary": "Enlarged prostate is most common in men over forty and is caused by swelling of the prostate gland between the bladder and the urinary tube. The person has difficulty passing urine and sometimes in having a bowel movement, the urine may only dribble or drip or become blocked completely, and sometimes the man is not able to urinate for days. If he has a fever, this is a sign that infection is also present. Chapter 22 repeats this for older men, noting that older men whose urine drips or dribbles probably have an enlarged prostate. The book notes that in older men prostate trouble is more likely, while a younger man, especially one recently having sex with a person with gonorrhea or chlamydia, probably has gonorrhea or chlamydia.",
+  "danger_signs": [
+   "fever as a sign of infection",
+   "inability to urinate for days"
+  ],
+  "when_to_seek_care": "Get medical help; serious or chronic cases may require surgery, and a catheter may be needed if sitting in a tub of hot water does not allow urination.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "diphtheria in a child: cold-like start with fever, sore throat and hoarse voice, yellow-grey coating in the back of the throat, swollen neck, very bad-smelling breath, choking and turning blue",
+  "alternate_names": [
+   "diphtheria"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Diphtheria begins like a cold with fever, sore throat and hoarse voice. A yellow-grey coating or membrane may form in the back of the throat and sometimes in the nose and on the lips, the child's neck may become swollen, and breath smells very bad. If diphtheria is suspected the book advises putting the child to bed in a room separate from other people, getting medical help quickly since there is a special antitoxin, giving antibiotic treatment as directed on its medicine pages, gargling warm water with a little salt, breathing hot water vapours often, sipping liquids often even if it hurts to swallow, and if the child begins to choke and turn blue, trying to remove the membrane from the throat with a cloth wrapped around a finger.",
+  "danger_signs": [
+   "choking and turning blue"
+  ],
+  "when_to_seek_care": "Get medical help quickly; there is a special antitoxin for diphtheria.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "joint out of place",
+   "dislocated shoulder"
+  ],
+  "citation": "Chapter 10: Dislocations",
+  "danger_signs": [
+   "cannot put the limb back in place"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "A dislocation is a bone that has come out of place at a joint. The book's three points are to try to put the bone back into place as soon as possible, keep it bandaged firmly in place so it does not slip out again for about a month, and avoid forceful use of the limb long enough for the joint to heal completely, about two or three months. For a shoulder it describes lying face down with the arm hanging and pulling steadily downward until it pops back, then bandaging the arm firmly against the body.",
+  "symptom": "dislocated joint",
+  "when_to_seek_care": "If you cannot put the dislocated limb back in place, look for medical help at once."
+ },
+ {
+  "symptom": "drops of pus from the penis, painful swelling of the testicles, yellow or green discharge from the vagina or anus, pain or burning during urination, lower belly pain, fever or pain during sex (gonorrhea or chlamydia)",
+  "alternate_names": [
+   "gonorrhea",
+   "chlamydia",
+   "penile discharge",
+   "the drip"
+  ],
+  "source_chapters": [
+   "Chapter 18"
+  ],
+  "citation": "Chapter 18: The Urinary System and the Genitals",
+  "summary": "People can have gonorrhea or chlamydia without any signs, and since people can have both at the same time it is best to treat for both. Gonorrhea usually starts sooner and is more painful than chlamydia. Signs in a man include drops of pus from the penis and sometimes painful swelling of the testicles. Signs in a woman include yellow or green discharge from the vagina or anus, pain in the lower belly, fever and pain during sex. Signs in both include pain or burning during urination, rash or sores all over the body, and painful swelling in one or both knees, ankles or wrists. If not treated, either infection can make a person unable to have a baby, and an untreated pregnant woman may pass infection to the baby's eyes causing blindness.",
+  "danger_signs": [
+   "fever with pain in the lower belly, suggesting pelvic inflammatory disease"
+  ],
+  "when_to_seek_care": "Seek local advice about which medicines are effective, available and affordable, and if the drip and pain have not gone away in two or three days after trying a treatment, the infection could be resistant or the person could have chlamydia; everyone who has had sex with a person known to have gonorrhea or chlamydia should also be treated.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "dry, cracked, peeling skin like sunburn on sun-exposed parts, or dark marks and peeling sores with swollen feet in a child (malnutrition skin signs, pellagra)",
+  "alternate_names": [
+   "pellagra",
+   "malnutrition skin problems"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Pellagra is a form of malnutrition affecting the skin and sometimes the digestive and nervous systems, found where people eat a lot of maize or other starchy foods and not enough beans, meat, fish, eggs, vegetables and other body-building and protective foods. In adults with pellagra the skin is dry and cracked and peels like sunburn on parts where the sun hits it, especially the neck, arms and backs of the legs. In malnourished children the skin of the legs and sometimes arms may have dark marks like bruises or peeling sores, and the ankles and feet may be swollen. Other signs often present include a swollen belly, sores in the corners of the mouth, a red sore tongue, weakness, loss of appetite and failure to gain weight.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "dry eyes that produce fewer tears, difficulty seeing at night or in low light, and later a dull wrinkled white of the eye with grey bubbly patches (night blindness and xerophthalmia, vitamin A deficiency)",
+  "alternate_names": [
+   "night blindness",
+   "xerophthalmia",
+   "vitamin A deficiency of the eye"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "This eye disease is most common in children and pregnant women and comes from not eating enough foods with vitamin A. If not recognised and treated early it can cause vision loss and even blindness, especially in children. First the eyes produce less tears and feel dry and may look red and irritated, and the person may have difficulty seeing at night or in low light, bump into objects, or move around less or more slowly than usual. Later the white of the eyes loses its shine and begins to wrinkle, patches of little grey bubbles may form, and as the disease gets worse the cornea becomes dry and dull, may develop little pits, and may quickly grow soft, bulge or even burst, usually without pain.",
+  "danger_signs": [
+   "cornea dry, dull, pitted or bulging",
+   "loss of vision"
+  ],
+  "when_to_seek_care": "If the eye surface is severely damaged (dull, pitted or bulging), get medical help right away, with vitamin A treatment and eye ointment and bandage as directed on the book's medicine pages until the person reaches a health worker.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "diarrhea with blood and mucus",
+   "bloody stools"
+  ],
+  "citation": "Chapter 13: Diarrhea and Dysentery; Special treatment, cases 3 and 4",
+  "danger_signs": [
+   "severe diarrhea with blood and fever",
+   "much blood in the stools"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "If mucus and blood can be seen in the stools, the person has dysentery. As a general rule in the book, diarrhea with blood and fever points to bacterial infection, while diarrhea with blood and no fever points to amebas, though a stool analysis may be needed to be sure. Bacterial dysentery begins more suddenly, stools are more watery, and there is almost always fever. Amebic dysentery is often chronic, with diarrhea some days and constipation other days, and the book points to its medicine pages for treatment of each type.",
+  "symptom": "dysentery",
+  "when_to_seek_care": "Get medical help if there is much blood in the stools, and seek medical advice if amebic diarrhea continues after treatment or if bacterial treatment does not bring improvement within 2 days."
+ },
+ {
+  "alternate_names": [
+   "ear pain",
+   "ear infection",
+   "pulling at the ear"
+  ],
+  "citation": "Chapter 3: How to Examine a Sick Person",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 3"
+  ],
+  "status": "ok",
+  "summary": "Earache is presented as a sign to check especially in a child with fever or a cold. A baby who cries a lot or pulls at the ear may have an ear infection, and a child with earache sometimes rubs the side of the head or pulls at the ear. The book advises pulling the ear gently, noting that increased pain may mean infection in the tube of the ear, and looking for redness or pus inside the ear with a small light, while never putting a stick, wire, or other hard object inside the ear. Hearing should also be checked, including whether one side is more deaf than the other, with deafness and ringing of the ears pointed to elsewhere in the book.",
+  "symptom": "earache",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "recurring seizures",
+   "epileptic fits",
+   "blanking out"
+  ],
+  "citation": "Chapter 13: Epilepsy",
+  "danger_signs": [
+   "seizure lasting more than 5 minutes"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "Epilepsy causes seizures in people who otherwise seem fairly healthy, coming hours, days, weeks or months apart. Seizures may cause loss of consciousness, violent movements or eyes rolling back, while mild types may cause a sudden brief blanking out, strange movements or odd behavior. Causes can include brain injury at birth, high fever in infancy, head and brain injuries, pesticide or chemical poisoning, or alcohol and drug use. Epilepsy is not an infection and cannot be caught, and medicines can help prevent seizures but do not cure it.",
+  "symptom": "epilepsy",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "eye pain",
+   "different sized pupils",
+   "eye problem"
+  ],
+  "citation": "Chapter 3: How to Examine a Sick Person; Chapter 5: Healing Without Medicines",
+  "danger_signs": [
+   "a big difference in the size of the pupils",
+   "an eye with the larger pupil hurting so badly it causes vomiting",
+   "pupil difference in an unconscious person or after head injury"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 3",
+   "Chapter 5"
+  ],
+  "status": "ok",
+  "summary": "Eye findings are presented as urgent examination signs. A big difference in pupil size is described as almost always a medical emergency. If the eye with the larger pupil hurts so badly it causes vomiting, acute glaucoma is suggested, while if the eye with the smaller pupil hurts a great deal, iritis is suggested as a very serious problem. A pupil difference in an unconscious person or after recent head injury may mean brain injury, and may also mean stroke. Chapter 5 separately advises flooding the eye with cool water at once and continuing for a prolonged period when acid, lye, dirt, or another irritating substance gets in the eye.",
+  "symptom": "eye pain and unequal pupils",
+  "when_to_seek_care": "Seek medical help immediately for a big difference in pupil size, which the book calls almost always a medical emergency."
+ },
+ {
+  "symptom": "eye that wanders or is always turned the wrong way (cross eyes, squint, lazy eye)",
+  "alternate_names": [
+   "strabismus",
+   "squint",
+   "lazy eye",
+   "wandering eye"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "If the eye sometimes wanders but at other times looks directly ahead, usually there is no need to worry and the eye will grow straighter in time. But if the eye is always turned the wrong way and the child is not treated at a very early age, the child may never see well with that eye. The book advises seeing an eye doctor as soon as possible to find out if patching of the good eye, surgery or special glasses might help, noting that surgery at a later age can usually straighten the eye and improve appearance but will not help the weak eye see better.",
+  "danger_signs": [],
+  "when_to_seek_care": "See an eye doctor as soon as possible if the eye is always turned the wrong way.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "hyperventilation",
+   "breathing very hard and fast when frightened"
+  ],
+  "citation": "Chapter 2: Sicknesses that Are Often Confused",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 2"
+  ],
+  "status": "ok",
+  "summary": "Chapter 2 describes a frightened person breathing very fast and deeply, with a fast pounding heartbeat, numbness or tingling of the face, hands, or feet, and muscle cramps. This is presented as part of extreme fright or hysteria, where the body may be getting too much air, which may itself be part of the problem. The book advises keeping the person as quiet as possible, having them breathe slowly into a paper bag and continue breathing the same air briefly, and explaining that the problem is not dangerous and will soon pass. It distinguishes this fright pattern from other causes of difficult breathing discussed elsewhere.",
+  "symptom": "fast, heavy breathing from extreme fright",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "high fever",
+   "high temperature",
+   "the fever",
+   "very high fever"
+  ],
+  "citation": "Chapter 2: Sicknesses that Are Often Confused; Chapter 3: How to Examine a Sick Person; Chapter 10: Fever and Very High Fevers",
+  "danger_signs": [
+   "fever over 40 degrees Celsius",
+   "fever that does not go down soon",
+   "fever with fast, shallow breathing and cough in a person confined to bed",
+   "fever with more than one seizure in a person with serious illness",
+   "high fever that cannot be brought down or that lasts more than four or five days",
+   "seizures",
+   "unconsciousness"
+  ],
+  "review_note": "Fever patterns in Chapter 2 are sketches for several different diseases and the book warns that diseases do not always show the signs described, so this entry must not be used to diagnose a specific cause of fever.",
+  "source_chapters": [
+   "Chapter 1",
+   "Chapter 10",
+   "Chapter 2",
+   "Chapter 3",
+   "Chapter 4",
+   "Chapter 5"
+  ],
+  "status": "NEEDS-REVIEW",
+  "summary": "Fever is defined as a body temperature higher than normal, but the book warns that many different serious illnesses are all called the fever in everyday speech. Chapter 2 sketches contrasting patterns, such as fever that comes and goes with chills and sweating, fever that rises a little each day, fever in waves, and mild fever with yellowing of the eyes and skin. Chapter 3 advises taking the temperature regularly, noting when and how fever comes and goes, and remembering that not every fever is malaria. For high fever, the book advises removing covers and clothing and soaking the body with water.",
+  "symptom": "fever",
+  "when_to_seek_care": "Seek medical help as soon as possible for high fever that cannot be brought down or lasts more than four or five days."
+ },
+ {
+  "symptom": "fever and infection after giving birth, with chills or fever, headache or low back pain, belly pain, and foul-smelling or bloody discharge from the vagina (childbirth fever)",
+  "alternate_names": [
+   "childbirth fever",
+   "womb infection after birth",
+   "postpartum infection"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Sometimes a mother develops fever and infection after giving birth, often because someone attending the birth did not keep everything very clean. The signs of childbirth fever are chills or fever, headache or low back pain, sometimes pain in the belly, and a foul-smelling or bloody discharge from the vagina. The book points to antibiotic treatment on its medicine pages and advises that if the person does not start to feel better within one or two days, to keep giving antibiotics and get medical help. This entry records the presentation only and gives no medicine doses, in line with the indexing rules.",
+  "danger_signs": [
+   "chills or fever after birth",
+   "foul-smelling or bloody vaginal discharge after birth"
+  ],
+  "when_to_seek_care": "If the person does not start to feel better within one or two days, keep giving antibiotics and get medical help.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "fleshy thickening growing from the white of the eye near the nose onto the cornea (pterygium)",
+  "alternate_names": [
+   "pterygium"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "A pterygium is a fleshy thickening on the eye surface that slowly grows out from the edge of the white part of the eye near the nose and onto the cornea, caused in part by sunlight, wind and dust. Dark glasses may help calm irritation and slow its growth, and it should be removed by surgery before it reaches the pupil, though after surgery it often grows back again. The book warns that folk treatments using powdered shells do more harm than good, and that cold compresses or camomile eye drops may help calm itching and burning.",
+  "danger_signs": [],
+  "when_to_seek_care": "It should be removed by surgery before it reaches the pupil; no separate referral timing is stated beyond that.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "foul-smelling grey or black area with blisters and air pockets in the flesh near a wound, spreading fast (gas gangrene)",
+  "alternate_names": [
+   "gangrene",
+   "gas gangrene"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Gas gangrene is a very dangerous infection of a wound in which a foul-smelling grey or brown liquid forms, the skin near the wound may have dark blisters, and the flesh may have air bubbles in it. The infection begins between six hours and three days after the injury, quickly gets worse and spreads fast, and without treatment causes death in a few days. The book advises opening the wound as wide as possible, washing it with cool boiled water and soap, cleaning out dead and damaged flesh, leaving the wound uncovered so air gets to it, and using antibiotic treatment as directed on its medicine pages.",
+  "danger_signs": [
+   "foul-smelling liquid from a wound",
+   "dark blisters",
+   "air bubbles in the flesh",
+   "rapid spread"
+  ],
+  "when_to_seek_care": "Get medical help; this is described as a very dangerous infection that causes death in a few days without treatment.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "gallbladder problems: sharp pain in the stomach at the edge of the right rib cage, sometimes reaching to the right upper back, often an hour or more after fatty foods, vomiting with severe pain, belching with a bad taste, fever or yellow eyes in severe cases",
+  "alternate_names": [
+   "gallbladder problems",
+   "gallbladder pain"
+  ],
+  "source_chapters": [
+   "Chapter 22"
+  ],
+  "citation": "Chapter 22: Health and Sicknesses of Older People",
+  "summary": "The gallbladder is a small sac attached to the liver collecting bile, a bitter green juice helping digest fatty foods, and people who are older, pregnant or have diabetes are more likely to have gallbladder problems. Signs are sharp pain in the stomach at the edge of the right rib cage, sometimes reaching up to the right side of the upper back, pain that may come an hour or more after eating rich or fatty foods, severe pain that may cause vomiting, belching or burping with a bad taste, fever in severe cases, and occasionally yellow eyes. The book advises not eating greasy food, eating small meals, taking a painkiller as directed on its medicine pages, noting aspirin will probably not help, and taking an antibiotic as directed if there is fever.",
+  "danger_signs": [
+   "fever",
+   "yellow eyes"
+  ],
+  "when_to_seek_care": "In severe or chronic cases, seek medical help; sometimes surgery is needed.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "German measles in a child: mild rash lasting three or four days, swollen tender lymph nodes on the back of the head and neck, low fever",
+  "alternate_names": [
+   "German measles",
+   "rubella"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "German measles are not as severe as regular measles, last three or four days, and the rash is mild. Often the lymph nodes on the back of the head and neck become swollen and tender, and there is often a low fever. The child should stay in bed and take a pain and fever medicine if necessary as directed on the book's medicine pages. The chapter stresses that getting German measles in the first three months of pregnancy increases the chance of giving birth to a child with a disability, so people who are pregnant and have not had German measles or are not sure should keep far away from children with this kind of measles, and vaccinating all children protects them and helps keep rubella away from anyone pregnant.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "yellow frothy bad-smelling diarrhea",
+   "sulfur burps"
+  ],
+  "citation": "Chapter 12: Giardia; Chapter 13: Yellow bad-smelling diarrhea",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 12",
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "Giardia is a microscopic parasite in the gut and a common cause of diarrhea, especially in children, which may be chronic or come and go. A person with yellow, bad-smelling, frothy diarrhea without blood or mucus probably has giardia. The belly is swollen with gas and uncomfortable, there are mild intestinal cramps, and the person farts and burps a lot, with burps tasting bad like sulfur. There is usually no fever. Infections sometimes clear up by themselves, and good nutrition helps.",
+  "symptom": "giardia diarrhea",
+  "when_to_seek_care": "not stated in the book"
+ }
+]
