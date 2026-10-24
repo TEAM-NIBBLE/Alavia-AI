@@ -1,0 +1,870 @@
+[
+ {
+  "symptom": "new breast lump, dent or dimple in the breast, swollen armpit lymph nodes, redness or a sore on the breast that does not heal, or abnormal discharge from the nipple (possible breast cancer signs)",
+  "alternate_names": [
+   "breast lump",
+   "breast cancer signs"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Most women have some small lumps in their breasts that can change in size and shape and become tender during the period, and sometimes a breast lump that does not go away can be a sign of breast cancer. Successful treatment depends on finding and treating the problem as soon as possible, which requires medical care and sometimes surgery. Signs of breast cancer listed are a new lump found during self-examination, an abnormal dent or dimple in the breast or many tiny pits like the skin of an orange, swollen lymph nodes in the armpit which may or may not be painful, redness or a sore on the breast that does not heal, and abnormal discharge from the nipple. The book advises monthly self-examination and notes that a smooth or rubbery lump that moves under the skin is less worrying, but a hard lump with an uneven shape that is painless or does not move needs medical advice, while stressing that many lumps are not cancer.",
+  "danger_signs": [
+   "new lump",
+   "dent or dimple",
+   "sore that does not heal",
+   "abnormal nipple discharge"
+  ],
+  "when_to_seek_care": "If a lump is hard, has an uneven shape, is painless, or does not move when pushed, get medical advice; if blood or discharge comes out when squeezing the nipples, get medical help.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "newborn baby not breathing at birth, pulse not felt or below 100, face and body white, blue or yellow after beginning to breathe, floppy arms and legs, or grunting and difficulty breathing after the first 15 minutes",
+  "alternate_names": [
+   "newborn not breathing",
+   "birth asphyxia signs",
+   "problems the baby is born with"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "The chapter advises examining the baby carefully immediately after birth for problems resulting from development in the womb or injury during birth: the baby does not breathe as soon as born, the pulse cannot be felt or heard or is less than one hundred beats per minute, the face and body are white, blue or yellow after breathing has begun, the arms and legs are floppy and the baby does not move them by itself or when pinched, and the baby grunts or has difficulty breathing after the first fifteen minutes. Some of these problems may be caused by brain injury at birth, are almost never caused by infection unless the waters broke more than twelve hours before birth, and common medicines probably will not help. The baby should be kept warm but not too warm.",
+  "danger_signs": [
+   "not breathing at birth",
+   "pulse not felt or below 100",
+   "white, blue or yellow colour after breathing begins",
+   "floppy limbs",
+   "grunting or difficulty breathing after 15 minutes"
+  ],
+  "when_to_seek_care": "Get medical help.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "newborn baby not gaining weight after the first week, or losing weight",
+  "alternate_names": [
+   "newborn not gaining weight",
+   "baby losing weight"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "During the first days of life most babies lose a little weight, which is typical and not a reason for concern. After the first week a healthy baby should gain about two hundred grams a week, and by two weeks the healthy baby should weigh as much as at birth. If the baby does not gain weight or loses weight, something is wrong, and the book advises asking whether the baby seemed healthy at birth, whether the baby feeds well, and examining the baby carefully for signs of infection or other problems. If the cause cannot be found and corrected, medical help should be sought.",
+  "danger_signs": [],
+  "when_to_seek_care": "If you cannot find out the cause of the problem and correct it, get medical help.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "newborn baby's eyes red, swollen and with pus in the first month of life (infected eyes in the newborn)",
+  "alternate_names": [
+   "neonatal conjunctivitis",
+   "newborn eye infection"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "If a mother has chlamydia or gonorrhea, she may pass these infections to her baby at birth, and the infection can get into the baby's eyes and cause blindness and other health problems. If the baby's eyes get red, swell and have pus in them within the first month, the baby may have one or both of these infections, and it is important to provide treatment immediately. The book points to its medicine pages for the treatment and for preventive eye medicine for every baby within the first two hours after birth, and states that if a baby develops gonorrhea or chlamydia of the eyes, both parents should be treated.",
+  "danger_signs": [
+   "risk of blindness"
+  ],
+  "when_to_seek_care": "Provide treatment immediately; the book does not state a separate referral step beyond immediate treatment in this section.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "newborn baby's face and whites of the eyes turning yellow (jaundice), especially on the first day of life or after the fifth day",
+  "alternate_names": [
+   "newborn jaundice",
+   "yellow baby"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "If the lips and face are blue, the book advises considering pneumonia or a heart condition or another problem the baby was born with. If the face and whites of the eyes begin to get yellow in the first day of life or after the fifth day, this is serious and medical help should be sought. Some yellow colour between the second and fifth day of life is usually not serious, and the book advises giving plenty of breast milk by spoon if necessary, taking off all the baby's clothes, and putting the baby in bright light near a window but not in direct sunlight. A sunken soft spot on top of the head may mean dehydration, while a swollen soft spot may mean meningitis, and both should be checked alongside jaundice.",
+  "danger_signs": [
+   "yellow colour on the first day of life",
+   "yellow colour after the fifth day",
+   "blue lips and face",
+   "swollen soft spot on the head"
+  ],
+  "when_to_seek_care": "Get medical help if jaundice appears on the first day of life or after the fifth day.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "newborn baby stops sucking well, seems very sleepy or ill, or cries or moves differently from usual",
+  "alternate_names": [
+   "baby stops nursing",
+   "baby stops sucking",
+   "sleepy newborn"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "If more than four hours pass and the baby still will not nurse, this is a danger sign, especially if the baby seems very sleepy or ill, or cries or moves differently from usual. Many illnesses can cause these signs, but the most common and dangerous causes in the first two weeks of life are a bacterial infection of the blood and tetanus. The book gives a timing clue: a baby who stops nursing during the second to fifth day of life may have a bacterial infection of the blood, while a baby who stops nursing during the fifth to fifteenth day may have tetanus. This entry is kept separate from the blood-infection entry because the book presents stopping sucking as a warning presentation in its own right.",
+  "danger_signs": [
+   "not nursing for more than four hours",
+   "very sleepy or ill appearance",
+   "crying or moving differently from usual"
+  ],
+  "when_to_seek_care": "Examine the baby carefully and completely as described in the book's examination chapter; the book does not state a single referral phrase for this presentation beyond treating it as a danger sign.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "newborn baby vomiting violently, vomiting so much and so often that the baby loses weight or becomes dehydrated, or vomit that is yellow or green with a very swollen belly or no bowel movements",
+  "alternate_names": [
+   "newborn vomiting",
+   "baby vomiting"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "When healthy babies burp, sometimes a little milk comes up too, which is common and not a reason for concern, and helping the baby bring up air after feeding by holding the baby against the shoulder and patting the back gently is advised. If a baby vomits when laid down after nursing, sitting the baby upright for a while after each feeding may help. A baby who vomits violently, or so much and so often that the baby begins to lose weight or become dehydrated, is ill, and if the baby also has diarrhea the baby probably has a gut infection. Bacterial infection of the blood, meningitis and other infections may also cause vomiting. If vomit is yellow or green there may be a gut obstruction, especially if the belly is very swollen or the baby has not been having bowel movements.",
+  "danger_signs": [
+   "vomiting violently",
+   "vomiting leading to weight loss or dehydration",
+   "yellow or green vomit",
+   "very swollen belly",
+   "no bowel movements"
+  ],
+  "when_to_seek_care": "Take the baby to a health centre at once if vomit is yellow or green, especially with a very swollen belly or no bowel movements.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "newborn baby with abnormal temperature: below 35.5 degrees or above 38 degrees",
+  "alternate_names": [
+   "newborn fever",
+   "newborn low temperature",
+   "newborn infection temperature"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Both low temperature and high temperature in a newborn can be signs of infection. The book gives the thresholds as below 35.5 degrees and above 38 degrees and advises getting medical help. For a baby with a high temperature, the book advises taking off all clothing and sponging with cool, not cold, water while going for help, and if there are signs of dehydration, giving breast milk and rehydration drink. Newborn babies do not always have a fever when they have a serious infection, and temperature may be high, low or normal, which is why the book stresses acting on the whole picture rather than temperature alone.",
+  "danger_signs": [
+   "temperature below 35.5 degrees",
+   "temperature above 38 degrees"
+  ],
+  "when_to_seek_care": "Get medical help.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "newborn baby with several signs at once: not sucking well, very sleepy, very pale, vomiting or diarrhea, fever or low temperature, swollen belly, yellow skin, seizures, or turning blue at times (bacterial infection of the blood)",
+  "alternate_names": [
+   "newborn septicemia",
+   "newborn blood infection",
+   "sepsis in the newborn"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Newborn babies cannot fight infections well, so bacteria entering the baby's skin or cord at birth often get into the blood and spread through the whole body, most commonly after the second day of life. Signs of infection in newborn babies differ from those in older children, and almost any sign could be caused by a serious infection in the blood. Possible signs listed are not sucking well, seeming very sleepy, being very pale, vomiting or diarrhea, fever or low temperature, swollen belly, yellow skin, seizures, and times when the baby turns blue. Each sign may be caused by something other than blood infection, but if the baby has several signs at once, blood infection is likely. The book advises antibiotic treatment as directed on its medicine pages, enough liquids by spoon-fed breast milk and rehydration drink if necessary, and trying to get medical help.",
+  "danger_signs": [
+   "several of the listed signs at once",
+   "seizures",
+   "turning blue",
+   "fever or low temperature"
+  ],
+  "when_to_seek_care": "Try to get medical help; if possible, get medical help, and if not, treat with the antibiotics the book directs.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "newborn cord stump or belly button red, draining pus or smelling bad; or baby vomiting or passing blood, developing many bruises, or not urinating or having a bowel movement in the first two days",
+  "alternate_names": [
+   "infected umbilical cord",
+   "cord infection",
+   "newborn no urine or stool"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "The cord stump should be kept clean and dry, and if it or the area around it gets red, drains pus or smells bad it is probably infected, to be cleaned well with attention to the book's antibiotic guidance on its medicine pages. The cord stump usually falls off five to seven days after birth, and a few drops of blood or mucus when it falls off is typical and not a reason for concern, but a lot of blood or any pus needs medical help. Separately, if the newborn vomits or passes blood or develops many bruises, the baby may need vitamin K as directed on the book's medicine pages, and if the baby does not urinate or have a bowel movement in the first two days, medical help should also be sought.",
+  "danger_signs": [
+   "cord red, draining pus or smelling bad",
+   "a lot of blood from the cord",
+   "vomiting or passing blood",
+   "many bruises",
+   "no urine or bowel movement in the first two days"
+  ],
+  "when_to_seek_care": "Get medical help if there is a lot of blood or any pus from the cord, and seek medical help if the baby does not urinate or have a bowel movement in the first two days.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "bleeding nose",
+   "blood from the nose"
+  ],
+  "citation": "Chapter 10: How to Stop Nosebleeds",
+  "danger_signs": [
+   "bleeding that pinching does not control"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "For a nosebleed, the book advises sitting quietly and upright, blowing the nose gently to remove mucus and blood, then pinching the nose firmly for ten minutes or until bleeding stops. If that fails, it advises packing the nostril with cotton, leaving part outside, and pinching again without tipping the head back. In older people, bleeding from the back of the nose may not stop with pinching, and holding an object between the teeth while leaning forward may help clotting.",
+  "symptom": "nosebleed",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "symptom": "oily yellow to white crust in patches on a baby's scalp, cheeks, forehead, eyebrows, nose or ears (dandruff or cradle cap)",
+  "alternate_names": [
+   "dandruff",
+   "cradle cap",
+   "seborrhea"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Dandruff is an oily, yellow to white crust that usually forms in patches on the scalp but also on the cheeks, forehead, eyebrows, nose and ears, with the skin often red and irritated. In babies it usually results from not washing the baby's head often enough or from keeping the head covered, and it is also common in people with HIV. The book advises washing the head daily, gently cleaning off all the dandruff and crust after loosening scales with lukewarm wet towels, and keeping the head uncovered, open to the air and sunlight, and not covering a baby's head with a cap or cloth.",
+  "danger_signs": [
+   "signs of infection"
+  ],
+  "when_to_seek_care": "If there are signs of infection, treat as for impetigo; no separate referral threshold is stated.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "open sore on the ankle",
+   "chronic sore",
+   "skin ulcer",
+   "lepra sore"
+  ],
+  "citation": "Chapter 2: Sicknesses that Are Often Confused; Chapter 5: Healing Without Medicines",
+  "danger_signs": [
+   "sores that keep growing and do not go away with treatment"
+  ],
+  "review_note": "Chapter 2 lists many different causes for a similar-looking sore and warns that signs may be confusing, so this entry must not be used to identify the cause of a particular sore.",
+  "source_chapters": [
+   "Chapter 2",
+   "Chapter 4",
+   "Chapter 5"
+  ],
+  "status": "NEEDS-REVIEW",
+  "summary": "An older person with a big, open, slowly growing sore on the ankle is used as an example of illnesses that look alike but need different treatment, including poor circulation from varicose veins, diabetes, infection of the bone, leprosy, tuberculosis of the skin, and advanced syphilis. Separately, villagers calling any open spreading sore lepra is shown to cause confusion, since such sores commonly include impetigo and other skin infections, sores from insect bites or scabies, chronic sores from poor circulation, skin cancer, and less commonly true leprosy or skin tuberculosis. Chapter 5 advises scrubbing sores, impetigo, ringworm, and pimples with soap and clean water.",
+  "symptom": "open or spreading skin sore",
+  "when_to_seek_care": "Seek medical help as soon as possible for sores that keep growing and do not go away with treatment."
+ },
+ {
+  "symptom": "pain or discomfort in the lower central part of a woman's belly",
+  "alternate_names": [
+   "lower belly pain",
+   "pelvic pain",
+   "lower abdominal pain in women"
+  ],
+  "source_chapters": [
+   "Chapter 18"
+  ],
+  "citation": "Chapter 18: The Urinary System and the Genitals",
+  "summary": "Pain in the lower central belly can come from many different causes discussed in different parts of the book, and the chapter lists them with key questions: menstrual discomfort, worse shortly before or during the period; a bladder infection, with very frequent or painful urination; pelvic inflammatory disease, causing lower belly pain, pain during sex and fever, most often from an untreated sexually transmitted infection such as gonorrhea or chlamydia; a lump or mass in the lower belly such as an ovarian cyst or cancer, needing a special exam by a trained health worker; ectopic pregnancy, usually with severe pain and irregular bleeding plus signs of early pregnancy, dizziness and weakness; complications from an abortion, with fever, vaginal bleeding with clots, belly pain, difficulty urinating and shock; and infection or another problem of the gut or rectum, related to eating or bowel movements.",
+  "danger_signs": [
+   "severe pain with irregular bleeding and dizziness and weakness (ectopic pregnancy)",
+   "fever, vaginal bleeding with clots, belly pain, difficulty urinating and shock (abortion complications)",
+   "fever with lower belly pain and pain during sex (pelvic inflammatory disease)"
+  ],
+  "when_to_seek_care": "For ectopic pregnancy and abortion complications, get medical help immediately, as life is in danger; more generally, if unsure what is causing the pain or if it does not get better soon, seek medical help.",
+  "status": "NEEDS-REVIEW",
+  "review_note": "This is a differential list, not a single condition; the book itself says these problems are not always easy to tell apart and special tests or examinations may be needed, so it must not be used to diagnose a cause."
+ },
+ {
+  "symptom": "painful blisters in a line or patch on one side of the body (shingles)",
+  "alternate_names": [
+   "herpes zoster",
+   "shingles"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Shingles is a line or patch of painful blisters that suddenly appears on one side of the body, most commonly on the back, chest, neck or face. The blisters usually last two or three weeks and then go away by themselves, though sometimes the pain continues or returns long after the blisters are gone. It is caused by the virus that causes chickenpox and usually affects people who have had chickenpox before. The book says it is not dangerous but can be painful, and that it is sometimes the first sign of another more serious problem such as cancer or HIV infection.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "painful greyish or less shiny patch on the cornea (corneal ulcer or scrape); or painless white patch on the cornea (corneal scar)",
+  "alternate_names": [
+   "corneal ulcer",
+   "corneal scrape",
+   "corneal scar"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "When the very thin, delicate surface of the cornea has been scraped or damaged by infection, a painful corneal ulcer may result, visible in good light as a greyish or less shiny patch on the surface of the cornea. If not well cared for, a corneal ulcer can cause blindness, and the book advises antibiotic eye ointment several times a day for a week as directed on its medicine pages. A corneal scar is a painless white patch on the cornea that may result from a healed corneal ulcer, burn or other injury, and if one eye is scarred but sight is good in the other, the book advises avoiding surgery and protecting the good eye from injury.",
+  "danger_signs": [
+   "painful greyish spot on the cornea with redness around the cornea",
+   "loss of vision"
+  ],
+  "when_to_seek_care": "If the eye is not better in two days with ointment, get medical help.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "painful joints in an older person (arthritis), with stiffness and loss of movement",
+  "alternate_names": [
+   "arthritis",
+   "rheumatoid arthritis",
+   "painful joints"
+  ],
+  "source_chapters": [
+   "Chapter 22"
+  ],
+  "citation": "Chapter 22: Health and Sicknesses of Older People",
+  "summary": "Many older people have arthritis, described in the chapter as rheumatoid arthritis with painful joints. To help arthritis the book advises resting the joints that hurt, applying hot compresses, taking a medicine for pain with aspirin described as best, and for severe arthritis taking several aspirin tablets up to several times a day with bicarbonate of soda, an antacid, milk or a lot of water, taking less if the ears begin to ring. It stresses doing exercises that help maintain as much movement as possible in the painful joints. No danger signs or referral threshold are stated for arthritis in this chapter, and medicine amounts are deliberately not repeated in this index entry beyond the book's general advice.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "painful menstrual periods",
+  "alternate_names": [
+   "painful periods",
+   "menstrual pain",
+   "period cramps"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Irregular or painful periods are common in adolescent girls and do not usually mean there is anything wrong. For a painful period the book advises that there is no need to stay in bed, and that lying quietly may make the pain worse, while walking around and doing light work or exercises often helps, as do hot drinks or putting the feet in hot water. If it is very painful, it may help to take a pain medicine and lie down with warm compresses on the belly. During the period, as at all times, a woman should keep clean, get enough sleep and eat a well balanced diet.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "painful urination and need to urinate very often, sometimes with fever, chills, side or lower back pain, cloudy or bloody urine, or inability to hold urine (urinary tract infection)",
+  "alternate_names": [
+   "urinary tract infection",
+   "bladder infection",
+   "painful urination",
+   "burning on urination"
+  ],
+  "source_chapters": [
+   "Chapter 18"
+  ],
+  "citation": "Chapter 18: The Urinary System and the Genitals",
+  "summary": "Urinary tract infections are most common in women and sometimes start after sexual contact but may come at other times, especially during pregnancy. Signs include painful urination and needing to urinate very often, sometimes fever and chills or headache, sometimes pain in the side, sometimes a feeling that the bladder does not empty completely, inability to hold in urine especially in children, cloudy or reddish urine, pain in the lower back, and pain seeming to go down the legs. In serious cases involving kidney disease the feet and face may swell. Pain in the mid or lower back spreading around the sides below the ribs with fever indicates a more serious problem.",
+  "danger_signs": [
+   "pain in the mid or lower back spreading around the sides below the ribs, with fever",
+   "swelling of the feet and face in serious kidney disease"
+  ],
+  "when_to_seek_care": "If the person does not get better quickly with drinking a lot of water and the medicines the book points to, seek medical advice; the book also advises not drinking much water if the person cannot urinate or has swelling of the hands and face.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "painful, very full and hard breasts when breastfeeding (breast engorgement)",
+  "alternate_names": [
+   "painful breasts",
+   "full breasts",
+   "engorged breasts"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Pain in the breast can be caused by a sore nipple or breasts that get very full and hard. The pain will often go away in a day or two if the baby breastfeeds frequently and the mother rests in bed and drinks lots of liquids, and usually antibiotics are not needed, though the book cross-refers to the breast infection section. When breasts are too full they are painful, a breast that is painfully full is more likely to develop an infection, and the baby may have trouble sucking when the breast is very full, so the book stresses keeping milk flowing by frequent feeding or milking the breasts by hand when the baby cannot suck.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "painless blood-red patch in the white of the eye (bleeding in the white of the eye)",
+  "alternate_names": [
+   "subconjunctival bleeding"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "A painless, blood-red patch in the white part of the eye occasionally appears after lifting something heavy, coughing hard such as with whooping cough, or being hit on the eye. The condition results from the bursting of a small vessel, is harmless like a bruise, and will slowly disappear without treatment in about two weeks. Small red patches are also common on the eyes of newborn babies, and no treatment is needed. This presentation is distinct from blood behind the cornea, which the book treats as a danger sign and which is indexed separately.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "painless bumpy growth that gets larger, may spread and may ooze months or years later (yaws)",
+  "alternate_names": [
+   "yaws"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Yaws is a bacterial infection first noticed when a painless, bumpy growth emerges and gets larger and may spread a little, then disappears after about six months. Months or years later it reappears, spreads more and may ooze, which is when it can spread to other people, and these signs also disappear. If it is not treated, after five or ten years the yaws infection can spread throughout the body, harming bones and joints and causing other problems. The book notes the yaws bacteria is related to syphilis, is spread by physical rather than sexual contact, and can be tested for and treated using the same medicines as for syphilis or with another antibiotic on its medicine pages.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "painless lumps, chronic patches of sores, skin ulcers or large warts that keep coming back; or neck lymph nodes that swell, open, drain pus and scar (tuberculosis of the skin or lymph nodes)",
+  "alternate_names": [
+   "skin tuberculosis",
+   "scrofula"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "The same microbe that causes tuberculosis of the lungs sometimes affects the skin, causing painless tumours that disfigure, chronic patches of sores, skin ulcers or big warts. As a rule tuberculosis of the skin develops slowly, lasts a long time and keeps coming back over months or years. Tuberculosis also sometimes infects the lymph nodes, most often those of the neck or behind the collarbone, which become large, open, drain pus, seal closed for a time and then open and drain again, usually without pain. The book advises seeking medical advice for any chronic sore, ulcer or swollen lymph nodes so tests can learn the cause.",
+  "danger_signs": [],
+  "when_to_seek_care": "Seek medical advice for any chronic sore, ulcer or swollen lymph nodes; tuberculosis of the skin is treated the same as tuberculosis of the lungs and medicines must be taken for many months after the skin looks well.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "painless lumps under the skin, itching, joint pains, thickened skin and eye problems leading to blindness (river blindness)",
+  "alternate_names": [
+   "river blindness",
+   "onchocerciasis"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "River blindness is common in many parts of Africa and certain areas of southern Mexico, Central America and northern South America, caused by tiny worms carried from person to person by small black flies. Several months after a bite, lumps begin to form under the skin, usually painless and growing slowly, most common on the head and upper body in the Americas and on the chest, lower body and thighs in Africa. There may be itching when the baby worms are spreading, pains in the back, shoulder or hip joints or general pains all over, enlarged lymph nodes in the groin, and thickening of the skin with big pores. If untreated the skin becomes more wrinkled, white spots and patches may appear on the front of the lower legs, a dry rash may appear, and eye problems often lead to blindness, beginning with redness and tears, then signs of iritis, a dull pitted cornea, and finally sight lost through corneal scarring, cataract, glaucoma or other problems.",
+  "danger_signs": [
+   "eye problems leading to blindness"
+  ],
+  "when_to_seek_care": "In areas where river blindness is known to occur, seek medical testing and treatment when the first signs appear; early treatment can prevent blindness.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "painless sore on the genitals, lips, fingers, anus or mouth, followed weeks or months later by rash on the hands or feet, sore throat, mild fever, mouth sores or swollen joints (syphilis)",
+  "alternate_names": [
+   "syphilis",
+   "chancre"
+  ],
+  "source_chapters": [
+   "Chapter 18"
+  ],
+  "citation": "Chapter 18: The Urinary System and the Genitals",
+  "summary": "Syphilis is a common and serious infection passed during sex that affects the whole body and worsens over time, but can be cured if treated early. The first sign is usually a sore called a chancre appearing one week to three months after sexual contact, looking like a pimple, blister or open sore on the genital area or less commonly on the lips, fingers, anus or mouth. The sore is usually painless and lasts only a few days before going away by itself without treatment, though the infection continues spreading through the body. Weeks or months later the person may have a sore throat, mild fever, mouth sores or swollen joints, and rashes including a reddish-brown rash on the hands or feet or a flat or bumpy rash elsewhere. Without adequate treatment syphilis can cause heart disease, paralysis, mental illness and death.",
+  "danger_signs": [
+   "unexplained skin condition days or weeks after a pimple or sore on the genitals"
+  ],
+  "when_to_seek_care": "If there is any chance someone has syphilis, they should immediately see a health worker for testing and treatment, and everyone who has had sexual contact with a person known to have syphilis should also be treated.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "pale skin",
+   "pale lips",
+   "pale eyelids",
+   "anemia sign"
+  ],
+  "citation": "Chapter 3: How to Examine a Sick Person",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 3",
+   "Chapter 6"
+  ],
+  "status": "ok",
+  "summary": "Paleness, especially of the lips and inside the eyelids, is presented as a sign of anemia, and the book advises looking at pale areas such as palms, soles, fingernails, and insides of lips and eyelids because dark skin can hide colour changes. Skin may also go lighter as a result of tuberculosis or kwashiorkor. Chapter 6 warns against wasteful or risky supposed cures for anemia and weakness, including vitamin B12 and liver extract injections except when a specialist prescribes them after blood testing, injectable iron, and intravenous fluids sold as strength or blood enrichment, and states that iron pills are safer and work as well for anemia. Good food is presented as the better use of money.",
+  "symptom": "paleness",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "symptom": "part of the breast hot, red, swollen and very painful, with fever or chills and sore swollen lymph nodes in the armpit, sometimes bursting and draining pus (breast infection or abscess)",
+  "alternate_names": [
+   "mastitis",
+   "breast abscess",
+   "breast infection"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Painful breasts and sore or cracked nipples can lead to an infection or abscess, meaning a pocket of pus. Signs are part of the breast becoming hot, red, swollen and very painful, fever or chills, lymph nodes in the armpit often sore and swollen, and a severe abscess sometimes bursting and draining pus. The chapter also notes that a painful, hot lump in the breast of a nursing mother is probably a breast abscess, while a painless breast lump may be cancer or a cyst. Treatment described includes keeping breastfeeding frequently, giving the baby the infected breast first or milking by hand whichever is less painful, resting, drinking lots of liquids, hot compresses before each feeding and cold compresses between feedings, gentle massage while nursing, pain relief, and an antibiotic as directed on its medicine pages.",
+  "danger_signs": [
+   "abscess bursting and draining pus"
+  ],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "hemorrhoids",
+   "lumps at the anus"
+  ],
+  "citation": "Chapter 13: Piles (Hemorrhoids)",
+  "danger_signs": [
+   "bleeding that does not stop"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "Piles, or hemorrhoids, are varicose veins of the anus or rectum that feel like little lumps or balls. They may be painful but are not dangerous, frequently appear during pregnancy, and may go away afterwards. The book advises bitter plant juices or hemorrhoid suppositories to shrink them, sitting in warm water, and eating plenty of fruit or high-fiber food since piles may be caused in part by constipation. Very large hemorrhoids may require an operation.",
+  "symptom": "piles",
+  "when_to_seek_care": "Get medical advice for very large hemorrhoids; if a hemorrhoid bleeds and bleeding still does not stop after pressure, seek medical advice."
+ },
+ {
+  "symptom": "pimples on the face, chest or back, sometimes with small white or black heads of pus (acne)",
+  "alternate_names": [
+   "acne",
+   "pimples",
+   "blackheads"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Young people sometimes get pimples on their face, chest or back, especially if their skin has too much oil in it. Pimples are little lumps that form, often with tiny white or black heads of pus, oil and dead cells, and sometimes they can become quite sore and large. The book advises washing the face twice a day with mild soap and warm water, washing the hair every two days if possible, letting sunlight fall on the affected parts, eating as well as possible, drinking a lot of water, getting enough sleep, and not using waxy, oily or greasy skin or hair lotions.",
+  "danger_signs": [],
+  "when_to_seek_care": "Seek medical advice for serious cases forming lumps and pockets of pus that do not get better with the measures described, for which the book points to its medicine pages.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "placenta delayed in coming out, or heavy bleeding after birth that does not stop within a day or exceeds about two cups of blood (postpartum hemorrhage)",
+  "alternate_names": [
+   "heavy bleeding after birth",
+   "postpartum hemorrhage",
+   "retained placenta",
+   "delayed afterbirth"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "The placenta usually comes out by itself five minutes to an hour after the baby, and the chapter advises seeking medical help if there is a lot of bleeding or if the placenta does not come out within one hour. Some bleeding after the placenta comes out is expected, but when bleeding does not stop within one day after birth or more than about two cups of blood is lost, it is a serious problem. The book also warns that sometimes a woman may be bleeding severely inside without much blood coming out, so her belly should be felt from time to time, since if it seems to be getting bigger it may be filling with blood, and her pulse should be checked often for signs of shock. Care described includes rubbing the womb firmly until it feels hard, letting the baby suck the breast, drinking a lot of liquid, and if she grows faint or has a fast weak pulse or other signs of shock, putting her legs up and head down.",
+  "danger_signs": [
+   "bleeding not stopping within a day after birth",
+   "loss of more than about two cups of blood",
+   "belly getting bigger, suggesting internal bleeding",
+   "faintness, fast weak pulse or other signs of shock",
+   "placenta not coming out within one hour with a lot of bleeding"
+  ],
+  "when_to_seek_care": "Go to a hospital right away, following the book's womb-rubbing and fluid advice while on the way; if the placenta still does not come out and bleeding continues, seek medical help fast.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "fast shallow breathing",
+   "cough with yellow or bloody mucus",
+   "lung infection"
+  ],
+  "citation": "Chapter 13: Pneumonia",
+  "danger_signs": [
+   "very sick child with fast shallow breathing",
+   "fever, chills, rapid shallow breathing, cough with yellow greenish or slightly bloody mucus, chest pain, person looks very ill"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "Pneumonia is an acute infection of the lungs, often after another respiratory illness or any very serious illness, especially in babies and old people, and also in people with HIV. Signs are fever, though infants and older people may have no fever, chills, rapid shallow breathing with little grunts or wheezing and nostrils spreading with each breath, cough often with yellow, greenish or slightly bloody mucus, chest pain sometimes, a very ill appearance, and cold sores on the face or lips. Fast breathing thresholds by age are given in the book.",
+  "symptom": "pneumonia",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "swallowed poison",
+   "child swallowed medicine or kerosene"
+  ],
+  "citation": "Chapter 10: Poisoning",
+  "danger_signs": [
+   "unconsciousness",
+   "stops breathing",
+   "severe poisoning"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "Many children die from swallowing poisonous things, including rat poison, insecticides, medicines in large amounts, kerosene, gasoline, bleach, lye, and poisonous plants or spoiled food. If poisoning is suspected, the book advises laying an unconscious child on the side, giving mouth-to-mouth breathing if breathing stops, giving water or milk to a child who is awake and alert to dilute the poison, and giving activated charcoal if available. Vomiting should only be induced when the child is awake and alert and vomiting is safe.",
+  "symptom": "poisoning",
+  "when_to_seek_care": "Look for medical help if poisoning is severe; do not make the person vomit after kerosene, gasoline, bleach, paint thinner, some pesticides, strong acids or corrosive substances, or if unconscious."
+ },
+ {
+  "symptom": "polio in a child: bad cold-like illness with fever, vomiting and diarrhea, painful muscles, and paralysis",
+  "alternate_names": [
+   "polio",
+   "poliomyelitis"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Polio is caused by a virus that attacks the spinal cord, damages the nerves that control movement, and can cause paralysis. It spreads through coughing and sneezing or when a healthy child gets something in the mouth that touched the stool of an infected child, in areas with poor sanitation. Vaccination has ended polio in most of the world, but where it is still a problem it mostly affects children under five. Most infected people show no signs, and when there are signs it may look like a bad cold with fever, vomiting and diarrhea. Most children with polio do not become paralysed, only about one in every hundred. There is no cure, and once paralysis has started no medicine will stop it, though part or all lost strength sometimes slowly returns.",
+  "danger_signs": [
+   "paralysis"
+  ],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "pre-eclampsia signs in pregnancy: high blood pressure, protein in the urine, sudden weight gain, swelling, headaches, dizziness, blurred vision and pain high in the belly",
+  "alternate_names": [
+   "pre-eclampsia",
+   "toxemia of pregnancy",
+   "high blood pressure in pregnancy"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "High blood pressure at or above the level the book gives can be a sign of a serious problem called pre-eclampsia, with a lot of protein in the urine, sudden weight gain and swelling as other important signs, and pre-eclampsia can lead to seizures and even death. If a woman has high blood pressure the book advises asking her to lie down and rest more often, helping her get plenty of good foods and a lot of protein, avoiding salty packaged foods and snacks, and re-checking blood pressure in a few days. Where blood pressure or urine protein cannot be checked, the book advises watching for swollen face or swelling all over in the morning, headaches, dizziness, blurred vision and pain high in the belly.",
+  "danger_signs": [
+   "blood pressure rising to the higher level the book gives",
+   "swollen face or swelling all over in the morning",
+   "headaches",
+   "dizziness",
+   "blurred vision",
+   "pain high in the belly",
+   "seizures"
+  ],
+  "when_to_seek_care": "If blood pressure keeps going up to the higher level the book gives or if she shows any of the listed signs, get medical help fast; if she is already having seizures, the book cross-refers to its seizures section.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "pregnancy developing outside the womb: abnormal menstrual bleeding with signs of pregnancy, severe cramps low in the belly and a painful lump outside the womb (ectopic pregnancy)",
+  "alternate_names": [
+   "ectopic pregnancy",
+   "tubal pregnancy"
+  ],
+  "source_chapters": [
+   "Chapter 19",
+   "Chapter 18"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Sometimes a fertilised egg begins to grow outside the womb in one of the tubes from the ovaries. There may be abnormal menstrual bleeding together with signs of pregnancy, also severe cramps low in the belly and a painful lump outside the womb. A fertilised egg that begins to form in the tube cannot develop into a baby, and ectopic pregnancy requires surgery in a hospital. Chapter 18 repeats this presentation in its lower belly pain list, usually with severe pain and irregular bleeding, signs of early pregnancy, and dizziness and weakness, and warns that her life is in danger. This entry is kept factual and separate from the general lower belly pain entry because the book treats ectopic pregnancy as a distinct emergency.",
+  "danger_signs": [
+   "severe cramps low in the belly",
+   "abnormal bleeding with signs of pregnancy",
+   "dangerous bleeding could start at any time",
+   "dizziness and weakness"
+  ],
+  "when_to_seek_care": "Get medical help soon, as dangerous bleeding could start at any time; Chapter 18 advises getting medical help immediately, as her life is in danger.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "pregnancy ending early by itself: heavy bleeding with big blood clots and painful cramps after missed periods (miscarriage)",
+  "alternate_names": [
+   "miscarriage",
+   "spontaneous abortion"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "A miscarriage is when a pregnancy ends early by itself, most often in the first three months of pregnancy. Many people have one or two miscarriages before carrying a pregnancy to birth, and many times they do not realise they are having a miscarriage, thinking their period was missed or delayed and then came back in a strange way with big blood clots. A woman who has heavy bleeding after missing one or more periods probably is having a miscarriage. Heavy bleeding with big blood clots and painful cramps often continue until all of the pregnancy is completely out, and bleeding may continue for several days afterwards similar to a menstrual period. She should not have sex or put anything in her vagina for at least two weeks after the miscarriage or until bleeding stops.",
+  "danger_signs": [
+   "heavy bleeding continuing for many days",
+   "extreme bleeding",
+   "fever or other signs of infection"
+  ],
+  "when_to_seek_care": "If heavy bleeding continues for many days, get medical help, as medicine or a simple suction procedure may be needed to empty the womb; stay in bed until heavy bleeding stops; if bleeding is extreme, follow the book's heavy-bleeding-after-birth instructions; if fever or other signs of infection develop, treat as for childbirth fever.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "pregnancy with twins: belly growing faster and womb larger than usual, faster weight gain, worse common pregnancy problems, or feeling three or more large objects in an extra-large womb",
+  "alternate_names": [
+   "twin pregnancy",
+   "twins"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Giving birth to twins is often more difficult and dangerous, both for the mother and babies, than giving birth to a single baby, with a greater chance one baby will be in a wrong position or that there will be heavy bleeding after birth. Signs that a woman may be pregnant with twins include the belly growing faster and the womb being larger than usual especially in the last months, gaining weight faster than expected, common problems of pregnancy such as morning sickness, backache, varicose veins, piles, swelling and difficult breathing being worse than usual, feeling three or more large objects in a womb that seems extra large, and sometimes hearing two different heartbeats other than the mother's, though this is difficult. Twins are often born small and need special care.",
+  "danger_signs": [],
+  "when_to_seek_care": "It is best to give birth to twins in a hospital, and because labour often begins early, the mother should be within easy reach of a hospital after the seventh month of pregnancy.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "latido",
+   "jumping in the pit of the stomach",
+   "pulsing stomach"
+  ],
+  "citation": "Chapter 2: Sicknesses that Are Often Confused",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 2"
+  ],
+  "status": "ok",
+  "summary": "Pulsing in the pit of the stomach is presented through the folk name latido, a pulsing or jumping felt in the pit of the stomach. The book explains that this is really the pulse of the aorta, the big blood vessel coming from the heart, which can be seen and felt in a person who is very thin and hungry. Latido is often described as a sign of malnutrition or hunger, and eating enough good food is presented as the only real treatment. This entry records that explanation only and does not extend it to other causes of abdominal pulsing, which are not discussed in this chapter.",
+  "symptom": "pulsing in the pit of the stomach",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "symptom": "pus behind the cornea (hypopyon), a sign of severe inflammation often with a corneal ulcer",
+  "alternate_names": [
+   "pus behind the cornea",
+   "hypopyon"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "Pus behind the cornea is a sign of severe inflammation, sometimes seen with corneal ulcers, and is a sign that the eye is in danger. The book advises applying antibiotic eye ointment and getting medical help at once, noting that if the ulcer is treated correctly the pus behind the cornea will often clear up by itself. This is a short section with no further detail on causes beyond its link to corneal ulcers and severe inflammation.",
+  "danger_signs": [
+   "pus behind the cornea",
+   "eye in danger"
+  ],
+  "when_to_seek_care": "Get medical help at once.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "mad dog bite",
+   "fear of liquids after a bite",
+   "pain and tingling at a bite"
+  ],
+  "citation": "Chapter 14: Rabies",
+  "danger_signs": [
+   "pain and tingling in the area of the animal bite",
+   "irregular breathing",
+   "pain and difficulty swallowing and fear of liquids",
+   "increased saliva, nervousness or excitability, anger and aggression",
+   "seizures and paralysis as death nears"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 14"
+  ],
+  "status": "ok",
+  "summary": "Rabies comes from the bite of a rabid animal, usually a dog, cat, fox, wolf, skunk or jackal, and bats and other animals may also spread it. In people, signs include pain and tingling at the bite, irregular breathing as if just crying, pain and difficulty swallowing with fear of liquids, increased saliva, nervousness or excitability that may become anger and aggression, and as death nears, seizures and paralysis. First symptoms appear from ten days up to two years after the bite, usually within three to seven weeks.",
+  "symptom": "rabies",
+  "when_to_seek_care": "Treatment must begin before the first signs appear; once sickness begins no known treatment can save life. If an animal that bit someone may have rabies, take the person at once to a health center if the animal dies, was killed, or cannot be caught."
+ },
+ {
+  "symptom": "rapidly spreading sores with shiny yellow crusts, often around a child's mouth (impetigo)",
+  "alternate_names": [
+   "impetigo"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Impetigo is a bacterial infection that causes rapidly spreading sores with shiny, yellow crusts, often on children's faces especially around the mouth. It spreads easily to other people from the sores or contaminated fingers. The book advises washing the affected part with soap and cooled boiled water several times each day, gently soaking off the crusts, then painting the sores or applying an antibiotic cream as directed on its medicine pages. Children with impetigo should not sleep or play with other children, and treatment should begin at the first sign.",
+  "danger_signs": [
+   "infection spread over a large area",
+   "fever"
+  ],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "red eyes with pus and mild burning, lids sticking together after sleep (pink eye)",
+  "alternate_names": [
+   "pink eye",
+   "conjunctivitis"
+  ],
+  "source_chapters": [
+   "Chapter 16",
+   "Chapter 21"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "Pink eye is an infection causing redness, pus and mild burning in one or both eyes, with lids often sticking together after sleep, and it is especially common in children. Chapter 21 repeats this for children, advising wiping the eyelids clean with a clean wet cloth several times a day and putting antibiotic eye ointment inside the eyelids several times a day. Most conjunctivitis is very contagious and easily spread from person to person, so a child with pink eye should not play or sleep with others or use the same towel, and hands should be washed after touching the eyes.",
+  "danger_signs": [],
+  "when_to_seek_care": "If a child with pink eye does not get well in a few days, see a health worker; more generally, get medical help fast for any eye infection or inflammation not better after five or six days of antibiotic eye ointment.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "red, painful eyes (general presentation with many possible causes)",
+  "alternate_names": [
+   "red eyes",
+   "painful eyes",
+   "sore eyes"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "Many different problems cause red, painful eyes, and correct treatment often depends on finding the cause, so the book advises checking carefully for signs of each possibility. Its chart lists foreign matter, burns or harmful liquids, pink eye, hay fever, trachoma, measles, acute glaucoma, iritis, and a scratch or ulcer on the cornea. Clues given include whether one or both eyes are affected, whether redness is greatest at the outer edge or next to the cornea, whether there is burning pain, and whether pain is great. The individual causes are indexed as separate entries in this file.",
+  "danger_signs": [
+   "any injury that cuts or ruptures the eyeball",
+   "painful greyish spot on the cornea with redness around the cornea",
+   "great pain inside the eye",
+   "a big difference in pupil size with pain in the eye or head",
+   "blood behind the cornea",
+   "beginning loss of vision",
+   "a white glow or reflection in the pupil",
+   "any eye infection or inflammation not better after five or six days of antibiotic eye ointment"
+  ],
+  "when_to_seek_care": "Get medical help fast when any of the chapter danger signs occurs.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "red patches with little blisters that ooze or weep, on a young child's cheeks or behind the knees and inside the elbows in older children and adults (eczema)",
+  "alternate_names": [
+   "eczema"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "In small children eczema forms a red patch or rash on the cheeks or sometimes on the arms and hands, consisting of small sores or blisters that ooze or weep. In older children and grown-ups it is usually drier and most common behind the knees and on the inside of the elbows. It does not start as an infection but is more like an allergic reaction, and in light-skinned people it may start red and then turn brown, while in dark-skinned people it may turn lighter or darker. The book advises cold compresses, letting sunlight fall on the patches, and treating any infection as for impetigo.",
+  "danger_signs": [
+   "signs of infection"
+  ],
+  "when_to_seek_care": "Seek medical advice in difficult cases, for which the book mentions a corticosteroid cream on its medicine pages.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "red, swollen lump on the eyelid, usually near its edge (sty)",
+  "alternate_names": [
+   "sty",
+   "hordeolum"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "A sty is a red, swollen lump on the eyelid, usually near its edge. The book advises treating it with warm, moist compresses with a little salt in the water, and states that use of an antibiotic eye ointment several times a day will help prevent more sties from occurring, pointing to its medicine pages for the ointment. No danger signs or referral threshold are stated for a sty in this section.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ }
+]
