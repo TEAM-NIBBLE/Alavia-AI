@@ -7,6 +7,7 @@ use App\Http\Controllers\User\ProfileController;
 use App\Http\Controllers\HospitalController;
 use App\Http\Controllers\ConsultationController;
 use App\Http\Controllers\SpeechController;
+use App\Http\Controllers\WtndController;
 
 Route::get('/health', function () {
     return response()->json(['status' => 'ok']);
@@ -56,6 +57,12 @@ Route::prefix('consultations')->group(function () {
 Route::prefix('speech')->group(function () {
     Route::post('/stt', [SpeechController::class, 'stt']);
     Route::post('/tts', [SpeechController::class, 'tts']);
+});
+
+
+// Book-grounded symptom search. Public like triage: emergencies do not wait for an account.
+Route::prefix('book')->group(function () {
+    Route::get('/symptoms/search', [WtndController::class, 'search'])->middleware('throttle:60,1');
 });
 
 Route::prefix('admin')->group(base_path('routes/admin.php'));
