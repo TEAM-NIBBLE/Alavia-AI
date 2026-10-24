@@ -1,0 +1,856 @@
+[
+ {
+  "alternate_names": [
+   "itching rash",
+   "hives",
+   "allergic reaction",
+   "difficulty breathing from allergy"
+  ],
+  "citation": "Chapter 13: Allergic Reactions",
+  "danger_signs": [
+   "irritation in the throat, difficulty breathing, or asthma",
+   "allergic shock"
+  ],
+  "review_note": "Allergy covers several presentations in one section, so this entry groups them as the book does rather than splitting each reaction; a reviewer may prefer separate rash, breathing and shock entries.",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "NEEDS-REVIEW",
+  "summary": "An allergy is a reaction affecting only certain people when things they are sensitive to are breathed in, eaten, injected or touch the skin, and it cannot be passed from person to person, though children of allergic parents also tend to have allergies. Reactions can be mild or very serious, including itching rashes, lumpy patches or hives, runny nose and itching or burning eyes, throat irritation, difficulty breathing or asthma, allergic shock, and diarrhea in children allergic to milk. Common causes include pollen, dust, animal hair, feathers, foods, medicines and molds.",
+  "symptom": "allergic reaction",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "amebic diarrhea",
+   "diarrhea with mucus and blood, no fever"
+  ],
+  "citation": "Chapter 12: Amebas; Chapter 13: Diarrhea with mucus and blood",
+  "danger_signs": [
+   "much blood, person very weak and ill",
+   "fever, which may mean bacterial infection as well",
+   "painful dangerous abscess in the liver"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 12",
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "Amebas are microscopic parasites spread when stools of infected people get into drinking water or food through poor sanitation. Many healthy people carry them without sickness, but they are a common cause of severe diarrhea or dysentery, especially in people weakened by other sickness or poor nutrition. Typical amebic dysentery is diarrhea that comes and goes, sometimes alternating with constipation, with belly cramps, frequent need to pass stools even when little comes out, and many loose but usually not watery stools with mucus, sometimes stained with blood.",
+  "symptom": "amebic dysentery",
+  "when_to_seek_care": "Get medical help and a stool analysis if possible."
+ },
+ {
+  "alternate_names": [
+   "threadworm",
+   "seatworm",
+   "itching around the anus at night"
+  ],
+  "citation": "Chapter 12: Pinworm, Threadworm, Seatworm (Enterobius)",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 12"
+  ],
+  "status": "ok",
+  "summary": "Pinworms are white, very thin threadlike worms about one centimeter long that lay thousands of eggs just outside the anus, causing itching especially at night. When a child scratches, eggs stick under the nails and reach food and other objects, then his own mouth or others' mouths, causing new infections. The book says these worms are not dangerous, though itching may disturb sleep. Prevention is tight pants at night, hand and buttock washing, short nails, frequent bathing and clothes changes, and Vaseline around the anus at bedtime.",
+  "symptom": "anal itching from pinworms",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "thin blood",
+   "pale skin and weakness"
+  ],
+  "citation": "Chapter 11: Special Diets, Anemia",
+  "danger_signs": [
+   "very severe anemia: face and feet swollen, rapid heartbeat, shortness of breath",
+   "anemia that is severe or does not get better",
+   "anemia in a pregnant woman"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 11"
+  ],
+  "status": "ok",
+  "summary": "Anemia means thin blood, when blood is lost or destroyed faster than the body can replace it, for example from large wounds, bleeding ulcers, dysentery, malaria, hookworm, chronic diarrhea, or not eating enough iron-rich foods. Signs are pale or transparent skin, pale insides of eyelids, white fingernails, pale gums, weakness and fatigue, and in children and women who like to eat dirt. The book advises iron-rich foods and, for moderate or severe anemia, iron pills by mouth, plus treating the underlying cause.",
+  "symptom": "anemia",
+  "when_to_seek_care": "If anemia is severe or does not get better, seek medical help, especially for a pregnant woman."
+ },
+ {
+  "symptom": "anemia in pregnancy: very pale and weak, with other signs of anemia and malnutrition",
+  "alternate_names": [
+   "anemia in pregnancy",
+   "pale and weak in pregnancy"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Many women in rural areas are anemic even before they are pregnant and become more anemic during pregnancy. To make a healthy baby a woman needs to eat well, and if she is very pale and weak or has other signs of anemia and malnutrition she needs to eat more protein and food with iron, such as beans, groundnuts, chicken, milk, cheese, eggs, meat, fish and dark green leafy vegetables. She should also take iron pills, especially if it is hard to get enough nutritious foods, to strengthen her blood to resist dangerous bleeding after birth, preferably with folic acid and vitamin C, which helps the body make better use of iron.",
+  "danger_signs": [
+   "severe anemia: weak, tired, pale or transparent skin, with risk of dying from blood loss when giving birth"
+  ],
+  "when_to_seek_care": "If anemia is severe, a good diet is not enough to correct it in time; see a health worker and get iron pills, and if possible have the baby in a hospital in case extra blood is needed.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "nervous worry",
+   "fright",
+   "susto",
+   "hysteria",
+   "being bewitched"
+  ],
+  "citation": "Chapter 1: Home Cures and Popular Beliefs; Chapter 2: Sicknesses that Are Often Confused",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1",
+   "Chapter 2"
+  ],
+  "status": "ok",
+  "summary": "The book describes how belief and fear can both heal and harm. Anxiety, nervous worry, unreasonable or hysterical fear, and uncertain aches and pains in stressful times are listed among problems where the healer's manner, showing care, helping the person believe they will get well, and helping them relax can matter greatly. A person who believes they are bewitched or given the evil eye is described as really the victim of their own fears. Susto is presented as a state of nervousness and fear after a sudden fright, in which a person may shake, behave strangely, be unable to sleep, or lose weight, and comfort plus explanation are advised.",
+  "symptom": "anxiety, nervous worry and fright",
+  "when_to_seek_care": "Ask for medical advice if needed, and treat any specific illness that may be causing the frightened state rather than assuming fear alone explains it."
+ },
+ {
+  "alternate_names": [
+   "pain moving to lower right belly",
+   "rebound pain in belly"
+  ],
+  "citation": "Chapter 10: Appendicitis, Peritonitis",
+  "danger_signs": [
+   "steady pain that gets worse and worse",
+   "belly hard like a board in advanced peritonitis",
+   "great pain when the belly is touched even lightly"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "Appendicitis is infection of the appendix in the lower right belly, and peritonitis is a serious infection of the lining holding the gut, which can follow a burst appendix or torn gut. The main sign is steady belly pain that gets worse, often beginning around the navel then moving to the lower right side, with possible loss of appetite, vomiting, constipation or mild fever. The book describes a rebound pain test, where sharp pain on quickly releasing pressure suggests appendicitis or peritonitis.",
+  "symptom": "appendicitis and peritonitis pain",
+  "when_to_seek_care": "Seek medical help immediately, preferably where surgery is possible; in advanced peritonitis take the person to a medical center immediately."
+ },
+ {
+  "alternate_names": [
+   "painful inflamed joints",
+   "chronic joint pain"
+  ],
+  "citation": "Chapter 13: Arthritis (Painful, Inflamed Joints)",
+  "danger_signs": [
+   "only one joint swollen and hot, especially with fever, which may be infected",
+   "painful joints in young people and children, which may signal rheumatic fever or tuberculosis"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "Most chronic joint pain, or arthritis, in older people cannot be cured completely, but rest, avoiding hard work and heavy exercise that bother the painful joints, hot cloths on the joints, pain relief, and simple exercises to maintain range of motion can offer relief. If only one joint is swollen and feels hot, especially with fever, it may be infected. Painful joints in young people and children may be a sign of other serious illness, such as rheumatic fever or tuberculosis, and the book points to further reading on joint pain.",
+  "symptom": "arthritis",
+  "when_to_seek_care": "If only one joint is swollen and hot, use an antibiotic as directed and if possible see a health worker."
+ },
+ {
+  "alternate_names": [
+   "asthma attack",
+   "difficulty breathing out",
+   "fits of difficult breathing",
+   "wheezing"
+  ],
+  "citation": "Chapter 3: How to Examine a Sick Person; Chapter 5: Healing Without Medicines; Chapter 13: Asthma",
+  "danger_signs": [
+   "cannot get enough air and does not improve with rescue inhaler",
+   "cannot get enough air, nails and lips turning blue, neck veins swelling",
+   "great difficulty in breathing that does not improve with rest",
+   "marked blueness of lips and nails if new"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1",
+   "Chapter 13",
+   "Chapter 3",
+   "Chapter 5",
+   "Chapter 6"
+  ],
+  "status": "ok",
+  "summary": "Asthma is described as a condition in which a whistle or wheeze and difficulty breathing out are important signs. For cough, asthma, bronchitis, and pneumonia, the book advises drinking plenty of water and breathing hot water vapours to loosen mucus. Asthma is also listed among problems that may be helped in part by belief and relaxation, though that does not replace care for severe attacks. Strong anti-inflammatory medicines are described in Chapter 6 as needed for severe attacks of asthma, while their use for minor aches is described as a serious mistake. Sucking in of skin between ribs or at the neck is noted as a sign air has trouble getting through.",
+  "symptom": "asthma",
+  "when_to_seek_care": "Seek medical help as soon as possible for great difficulty in breathing that does not improve with rest."
+ },
+ {
+  "symptom": "baby's feet turned inward or bent (club foot); or lip or top of mouth divided (cleft lip and palate) with trouble breastfeeding",
+  "alternate_names": [
+   "club foot",
+   "cleft lip",
+   "cleft palate"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "If a newborn baby's feet are turned inward or bent, the book advises trying to bend them to a typical shape, repeating several times each day if this can be done easily, with feet slowly straightening by themselves in the first few years of life. If the feet cannot be bent, the baby should be taken at once to a health centre where feet can be strapped in a correct position or put in casts, best within two days after birth. If a baby's lip or the top of the mouth is divided, the baby may have trouble breastfeeding and need to be fed with a spoon or dropper, and surgery can improve looks, eating ability and speech, usually at four to six months for the lip and eighteen months for the palate.",
+  "danger_signs": [],
+  "when_to_seek_care": "If clubbed feet cannot be bent, take the baby at once to a health centre; for cleft lip or palate, take the child to a health centre, as surgery can help.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "baby's hand or arm comes out first in labour; or cord wrapped tightly around the baby's neck; or dark green fluid in the waters with baby's first stools in the mouth and nose",
+  "alternate_names": [
+   "arm presentation",
+   "cord around neck",
+   "meconium in the waters"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "If the baby's hand comes out first, the chapter advises getting medical help right away, as an operation may be needed to get the baby out. Sometimes the cord is wrapped around the baby's neck so tightly the baby cannot come out all the way, and the loop should be slipped from around the neck, or if that cannot be done the cord may have to be clamped or tied and cut with sterilised blunt-tipped scissors. When the waters break, if they contain a dark green, almost black liquid, this is probably the baby's first stools, which can get inside the baby's mouth, nose and lungs and make breathing hard or cause infection after birth. As soon as the head is out the mother should not push but take short, rapid breaths, and the mouth and nose should be wiped or suctioned before the baby starts breathing, keeping the head lower than the body.",
+  "danger_signs": [
+   "hand first in labour",
+   "cord too tight around the neck for the baby to come out",
+   "baby having difficulty breathing after meconium exposure"
+  ],
+  "when_to_seek_care": "For a hand-first presentation, get medical help right away; if the baby has difficulty breathing after meconium exposure, take it to a hospital.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "baby with a dislocated hip: one leg seeming shorter, knee and foot pointing outwards, fewer skin folds on one side, or a leg stopping early or making a jump or click when opened wide",
+  "alternate_names": [
+   "dislocated hip",
+   "hip dislocation at birth"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Some children are born with a dislocated hip, where the leg has slipped out of its joint in the hip bone. If treatment is given early the child will later walk without a limp, so babies should be checked for possible hip dislocation at about ten days after birth. On the dislocated side the upper leg may partly cover part of the body, there are fewer folds, and the leg seems shorter or the knee and foot point outwards. Holding both legs with knees doubled and opening them wide, if one leg stops early or makes a jump or click, the hip is dislocated. The book advises keeping the baby with knees high and wide apart, best with a harness, or with extra diapers or carrying with legs apart if no harness is available.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "baby with hypothyroidism: puffy face, dull look, skin and eyes remaining yellow for a long time, tongue hanging out, hairy forehead, weak, feeding poorly, crying little, sleeping a lot, umbilical hernia, slow walking and talking, hearing loss",
+  "alternate_names": [
+   "hypothyroidism in a baby",
+   "congenital hypothyroidism"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Lack of iodine in a pregnant woman's diet can cause hypothyroidism in her baby. The baby's face is puffy and the baby looks dull, skin and eyes may remain yellow for a long time after birth, the tongue hangs out, the forehead may be hairy, the baby is weak, feeds poorly, cries little and sleeps a lot, has cognitive delay, may have hearing loss, and usually has an umbilical hernia. The baby will take longer to start walking and talking than other children. To help prevent hypothyroidism, pregnant women should use iodised salt instead of ordinary salt. If a baby is suspected to have hypothyroidism, the book advises taking the baby to a health worker or doctor at once, since early and continued treatment with thyroid medicine helps improve growth and physical appearance and may reduce or prevent cognitive delay.",
+  "danger_signs": [],
+  "when_to_seek_care": "Take the baby to a health worker or doctor at once if hypothyroidism is suspected.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "backache",
+   "low back pain",
+   "pain going into the leg"
+  ],
+  "citation": "Chapter 13: Back Pain",
+  "danger_signs": [
+   "sudden severe low back pain with knife-like pain on bending, pain going into the legs, or a foot becoming numb or weak",
+   "chronic upper back pain with cough and weight loss, possibly tuberculosis of the lungs",
+   "mid back pain in a child, possibly tuberculosis of the spine"
+  ],
+  "review_note": "Back pain has many unrelated causes in this section, so this entry groups them as a presenting symptom and flags the serious-cause patterns rather than giving one diagnosis.",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "NEEDS-REVIEW",
+  "summary": "Back pain has many causes: chronic upper back pain with cough and weight loss may be tuberculosis of the lungs, mid back pain in a child may be tuberculosis of the spine, upper right back pain may be gallbladder trouble, low back pain worse the day after heavy lifting may be a sprain, sudden severe low back pain on lifting or twisting may be a slipped disc, and low backache is common in menstruation or pregnancy. Simple backache can often be helped by good posture, a firm flat sleeping surface, slow back-bending exercises, pain relief and hot soaks.",
+  "symptom": "back pain",
+  "when_to_seek_care": "Seek medical help if a serious disease is suspected; if sudden severe pain from lifting or twisting does not begin to get better in a few days, seek medical advice."
+ },
+ {
+  "alternate_names": [
+   "gila monster bite",
+   "beaded lizard bite"
+  ],
+  "citation": "Chapter 10: Bite of the Beaded Lizard (Gila Monster)",
+  "danger_signs": [],
+  "review_note": "This section is very short in the extract and gives no distinct signs beyond danger; it is kept as a separate entry only because the book treats it separately, and a reviewer should check whether to merge it with snakebite.",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "NEEDS-REVIEW",
+  "summary": "The bite of the beaded lizard is treated just like a poisonous snakebite, except that there are no good antivenoms for it, and the bite can be very dangerous. The book advises washing the bite area well, avoiding movement, and keeping the bite below the level of the heart. No separate list of signs for this bite is given in this section.",
+  "symptom": "beaded lizard bite",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "symptom": "belly button that sticks out in a baby (umbilical hernia)",
+  "alternate_names": [
+   "umbilical hernia",
+   "belly button sticking out"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "A belly button that sticks out is no problem and no medicine or treatment is needed, and tying a tight cloth or belly band around the belly will not help. Even a big umbilical hernia is not dangerous and will often go away by itself. The book advises that if it is still there after age five, an operation may be needed, and to get medical advice. This entry is included so a common harmless finding is not mistaken for a condition needing treatment.",
+  "danger_signs": [],
+  "when_to_seek_care": "If it is still there after age five, get medical advice, as an operation may be needed.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "bites in groups or lines, usually at night (bedbugs); tick or chigger bites",
+  "alternate_names": [
+   "bedbug bites",
+   "tick bites",
+   "chigger bites"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Bedbugs are small, flat, red-brown insects hiding in mattresses, bedding, furniture and walls that usually bite at night, with bites often appearing in groups or lines. The chapter gives household measures for getting rid of them, such as washing bedding in boiling water and sunning bedding often. Ticks and chiggers are also covered: careful removal of a tick within a few hours usually prevents dangerous infection or paralysis, the head must not be left in the skin, and itching or pain from tick or chigger bites is treated like other itching.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "bleeding during pregnancy, even a little",
+  "alternate_names": [
+   "bleeding in pregnancy",
+   "vaginal bleeding in pregnancy"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "If a woman begins to bleed during pregnancy, even a little, this is a danger sign. She could be having a miscarriage, meaning losing the baby, or the baby could be developing outside the womb, an ectopic pregnancy. The woman should lie quietly and send for a health worker. Bleeding late in pregnancy, after six months, may mean the placenta is blocking the birth opening, known as placenta previa, and without expert help the woman could quickly bleed to death. In that case the book warns not to do a vaginal exam or put anything inside her vagina and to try to get her to a hospital at once.",
+  "danger_signs": [
+   "any bleeding during pregnancy, even a little",
+   "bleeding late in pregnancy after six months"
+  ],
+  "when_to_seek_care": "Lie quietly and send for a health worker; for bleeding late in pregnancy, get her to a hospital at once and do not do a vaginal exam or put anything inside her vagina.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "heavy bleeding",
+   "cut that will not stop bleeding"
+  ],
+  "citation": "Chapter 10: How to Control Bleeding from a Wound",
+  "danger_signs": [
+   "bleeding that direct pressure does not control",
+   "a limb cut off",
+   "severe bleeding with risk of shock"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "For bleeding from a wound, the book advises raising the injured part and pressing directly on the wound with a clean thick cloth, keeping pressure until bleeding stops, which may take a long time. If direct pressure fails, especially for a very large wound or a cut-off limb, it advises keeping pressure, keeping the part high, binding tightly, and pressing on pressure points. It warns against tourniquets except as a last resort, and against using dirt, kerosene or lime.",
+  "symptom": "bleeding from a wound",
+  "when_to_seek_care": "When bleeding or injury is severe, raise the feet and lower the head to prevent shock; the chapter does not give a separate seek-care sentence for ordinary wound bleeding beyond this severe-injury guidance."
+ },
+ {
+  "symptom": "blisters, burns or weeping itchy patches after touching a plant or substance (contact dermatitis)",
+  "alternate_names": [
+   "contact dermatitis",
+   "poison ivy type reaction"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Nettles, stinging trees, sumac, poison ivy and many other plants may cause blisters, burns or hives with itching when they touch the skin, and juices or hairs of certain caterpillars and other insects produce similar reactions. In allergic people, rashes or weeping sore patches may be caused by things touching or put on the skin, such as rubber shoes, watchbands, ear drops and other medicines, face creams, perfumes or soaps. These irritations go away by themselves when the causing thing no longer touches the skin, and a paste of oatmeal and cool water helps calm itching.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "blocked gut",
+   "gut obstruction"
+  ],
+  "citation": "Chapter 10: Obstructed Gut",
+  "danger_signs": [
+   "steady severe belly pain",
+   "swollen, hard, very tender belly",
+   "sudden forceful vomiting, possibly with green bile or feces-like vomit",
+   "constipation with little or no bowel movement"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "An obstructed gut means something blocks part of the gut so food and stools cannot pass, for example a ball of roundworms, a loop pinched in a hernia, or a part of gut slipping inside the part below it. Signs are steady severe belly pain, a swollen hard very tender belly that the person protects with legs doubled up, a silent belly, constipation or only a little bloody mucus, and sudden forceful vomiting that may contain green bile or smell and look like feces.",
+  "symptom": "blocked gut",
+  "when_to_seek_care": "Get this person to a hospital as fast as possible; life is in danger and surgery may be needed."
+ },
+ {
+  "symptom": "blood behind the cornea inside the eyeball, usually after a blunt injury, with pain and loss of sight (hyphema)",
+  "alternate_names": [
+   "bleeding behind the cornea",
+   "hyphema"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "Blood behind the cornea is a danger sign that usually results from an injury to the eye with a blunt object such as a fist. If there is pain and loss of sight, the book advises referring the person to an eye specialist immediately. If the pain is mild and there is no loss of sight, it advises patching both eyes and keeping the person at rest in bed for several days. If after a few days the pain becomes much worse, there is probably hardening of the eye, meaning glaucoma, and the person should be taken to an eye doctor at once.",
+  "danger_signs": [
+   "blood behind the cornea inside the eyeball",
+   "pain and loss of sight",
+   "pain becoming much worse after a few days"
+  ],
+  "when_to_seek_care": "Refer to an eye specialist immediately if there is pain and loss of sight; take the person to an eye doctor at once if pain becomes much worse after a few days.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "blood in urine",
+   "bilharzia",
+   "bloody diarrhea from flukes"
+  ],
+  "citation": "Chapter 12: Blood Flukes (Schistosomiasis, Bilharzia)",
+  "danger_signs": [
+   "damage or enlargement of kidneys, liver or spleen after months or years, which can cause pain and eventually death"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 12"
+  ],
+  "status": "ok",
+  "summary": "Blood flukes are worms that get into the bloodstream, spread not directly person to person but through a small water snail after an infected person urinates or defecates in water. One common kind in Africa and the Middle East causes blood in the urine, while other kinds cause bloody diarrhea. Signs include blood in the urine especially when passing the last drops, pain in the lower belly and between the legs worst at the end of urinating, low fever, weakness and itching, and in women sores that look like a sexually transmitted infection.",
+  "symptom": "blood in urine from blood flukes",
+  "when_to_seek_care": "See a health worker; in areas where the disease occurs, anyone with blood in urine or stools should have a sample tested for fluke eggs."
+ },
+ {
+  "alternate_names": [
+   "blue lips",
+   "blueness",
+   "cyanosis"
+  ],
+  "citation": "Chapter 3: How to Examine a Sick Person; Chapter 4: How to Take Care of a Sick Person",
+  "danger_signs": [
+   "marked blueness of lips and nails if new",
+   "blue-grey colour in an unconscious child"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 3",
+   "Chapter 4"
+  ],
+  "status": "ok",
+  "summary": "Bluish skin, especially blueness or darkness of lips and fingernails, is presented as a possible sign of serious problems with breathing or with the heart. Blue-grey colour in an unconscious child may be a sign of severe malaria. Chapter 4 lists marked blueness of lips and nails, if new, among signs of dangerous illness, where the person is probably too sick to be treated at home without skilled medical help and life may be in danger. The book advises looking at colour changes carefully and, for dark skin, checking pale areas, while new blueness is treated as urgent rather than as a minor colour variation.",
+  "symptom": "bluish lips and nails",
+  "when_to_seek_care": "Seek medical help as soon as possible for marked blueness of lips and nails if new."
+ },
+ {
+  "alternate_names": [
+   "not breathing",
+   "stopped breathing",
+   "drowning"
+  ],
+  "citation": "Chapter 10: Drowning and What to Do When Breathing Stops",
+  "danger_signs": [
+   "breathing has stopped"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "Breathing can stop because something is stuck in the throat, the tongue or mucus blocks the throat of an unconscious person, or after drowning, smoke, poisoning, a strong blow to the head or chest, or a heart attack. The book stresses that a person can die within minutes without breathing, so mouth-to-mouth breathing should begin immediately, after clearing the mouth and throat, tilting the head back and pulling the jaw forward, and should continue until the person breathes alone.",
+  "symptom": "breathing stops",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "symptom": "breech birth: the baby's buttocks or legs come out first",
+  "alternate_names": [
+   "breech delivery",
+   "breech birth"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "A breech delivery is when the buttocks come out first, and sometimes the midwife can tell the baby is in the breech position by feeling the mother's belly and listening to the baby's heartbeat. The chapter describes positions that may make a breech birth easier and manoeuvres for when the baby's legs come out but not the arms, and for when the baby gets stuck, including having the mother push hard while the head is guided, but never pulling on the baby's body. If the baby's head is not down toward the womb opening when labour starts, birth can be difficult or even dangerous, and if the head is up the birth will be more difficult and it may be safer to give birth in or near a hospital.",
+  "danger_signs": [
+   "baby's head not down toward the womb opening when labour starts",
+   "baby stuck during a breech birth"
+  ],
+  "when_to_seek_care": "If the baby's head is up, it may be safer to give birth in or near a hospital; if the baby is lying sideways, the birth must be in a hospital.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "broken arm",
+   "broken arm or leg",
+   "broken leg",
+   "fracture"
+  ],
+  "citation": "Chapter 1: Home Cures and Popular Beliefs; Chapter 10: Broken Bones (Fractures)",
+  "danger_signs": [
+   "bone breaking through the skin",
+   "suspected break of a bone after a bullet wound",
+   "the person complains the cast is too tight, or fingers or toes become cold, white, or blue, in which case the cast should be taken off and replaced with a looser one"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1",
+   "Chapter 10",
+   "Chapter 4"
+  ],
+  "status": "ok",
+  "summary": "Broken bones are discussed through homemade casts made from plant syrups or, in India, egg whites and herbs, used to keep bones in place. The book stresses making sure bones are in a good position, never putting a cast directly against skin, wrapping the limb in soft cloth and cotton first, and forming a firm but not too tight cast. Fingertips should be left uncovered so their colour can be checked. A temporary splint may be made from cardboard, folded paper, or dried banana or palm leaf. Chapter 4 adds that broken bones should be splinted before a person is moved on a stretcher.",
+  "symptom": "broken bone",
+  "when_to_seek_care": "Take the person to a health centre or hospital, splinting broken bones before moving them; do not wait for a health worker in an emergency needing special attention or an operation."
+ },
+ {
+  "alternate_names": [
+   "broken ribs",
+   "painful ribs after injury"
+  ],
+  "citation": "Chapter 10: Broken Ribs",
+  "danger_signs": [
+   "rib breaking through the skin",
+   "coughing blood",
+   "breathing difficulties other than pain"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "Broken ribs are very painful but almost always heal on their own, and the book advises against splinting or binding the chest. Treatment is pain relief and rest, plus taking several deep breaths in a row every two hours until breathing is normal again, to keep the lungs healthy, even though this is very painful at first. Pain may take months to go completely. A broken rib does not often puncture a lung.",
+  "symptom": "broken ribs",
+  "when_to_seek_care": "Seek medical help if a rib breaks through the skin, or if the person coughs blood or develops breathing difficulties other than pain."
+ },
+ {
+  "alternate_names": [
+   "noisy cough with mucus",
+   "bronchial infection"
+  ],
+  "citation": "Chapter 13: Bronchitis",
+  "danger_signs": [
+   "signs of pneumonia",
+   "chronic lung problem"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "Bronchitis is an infection of the bronchi, the tubes carrying air to the lungs, causing a noisy cough often with mucus or phlegm. It is usually caused by a virus, so antibiotics do not generally help, and the extract states antibiotics are only used in the situations it lists, including when bronchitis lasts more than a week and is not getting better or signs of pneumonia appear. General cough care in the chapter is drinking lots of water, breathing hot water vapors, and helping loosen and bring up phlegm rather than stopping a productive cough.",
+  "symptom": "bronchitis",
+  "when_to_seek_care": "Seek care if bronchitis lasts more than a week and is not getting better, if signs of pneumonia appear, or if the person already has a chronic lung problem."
+ },
+ {
+  "alternate_names": [
+   "undulant fever",
+   "Malta fever",
+   "gradual fever with tiredness and joint pain"
+  ],
+  "citation": "Chapter 14: Brucellosis (Undulant Fever, Malta Fever)",
+  "danger_signs": [
+   "fevers stopping for days then returning in chronic brucellosis",
+   "illness lasting for years without treatment"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 14"
+  ],
+  "status": "ok",
+  "summary": "Brucellosis comes from drinking fresh milk from infected cows or goats, and may also enter through scrapes or wounds in people working with sick cattle, goats or pigs, or by breathing it into the lungs. It may start with fever and chills, but often begins very gradually with increasing tiredness, weakness, loss of appetite, headache, stomach ache and sometimes joint pains. Fevers may be mild or severe, typically beginning with afternoon chills and ending with sweating in the early morning, and in chronic cases stopping for days then returning.",
+  "symptom": "brucellosis",
+  "when_to_seek_care": "If brucellosis is suspected, get medical advice, because it is easy to confuse with other diseases and treatment is long."
+ },
+ {
+  "symptom": "burning or pain in the pit of the stomach or chest in pregnancy (acid indigestion and heartburn)",
+  "alternate_names": [
+   "heartburn in pregnancy",
+   "acid indigestion in pregnancy"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Burning or pain in the pit of the stomach or chest in pregnancy is described as acid indigestion and heartburn. The book advises eating only small amounts of food at one time and drinking water often, avoiding greasy foods, and notes that antacids can help, especially those with calcium carbonate, and that sucking hard candy may also help. It may also help to sleep with the chest and head lifted up some with pillows or blankets. No danger signs or referral threshold are stated for this minor problem of pregnancy in this section.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "burn injury",
+   "scald"
+  ],
+  "citation": "Chapter 10: Burns",
+  "danger_signs": [
+   "burns affecting large areas or face, hands, feet, genitals or major joints",
+   "deep burns",
+   "burn combined with other injuries",
+   "signs of infection: pus, bad smell, fever, swollen lymph nodes",
+   "shock in a badly burned person"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "A minor burn does not form blisters, is not on the face, hands, feet or genitals, is not across a major joint, and is the only injury; the book advises clean cool water for no longer than twenty minutes, keeping the burn clean and dry, and pain relief, with healing in about two weeks. Severe burns affect large areas or sensitive parts, are deep, or come with other injuries; they need washing with boiled cooled water, an antimicrobial layer, sterile covering changed daily, elevation of a burned limb, plenty of fluids, and protein-rich food.",
+  "symptom": "burns",
+  "when_to_seek_care": "Get medical attention as soon as possible if signs of infection appear in a severe burn; badly burned people can easily go into shock and need care."
+ },
+ {
+  "symptom": "cannot pass urine at all, with a very full painful bladder, breath smelling like urine, swelling of feet and face, vomiting, distress or confusion (inability to urinate and urine poisoning)",
+  "alternate_names": [
+   "cannot urinate",
+   "blocked urine",
+   "uremia",
+   "urine poisoning"
+  ],
+  "source_chapters": [
+   "Chapter 18"
+  ],
+  "citation": "Chapter 18: The Urinary System and the Genitals",
+  "summary": "The chapter's catheter section states that a catheter should never be used unless absolutely necessary and medical help cannot be reached in time, and that if any urine is coming out at all a catheter should not be used. If the person cannot urinate, the book first advises trying to urinate while sitting in a tub of warm water and beginning the recommended medicine for gonorrhea or prostate trouble at once. Only if the person has a very full, painful bladder and cannot urinate, or begins to show signs of poisoning from urine, should a catheter be used. Signs of urine poisoning given are breath smelling like urine, swelling of the feet and face, and vomiting, distress and confusion.",
+  "danger_signs": [
+   "breath smelling like urine",
+   "swelling of the feet and face",
+   "vomiting, distress, confusion",
+   "very full painful bladder with no urine"
+  ],
+  "when_to_seek_care": "Use a catheter only if it is impossible to get medical help in time; a woman who cannot urinate after giving birth and whose bladder seems full after more than six hours may need a catheter.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "chemical or harmful liquid in the eye, such as battery acid, lye, gasoline or pesticide",
+  "alternate_names": [
+   "chemical burn of the eye"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "Battery acid, lye, gasoline or a pesticide getting into the eye can be dangerous. The book advises holding the eye open and immediately flooding it with clean, cool water, keeping flooding for thirty minutes or until it stops hurting, and not letting the water get into the other eye. Redness and pain from burns or harmful liquids may affect one or both eyes and vary in severity. This entry covers the immediate presentation only; the book does not give further treatment for chemical burns in this chapter.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "chickenpox in a child: many small red itchy spots turning into pimples or blisters that pop and form scabs, beginning on the body then face, arms and legs, with mild fever",
+  "alternate_names": [
+   "chickenpox"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Chickenpox is a mild virus infection beginning two to three weeks after a child is exposed to another child who has the disease. First many small, red, itchy spots appear, turning into little pimples or blisters that pop and finally form scabs, usually beginning on the body and later on the face, arms and legs, with spots, blisters and scabs often all present at the same time, and fever usually mild. The infection usually goes away in a week. The book advises bathing the child daily with soap and warm water, calming itching with cool cloths soaked in water from boiled and strained oatmeal, cutting fingernails very short, and keeping infected scabs clean with hot wet compresses and antibiotic ointment, while trying to keep the child from scratching.",
+  "danger_signs": [
+   "scabs getting infected"
+  ],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "intense joint pain with mild fever",
+   "joint pain lasting weeks after fever"
+  ],
+  "citation": "Chapter 14: Dengue, Zika, Chikungunya, and Yellow Fever, Chikungunya",
+  "danger_signs": [
+   "joint pain so painful it hurts to walk"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 14"
+  ],
+  "status": "ok",
+  "summary": "Chikungunya is spread by mosquitoes and causes a mild fever with very intense joint pain affecting the hands, feet, knees and back, so painful it can hurt to walk. After the fever goes away, joint pain can last for weeks or return on and off for months. Like other mosquito illnesses in this section, there are no medicines that cure it, and care for a week or two is rest, liquids, and acetaminophen for pain and fever rather than aspirin or ibuprofen.",
+  "symptom": "chikungunya",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "symptom": "child cold or flu: runny nose, mild fever, cough, often sore throat, sometimes diarrhea",
+  "alternate_names": [
+   "child cold",
+   "child flu",
+   "common cold in a child"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "The common cold, with runny nose, mild fever, cough, often sore throat and sometimes diarrhea, is a frequent but not serious problem in children. The book advises treating with lots of liquids, giving a pain and fever medicine as directed on its medicine pages, letting children who want to stay in bed do so, and noting that good food and lots of fruit help children avoid colds and get well quickly. Penicillin, tetracycline and other antibiotics do no good for the common cold or flu, and injections are not needed for colds. If a child with a cold becomes very ill with high fever and shallow, rapid breathing, the child may be getting pneumonia and antibiotics should be given, and an ear infection or strep throat should also be watched for.",
+  "danger_signs": [
+   "child becoming very ill with high fever and shallow, rapid breathing, suggesting pneumonia"
+  ],
+  "when_to_seek_care": "If a child with a cold becomes very ill with high fever and shallow, rapid breathing, antibiotics should be given as for pneumonia; no separate referral phrase is stated in this section.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "child earache and ear infection: fever rising, child crying or rubbing the side of the head, pus in the ear, sometimes vomiting or diarrhea; or ear canal infection with pain when the ear is gently pulled",
+  "alternate_names": [
+   "child earache",
+   "ear infection",
+   "pus from the ear"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Ear infections are common in small children and often begin after a few days with a cold or a stuffy nose. The fever may rise, the child often cries or rubs the side of the head, and sometimes pus can be seen in the ear. In small children an ear infection sometimes causes vomiting or diarrhea, so when a child has diarrhea and fever the book advises checking the ears. An ear infection may be very painful but if the child is generally healthy it usually goes away on its own, with pain relief as directed on its medicine pages. Pus should be carefully cleaned out with cotton without plugging the ear, and children with pus coming from an ear should bathe regularly but not swim for at least two weeks after they are well. For infection in the ear canal, gently pulling the ear causes pain, and the book advises vinegar-water drops.",
+  "danger_signs": [
+   "pus or blood from the ear"
+  ],
+  "when_to_seek_care": "If the child is already in poor health, or if the ear infection does not go away after a few days, or if there is pus or blood, the book points to antibiotic treatment on its medicine pages; always give antibiotics to a baby six months or younger with an ear infection.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "child having seizures or convulsions, including jaw then whole body becoming stiff",
+  "alternate_names": [
+   "child seizures",
+   "child convulsions",
+   "fits in a child"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Common causes of seizures or convulsions in children listed in the chapter are high fever, dehydration, epilepsy, malaria and meningitis. If fever is high, the book advises lowering it rapidly, and checking for signs of dehydration, malaria and meningitis. Seizures that come suddenly without fever or other signs are probably epilepsy, especially if the child seems well between them. Seizures or spasms in which first the jaw and then the whole body become stiff may be tetanus. Chapter 19 repeats seizures for newborns, noting that seizures beginning on the day of birth could be from brain injury at birth, while seizures beginning several days later should prompt a careful check for tetanus or meningitis.",
+  "danger_signs": [
+   "jaw then whole body becoming stiff, suggesting tetanus"
+  ],
+  "when_to_seek_care": "not stated in the book",
+  "status": "NEEDS-REVIEW",
+  "review_note": "Causes are listed as possibilities in the chapter, not as a diagnosis from seizures alone; a health worker must check fever, dehydration, malaria and meningitis signs before assigning a cause."
+ },
+ {
+  "symptom": "child not gaining weight, stopping gaining weight, or losing weight (poor growth)",
+  "alternate_names": [
+   "poor growth",
+   "child losing weight",
+   "failure to gain weight"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "A healthy child grows steadily and gains weight each month if eating enough nutritious food and having no serious illness. A child who takes longer to gain weight than other children, stops gaining weight, or is losing weight is not healthy, and may not be eating enough or may have a serious illness, or both. Weighing each month and keeping a child health chart makes it easy to see whether the child is gaining weight as expected, and the direction of the line of dots matters more than whether dots fall inside the curved lines. A chart showing a child not gaining weight is marked as danger, and losing weight as very dangerous, with advice to find out why, give more food, and check for illness.",
+  "danger_signs": [
+   "not gaining weight",
+   "losing weight"
+  ],
+  "when_to_seek_care": "A child with a chart like the underweight example should visit a health worker frequently until the chart shows the child is gaining weight well.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "child slow to develop in the first months of life, or sickly and slow to develop (delayed development)",
+  "alternate_names": [
+   "delayed development",
+   "slow development"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Some children born healthy take longer to develop because they do not eat enough nutritious food. During the first few months of life the brain develops more rapidly than at any other time, so newborn nutrition is of great importance, and breast milk is the best food for a baby. The chapter advises testing babies for HIV if they are slow to develop or sickly. Healthy, well-nourished children typically sit without help at six to eight months, walk ten steps without help at twelve to sixteen months, and use single words at eleven to eighteen months, as shown on the chapter's growth chart, though the chapter stresses watching the direction of weight gain rather than fixed milestones alone.",
+  "danger_signs": [],
+  "when_to_seek_care": "Test babies for HIV if they are slow to develop or sickly; no separate referral threshold is stated.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "child sore throat and inflamed tonsils: throat red and hurting when swallowing, tonsils large, painful or draining pus, fever up to 40 degrees",
+  "alternate_names": [
+   "child sore throat",
+   "inflamed tonsils",
+   "tonsillitis"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Sore throat and inflamed tonsils often begin with the common cold. The throat may be red and hurt when the child swallows, the tonsils, two lymph nodes seen as lumps on each side at the back of the throat, may become large, painful or drain pus, and fever may reach 40 degrees. The book advises gargling with warm salt water, taking a pain and fever medicine as directed on its medicine pages, and being sure the child drinks enough even if it hurts to swallow, trying tea or watered-down fruit juice. It advises looking at the following section on strep throat if pain and fever come on suddenly or continue for more than three days.",
+  "danger_signs": [],
+  "when_to_seek_care": "If pain and fever come on suddenly or continue for more than three days, see the strep throat section; no separate referral threshold is stated here.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "child with anemia: pale inside eyelids, gums and fingernails, weak, tires easily, likes to eat dirt",
+  "alternate_names": [
+   "child anemia",
+   "pale child"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Common signs of anemia in children are paleness especially inside the eyelids, gums and fingernails, weakness and tiring easily, and liking to eat dirt. Common causes listed are a diet poor in iron, chronic gut infections, hookworm and malaria. Prevention and treatment in the chapter include eating iron-rich foods such as meat and eggs, with beans, lentils, groundnuts and dark green vegetables also having some iron, treating the cause of anemia, not going barefoot if hookworm is common, and if necessary giving iron salts by mouth as directed on its medicine pages. The book warns not to give iron tablets to a baby or small child because they could poison the child, advising liquid iron or a crushed tablet mixed with food instead.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "child with diarrhea, especially with vomiting (danger of dehydration and malnutrition)",
+  "alternate_names": [
+   "child diarrhea",
+   "child dysentery"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Chapter 21 reviews diarrhea briefly and cross-refers to the fuller diarrhea chapter, so this entry records only what Chapter 21 itself states. The greatest danger to children with diarrhea is dehydration, losing too much liquid from the body, and the danger is even greater if the child is also vomiting. The book advises giving rehydration drink, and if the child is breastfeeding, continuing breast milk but giving rehydration drink also. The second big danger to children with diarrhea is malnutrition, and the book advises giving the child nutritious food as soon as the child will eat. No dehydration signs are listed in Chapter 21 itself, so none are invented here.",
+  "danger_signs": [
+   "dehydration, especially with vomiting"
+  ],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "child with high fever, over 39 degrees, sometimes causing seizures",
+  "alternate_names": [
+   "child fever",
+   "high fever in a child"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "In small children, high fever over 39 degrees can easily cause seizures. To lower fever the book advises taking the clothes off the child, and if the child is crying and seems unhappy, giving a fever medicine as directed on its medicine pages and giving lots of liquids. If the child is very hot and shaky, the book advises wetting the child with cool, not cold, water and fanning. It also advises trying to find the cause of the fever and treating it, rather than treating fever alone. This entry is kept separate from the seizures entry because the chapter presents fever management and seizure risk together but as distinct steps.",
+  "danger_signs": [
+   "seizures from high fever",
+   "child very hot and shaky"
+  ],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ }
+]
