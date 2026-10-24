@@ -1,0 +1,869 @@
+[
+ {
+  "symptom": "red, swollen, painful gums that bleed easily (gum infection)",
+  "alternate_names": [
+   "pyorrhea",
+   "inflamed gums",
+   "bleeding gums"
+  ],
+  "source_chapters": [
+   "Chapter 17"
+  ],
+  "citation": "Chapter 17: The Teeth, Gums, and Mouth",
+  "summary": "Inflamed, red and swollen, painful gums that bleed easily are caused by not cleaning the teeth and gums well or often enough, and by not eating enough nutritious foods. The book advises brushing teeth well after each meal, removing food stuck between the teeth, scraping off the dark yellow crust that forms where teeth meet the gums, and cleaning under the gums regularly with a strong thin thread or dental floss, noting that at first this causes a lot of bleeding but soon the gums become healthier and bleed less. Eating protective foods rich in vitamins is also advised, and sweet, sticky and stringy foods that get stuck between the teeth should be avoided.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "reddish patches of irritation between a baby's legs or buttocks (diaper rash)",
+  "alternate_names": [
+   "diaper rash",
+   "nappy rash"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Reddish patches of irritation between a baby's legs or buttocks may be caused by urine in diapers or bedding. The book advises bathing the child daily with lukewarm water and mild soap and drying carefully, keeping the child naked without diapers where possible and taking the child out into the sun, changing diapers often if they are used and rinsing washed diapers in water with a little vinegar. It advises that it is best not to use talcum powder, but if used, to wait until the rash is gone.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "redness, pain and swelling beneath the eye next to the nose, eye watering a lot, pus appearing in the corner when the swelling is pressed (tear sac infection)",
+  "alternate_names": [
+   "dacryocystitis",
+   "infection of the tear sac"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "Infection of the tear sac shows as redness, pain and swelling beneath the eye next to the nose, the eye waters a lot, and a drop of pus may appear in the corner of the eye when the swelling is gently pressed. The book advises hot compresses, antibiotic eye drops or ointment, and an antibiotic as directed on its medicine pages. This is a short section in the chapter with no separate danger signs or referral threshold stated beyond the treatment described.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "rheumatic fever in a child or young adult, one to three weeks after strep throat: high fever, joint pain and swelling especially wrists and ankles then knees and elbows, curved red lines or lumps under the skin, uncontrolled movements, weakness, shortness of breath or chest pain",
+  "alternate_names": [
+   "rheumatic fever"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Rheumatic fever is a disease of children and young adults that usually begins one to three weeks after the person has had a strep throat. Principal signs, usually only some present, are high fever, joint pain especially in the wrists and ankles and later the knees and elbows, with joints becoming swollen and often hot and red, curved red lines or lumps under the skin, uncontrolled movements, and in more serious cases weakness, shortness of breath and perhaps chest pain. The book advises that if rheumatic fever is suspected, a health worker should be seen quickly, since early treatment can lessen the risk that the heart is damaged, and points to antibiotic treatment on its medicine pages. A child who has had rheumatic fever may get it again with worse heart damage each time, so any sore throat should be treated quickly.",
+  "danger_signs": [
+   "weakness, shortness of breath and chest pain in more serious cases",
+   "risk of heart damage"
+  ],
+  "when_to_seek_care": "See a health worker quickly if rheumatic fever is suspected; early treatment can lessen the risk that the heart is damaged.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "weak deformed bones in a child",
+   "bowed legs",
+   "curved bones"
+  ],
+  "citation": "Chapter 11: Rickets",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 11"
+  ],
+  "status": "ok",
+  "summary": "Rickets is weakness and deformity of the bones in children who do not get enough food with vitamin D, are not often in sunlight, or were born to people who did not get enough vitamin D during pregnancy. Signs given are a bony necklace, curved bones, big joints and bowed legs. Prevention is through foods with vitamin D such as whole milk, egg yolks, animal fats and fish liver oil, vitamin D supplements where foods are unavailable, and time in sunlight.",
+  "symptom": "rickets",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "roundworms in stools",
+   "large swollen belly in a child with worms"
+  ],
+  "citation": "Chapter 12: Roundworm (Ascaris)",
+  "danger_signs": [
+   "dry cough or pneumonia with coughing of blood as young worms travel to the lungs",
+   "dangerous gut obstruction",
+   "worms crawling into the airway causing gagging"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 12"
+  ],
+  "status": "ok",
+  "summary": "Roundworms are pink or white worms twenty to thirty centimeters long, spread feces-to-mouth when eggs pass from one person's stools to another person's mouth through lack of cleanliness. Young worms may cause general itching, travel to the lungs causing a dry cough or at worst pneumonia with coughing of blood, then are swallowed and grow in the intestines. Many roundworms may cause discomfort, indigestion and weakness, and children with many often have very large swollen bellies.",
+  "symptom": "roundworm infection",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "scorpion bite",
+   "scorpion sting pain",
+   "sting in a small child",
+   "stung by a scorpion"
+  ],
+  "citation": "Chapter 1: Home Cures and Popular Beliefs; Chapter 9: Instructions and Precautions for Injections; Chapter 10: Scorpion Sting",
+  "danger_signs": [
+   "child stops breathing",
+   "sting from a deadly type of scorpion",
+   "sting in a child under 5 years old, especially on the head or body"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1",
+   "Chapter 10",
+   "Chapter 9"
+  ],
+  "status": "ok",
+  "summary": "Scorpion sting appears in Chapter 1 among folk remedies said to resemble the sickness, such as tying a scorpion against the stung finger, which the book says has no curative value in itself and may help only through belief. Chapter 1 also states that no home cure for poisonous bites, whether from snakes, scorpions, spiders, or other poisonous animals, has much effect beyond belief. Chapter 9 lists scorpion sting in children among sicknesses where medical help should be sought as fast as possible, with appropriate medicine injected if there will be delay in getting help or reaching a health centre. Serious problems must not be delayed by relying on such remedies.",
+  "symptom": "scorpion sting",
+  "when_to_seek_care": "Get medical help as fast as you can, especially for a child; if help will be delayed, inject the appropriate medicine as soon as possible."
+ },
+ {
+  "symptom": "seeing double",
+  "alternate_names": [
+   "double vision",
+   "diplopia"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "Seeing double can have many causes. If double vision comes suddenly, is chronic, or gradually gets worse, the book says it is probably a sign of a serious problem and to seek medical help. If double vision occurs only from time to time, it may be a sign of weakness or exhaustion, perhaps from malnutrition, and the book advises reading its nutrition chapter and eating as well as possible. If sight does not improve, the book advises getting medical help. No specific cause is assigned in this section, so this entry records the presentation and its stated care advice only.",
+  "danger_signs": [],
+  "when_to_seek_care": "Seek medical help if double vision comes suddenly, is chronic, or gradually gets worse, or if occasional double vision does not improve with better nutrition.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "convulsions",
+   "fits",
+   "jerking movements with loss of consciousness",
+   "jerky movements with loss of consciousness"
+  ],
+  "citation": "Chapter 3: How to Examine a Sick Person; Chapter 4: How to Take Care of a Sick Person; Chapter 13: Seizures (Convulsions)",
+  "danger_signs": [
+   "more than one seizure in someone with fever or serious illness",
+   "seizure lasting more than 5 minutes"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13",
+   "Chapter 2",
+   "Chapter 3",
+   "Chapter 4"
+  ],
+  "status": "ok",
+  "summary": "Seizures are described as strange or jerky movements coming suddenly with loss of consciousness. If they happen often, epilepsy is suggested as a possibility, while seizures during illness may be caused by high fever, dehydration, tetanus, or meningitis. Chapter 1 also warns that cow dung held in the hand cannot help control seizures, and that animal or human waste remedies do no good and can cause dangerous infections. Chapter 4 lists more than one seizure in someone with fever or serious illness among signs of dangerous illness. The book also warns never to give medicines by mouth to a child while they are having a seizure, asleep, or unconscious.",
+  "symptom": "seizures",
+  "when_to_seek_care": "Seek medical help as soon as possible for more than one seizure in someone with fever or serious illness."
+ },
+ {
+  "alternate_names": [
+   "allergic shock",
+   "severe allergic reaction",
+   "anaphylaxis-like reaction",
+   "reaction after injection"
+  ],
+  "citation": "Chapter 9: Instructions and Precautions for Injections; Chapter 2: Sicknesses that Are Often Confused",
+  "danger_signs": [
+   "cool, moist, pale, grey skin with cold sweat",
+   "weak, rapid pulse or heartbeat",
+   "difficulty breathing",
+   "loss of consciousness",
+   "hives, rash with itching, or swelling after an injection"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 2",
+   "Chapter 6",
+   "Chapter 9"
+  ],
+  "status": "ok",
+  "summary": "A severe allergic reaction is sketched in Chapter 2 as vomiting, diarrhea, cold sweat, breathing trouble, itchy rash, and severe distress after eating certain foods, taking certain medicines, or being injected with penicillin. Chapter 9 describes allergic shock after injection, especially with penicillins and antitoxins made from horse serum, with signs including cool, moist, pale, grey skin, weak rapid pulse, difficulty breathing, and loss of consciousness, and warns that risk is greater in a person previously injected with the same group, especially after a prior allergic reaction. Hives, rash with itching, swelling, difficulty breathing, and shock signs after any injection mean the same or similar medicine must never be given again.",
+  "symptom": "severe allergic reaction and allergic shock",
+  "when_to_seek_care": "Get medical help as fast as you can; Chapter 9 presents this as an emergency where appropriate emergency medicine is given while treating for shock, with the person watched closely after any injection."
+ },
+ {
+  "alternate_names": [
+   "sudden severe belly pain",
+   "severe gut pain with vomiting and no diarrhea"
+  ],
+  "citation": "Chapter 10: Emergency Problems of the Gut (Acute Abdomen)",
+  "danger_signs": [
+   "continuous severe pain that keeps getting worse",
+   "constipation and vomiting",
+   "belly swollen, hard, person protects it",
+   "severely ill"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "Acute abdomen is the book's name for sudden severe conditions of the gut, such as appendicitis, peritonitis and gut obstruction, for which prompt surgery is often needed. The book says to suspect it when a person has continuous severe gut pain with vomiting but does not have diarrhea. It contrasts this with less serious illness, where pain comes and goes as cramps, diarrhea is moderate or severe, or the person is only moderately ill.",
+  "symptom": "severe belly pain with vomiting",
+  "when_to_seek_care": "Get the person to a hospital as fast as you can; surgery may be needed."
+ },
+ {
+  "symptom": "severe pain in one eye, small often irregular pupil, redness around the iris, watering, pain in bright light and blurred vision, without pus (iritis)",
+  "alternate_names": [
+   "iritis",
+   "inflammation of the iris"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "Iritis usually happens in one eye only. Pain may begin suddenly or gradually, the eye waters a lot, it hurts more in bright light, the eyeball hurts when touched, there is no pus as with conjunctivitis, and vision is usually blurred. The pupil is small and often irregular with redness around the iris. The book states plainly that this is an emergency, that antibiotic ointments do not help, and to get medical help. It also lists great pain inside the eye, possibly iritis or glaucoma, among the chapter danger signs requiring fast medical help.",
+  "danger_signs": [
+   "great pain inside the eye",
+   "a big difference in pupil size with pain in the eye or head"
+  ],
+  "when_to_seek_care": "Get medical help; this is an emergency and antibiotic ointments do not help.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "sharp or severe pain in the lower back, side, lower belly or base of the penis, with difficulty passing urine or drops of blood when beginning to urinate (kidney or bladder stones)",
+  "alternate_names": [
+   "kidney stones",
+   "bladder stones"
+  ],
+  "source_chapters": [
+   "Chapter 18"
+  ],
+  "citation": "Chapter 18: The Urinary System and the Genitals",
+  "summary": "The first sign of kidney or bladder stones is often sharp or severe pain in the lower back, the side, or the lower belly, or in the base of the penis in men. Sometimes the urinary tube is blocked so the person has difficulty passing urine or cannot pass any, or drops of blood may come out when the person begins to urinate, and there may be a urinary infection at the same time. The book advises antibiotic treatment and a painkiller and antispasmodic as directed on its medicine pages, trying to urinate lying down, which sometimes allows a stone in the bladder to roll back and free the opening to the urinary tube.",
+  "danger_signs": [
+   "inability to pass urine"
+  ],
+  "when_to_seek_care": "In severe cases, get medical help; sometimes surgery is needed.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "cold sweat",
+   "weak rapid pulse",
+   "collapse"
+  ],
+  "citation": "Chapter 10: Shock",
+  "danger_signs": [
+   "weak, rapid pulse",
+   "pale, cold, damp skin or cold sweat",
+   "blood pressure drops dangerously low",
+   "mental confusion, weakness, or loss of consciousness"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "Shock is a life threatening condition that can follow a large burn, losing a lot of blood, severe illness, dehydration, severe allergic reaction, or hidden bleeding inside the body. The book advises loosening tight clothing, laying the person down with feet slightly higher than the head unless there is a severe head injury, stopping bleeding, keeping the person warm if cold, giving sips of fluid if conscious, treating wounds, and seeking medical help.",
+  "symptom": "shock",
+  "when_to_seek_care": "Seek medical help, and seek it fast if the person is unconscious."
+ },
+ {
+  "symptom": "sickle cell disease in a child: fever and crying, swelling of feet and fingers lasting one or two weeks, big hard belly at the top, anemia and sometimes yellow eyes, frequent sickness, slow growth, bony bumps on the head by age two, and crises with high fever and severe pain in arms, legs or belly",
+  "alternate_names": [
+   "sickle cell disease",
+   "sickle cell anemia"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "Some children, most commonly of African or Indian ancestry, are born with sickle cell disease passed on from parents who often do not know they carry the trait, with signs not appearing until six months of age or later. Signs include fever and crying, occasional swelling of the feet and fingers lasting one or two weeks, a big belly feeling hard at the top, anemia and sometimes yellow colour in the eyes, frequent sickness such as cough and diarrhea, slow growth, and by age two bony bumps on the head. Malaria or other infections can bring on a sickle cell crisis with high fever and severe pain in the arms, legs or belly, anemia becoming much worse, swellings on bones discharging pus, and the child may die. There is no way to change the weakness in the blood, so protection from malaria and other diseases, regular monthly health worker visits, plenty of water and pain relief are advised.",
+  "danger_signs": [
+   "sickle cell crisis: high fever and severe pain in arms, legs or belly",
+   "anemia becoming much worse",
+   "swellings on bones discharging pus"
+  ],
+  "when_to_seek_care": "Take the child for regular monthly visits to a health worker, and if the child shows fever, cough, diarrhea, passing urine too often, or pains in the belly, legs or arms, take the child to a health worker as soon as possible.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "pain in one side of the belly",
+   "dolor de ijar",
+   "side pains"
+  ],
+  "citation": "Chapter 2: Sicknesses that Are Often Confused",
+  "danger_signs": [],
+  "review_note": "Chapter 2 gives a broad differential for one folk label, including ectopic pregnancy and appendicitis, so this entry cannot safely point to a single cause.",
+  "source_chapters": [
+   "Chapter 2",
+   "Chapter 3"
+  ],
+  "status": "NEEDS-REVIEW",
+  "summary": "Side pain is presented through the folk name dolor de ijar, used for any pain women get in one side of the belly, often going around to the mid or lower back. Possible causes listed include infection of the urinary system, including kidneys, bladder, or connecting tubes, cramps or gas pains, menstrual pains, appendicitis, and infection, cyst, or tumour in the womb or ovaries, or an ectopic pregnancy. Chapter 3 adds that urinary pain often sits in the mid or low back and goes around the waist to the lower belly, while ectopic pregnancy pain may be on one or both sides, sometimes with pain in the shoulder or neck. The cause must be identified rather than assumed.",
+  "symptom": "side pain in women",
+  "when_to_seek_care": "If unsure what the sickness is, especially if it seems serious, try to get medical help."
+ },
+ {
+  "symptom": "signs of pregnancy: missed period, morning sickness, needing to urinate more often, bigger belly and tender breasts, dark areas on face, breasts and belly, and baby moving in the fifth month",
+  "alternate_names": [
+   "early pregnancy signs",
+   "signs of being pregnant"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Signs of pregnancy listed in the chapter are missing the period, often the first sign; morning sickness, meaning nausea or feeling about to vomit especially in the morning, worse during the second and third months; needing to urinate more often; the belly getting bigger; the breasts getting bigger and feeling tender; dark areas on the face, breasts and belly known as the mask of pregnancy; and finally, during the fifth month or so, the child beginning to move in the womb. This entry records the signs as a presentation only; the chapter's guidance on staying healthy during pregnancy, including eating well, keeping clean, avoiding medicines, alcohol and smoking, and resting, is general health advice rather than treatment for a symptom.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "signs that labour is near: clear or blood-tinted mucus from the vagina, clear water from the vagina, and regular pains 10 to 20 minutes apart",
+  "alternate_names": [
+   "labour starting",
+   "signs of labour",
+   "waters breaking"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Signs that labour will start soon may not all happen at every birth and can happen in any order. Clear or blood-tinted mucus may come out of the vagina as the mucus plug is released when the cervix opens. Clear water may come out of the vagina when the bag of waters breaks before labour starts. Pains or contractions may begin, and while some contractions are common long before labour starts, when they occur regularly with ten to twenty minutes between them it is likely the beginning of labour, becoming more frequent and closer together as labour continues. When any of these signs happens it is time to get ready for the birth, let family and midwife know, make sure birth supplies are ready, and rest while possible.",
+  "danger_signs": [
+   "labour not starting within 24 hours of waters breaking, when infection is more likely"
+  ],
+  "when_to_seek_care": "If labour does not start within 24 hours of waters breaking, see a health worker, as infection is more likely.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "sinus pain",
+   "face pain above and below eyes",
+   "thick mucus in nose"
+  ],
+  "citation": "Chapter 13: Sinus Trouble (Sinusitis)",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "Sinusitis is inflammation of the hollows in the bone that open into the nose, usually after an ear or throat infection or a bad cold. Signs are pain in the face above and below the eyes, worse when tapping lightly over the bones or bending over, thick mucus or pus in the nose perhaps with a bad smell, a stuffy nose, fever sometimes, and certain teeth hurting. Treatment is drinking a lot of water, sniffing salt water or breathing steam, hot compresses on the face, decongestant nose drops, and an antibiotic as directed on the book's medicine pages.",
+  "symptom": "sinus trouble",
+  "when_to_seek_care": "If the person does not get better, seek medical help."
+ },
+ {
+  "alternate_names": [
+   "rash",
+   "itchy skin",
+   "impetigo",
+   "ringworm",
+   "pimples",
+   "weeping skin irritation"
+  ],
+  "citation": "Chapter 5: Healing Without Medicines; Chapter 3: How to Examine a Sick Person",
+  "danger_signs": [
+   "sores that keep growing and do not go away with treatment",
+   "hives or a rash with itching appearing after an injection, which may warn of a serious reaction if the same medicine is given again"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 3",
+   "Chapter 5",
+   "Chapter 9"
+  ],
+  "status": "ok",
+  "summary": "Skin complaints are grouped here because Chapters 3 and 5 treat examination and simple washing together rather than giving a single diagnosis. Chapter 3 advises examining the whole body for sores, rashes, welts, spots, patches, swelling, and swollen lymph nodes, and checking children between buttocks, in the genital area, between fingers and toes, behind ears, and in hair for lice, scabies, ringworm, rashes, and sores. Chapter 5 advises bathing often to help prevent skin infections, scrubbing sores, impetigo, ringworm of skin or scalp, cradle cap, and pimples with soap and clean water, and using cold compresses for itching, burning, or weeping irritations of the skin.",
+  "symptom": "skin sores, rash and itching irritation",
+  "when_to_seek_care": "Seek medical help as soon as possible for sores that keep growing and do not go away with treatment."
+ },
+ {
+  "symptom": "slow, painless loss of vision starting from the side, often unnoticed (chronic glaucoma)",
+  "alternate_names": [
+   "chronic glaucoma"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "In chronic glaucoma the pressure in the eye rises slowly, usually there is no pain, and vision is lost slowly starting from the side, so the person often does not notice the loss. The book describes a side-vision test in which the person covers one eye, looks at an object straight ahead, and notes when moving fingers coming from behind on each side of the head are first seen, since in glaucoma finger movement is first seen more toward the front. If discovered early, treatment with special eyedrops may prevent blindness, but dosage must be determined by a doctor or health worker who can measure eye pressure, drops must be used for life, and when possible eye surgery is usually the surest treatment.",
+  "danger_signs": [
+   "loss of vision"
+  ],
+  "when_to_seek_care": "Seek medical help; people over forty or with family members who have had glaucoma should try to have eye pressure checked once a year.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "small dark or light spots with a distinct irregular border on the neck, chest or back; or white patches on the skin",
+  "alternate_names": [
+   "tinea versicolor",
+   "white spots",
+   "vitiligo",
+   "pinta"
+  ],
+  "source_chapters": [
+   "Chapter 15"
+  ],
+  "citation": "Chapter 15: Skin Problems",
+  "summary": "Tinea versicolor is a mild fungus infection causing small dark or light spots with a distinct and irregular border, often on the neck, chest and back, slightly scaly but usually not itchy and of little medical importance. The chapter also describes small whitish spots common on the cheeks of dark-skinned children who spend a lot of time in the sun, which are not an infection and need no treatment. Vitiligo is loss of skin colour producing white patches, most common on the hands, feet, face and upper body, which the book says is not an illness and needs no treatment beyond sun protection. Pinta, in Latin America, starts with bluish or red pimples and later leaves pale or white patches.",
+  "danger_signs": [],
+  "when_to_seek_care": "Have a child checked if leprosy is common in the area, because pale spots can sometimes be early signs of leprosy, which the book says are never completely white and may have reduced feeling.",
+  "status": "NEEDS-REVIEW",
+  "review_note": "Grouped because the chapter presents these together as white-spot presentations that look alike; the distinctions (fungus versus vitiligo versus pinta versus possible leprosy) need a health worker to confirm, and this entry should not be used to distinguish them."
+ },
+ {
+  "symptom": "small moving spots before the eyes, like bits of string or cobwebs, when looking at a bright surface (floaters)",
+  "alternate_names": [
+   "floaters",
+   "spots before the eyes"
+  ],
+  "source_chapters": [
+   "Chapter 16",
+   "Chapter 22"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "Sometimes older people complain of small moving spots when they look at a bright surface such as a wall or sky. The spots move when the eyes move and may look like bits of string or cobwebs. These spots are usually harmless and need no treatment. But if they appear suddenly in large numbers and vision begins to fail from one side, the book says this could be a medical emergency, a detached retina, and to seek medical help at once. Chapter 22 repeats floaters as a common problem of old age.",
+  "danger_signs": [
+   "spots appearing suddenly in large numbers",
+   "vision failing from one side"
+  ],
+  "when_to_seek_care": "Seek medical help at once if spots appear suddenly in large numbers and vision begins to fail from one side.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "small painful blisters on the lips that break and form scabs (cold sores or fever blisters)",
+  "alternate_names": [
+   "cold sores",
+   "fever blisters",
+   "herpes of the lips"
+  ],
+  "source_chapters": [
+   "Chapter 17"
+  ],
+  "citation": "Chapter 17: The Teeth, Gums, and Mouth",
+  "summary": "Small painful blisters on the lips, or on the genitals, that break and form scabs are caused by the herpes virus and may appear after fever or stress. They heal after one or two weeks. The book advises that holding ice on the sores for several minutes several times a day may help them heal faster, and that alum, camphor or bitter plant juices may help, while an antiviral medicine on its medicine pages can make cold sores less painful. For herpes on the genitals the book cross-refers to its genital herpes section.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "small, white, painful spots inside the lip or mouth (canker sores)",
+  "alternate_names": [
+   "canker sores",
+   "mouth ulcers"
+  ],
+  "source_chapters": [
+   "Chapter 17"
+  ],
+  "citation": "Chapter 17: The Teeth, Gums, and Mouth",
+  "summary": "Canker sores are small, white, painful spots inside the lip or mouth that may appear after fever or stress. In one to three weeks they go away, and the book advises rinsing the mouth with salt water. It states plainly that antibiotics do not help canker sores. No danger signs or referral threshold are stated for canker sores in this section.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "fang marks",
+   "poisonous snake bite",
+   "snake bite"
+  ],
+  "citation": "Chapter 1: Home Cures and Popular Beliefs; Chapter 9: Instructions and Precautions for Injections; Chapter 10: Snakebite",
+  "danger_signs": [
+   "poisonous snakebite",
+   "the book states that many people still become very ill or die despite common home remedies for poisonous bites"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1",
+   "Chapter 10",
+   "Chapter 9"
+  ],
+  "status": "ok",
+  "summary": "Snakebite is presented as a case where home cures have, as far as the book knows, little effect beyond the healing power of belief. Village remedies such as leaves, tobacco, or smearing bile are described as having no direct effect against snake poison, though calming fear may slow pulse and movement and so slow the spread of poison. The book advises modern treatment for snakebite and being prepared by obtaining antitoxins before they are needed, rather than waiting until it is too late. Chapter 9 lists poisonous snakebite among emergencies where medical help should be sought as fast as possible and appropriate medicine injected if help will be delayed.",
+  "symptom": "snakebite",
+  "when_to_seek_care": "Get medical help as fast as you can; if there will be delay, inject the appropriate medicine as soon as possible, following the book's precautions."
+ },
+ {
+  "symptom": "sore or cracked nipples when breastfeeding",
+  "alternate_names": [
+   "sore nipples",
+   "cracked nipples"
+  ],
+  "source_chapters": [
+   "Chapter 19"
+  ],
+  "citation": "Chapter 19: Information for Mothers and Midwives",
+  "summary": "Sore or cracked nipples develop when the baby sucks only the nipple instead of taking the nipple and part of the breast when breastfeeding. The book advises that it is important to keep breastfeeding even if it hurts, to breastfeed often for as long as the baby wants to suck, to be sure the baby is taking as much of the breast into the mouth as possible, and to change the baby's position each time the baby nurses. If only one nipple is sore, the baby should suck on the other side first, then on the sore nipple, and after feeding a little milk should be squeezed out and rubbed over the sore nipple and left to dry, which helps the nipple heal. If the nipple oozes a lot of blood or pus, the breast should be milked by hand until the nipple is healed.",
+  "danger_signs": [
+   "nipple oozing a lot of blood or pus"
+  ],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "sore muscles",
+   "stiff joints",
+   "muscle pain",
+   "sprain",
+   "strain"
+  ],
+  "citation": "Chapter 5: Healing Without Medicines; Chapter 6: Right and Wrong Uses of Modern Medicines",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 5",
+   "Chapter 6"
+  ],
+  "status": "ok",
+  "summary": "Sore, stiff muscles and joints are presented as complaints often helped by water-based care rather than medicines. Chapter 5 advises hot compresses for stiff, sore muscles and joints, and for strains and sprains soaking the joint in cold water on the first day and then using hot soaks. Chapter 6 warns against using powerful steroid medicines for minor aches and pains, since steroids can lower defences against infection, worsen tuberculosis, cause stomach ulcer bleeding, and weaken bones, and warns against dangerous arthritis medicines that can cause a deadly blood disease and damage stomach, liver, and kidneys. For arthritis pain, the book presents simpler painkillers as much safer and cheaper, with details in its medicine pages.",
+  "symptom": "sore, stiff muscles and joints and strains or sprains",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "sore throat",
+   "tonsillitis",
+   "throat pain"
+  ],
+  "citation": "Chapter 5: Healing Without Medicines; Chapter 3: How to Examine a Sick Person",
+  "danger_signs": [
+   "a stiff jaw that will not open, which the book links with a possible severe infection of the throat, a tooth infection, or tetanus"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 3",
+   "Chapter 5"
+  ],
+  "status": "ok",
+  "summary": "Sore throat is presented both as an examination finding and as a complaint helped by simple measures. Chapter 3 advises examining mouth and throat with a torch or sunlight, noting whether the throat is red and whether tonsils are swollen or have spots with pus, and checking for mouth sores, inflamed gums, sore tongue, and rotten or abscessed teeth. Chapter 5 advises gargling with warm salt water for sore throat or tonsillitis, as one of the cases where correct use of water may do more good than medicines. A stiff jaw is separately noted in Chapter 3 as possibly linked with a severe infection of the throat, among other causes.",
+  "symptom": "sore throat",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "symptom": "speck of dirt or sand in the eye",
+  "alternate_names": [
+   "foreign matter in the eye"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "A speck of dirt in the eye usually affects one eye only, with redness and pain that vary. The book advises having the person close the eyes and look left, right, up and down, then holding the eye open while the person looks up and then down, which makes the eye produce more tears so dirt often comes out by itself. It can also be removed by flooding the eye with clean water or with the corner of a clean cloth or moist cotton, and a particle under the upper lid can be found by turning the lid up and looking in the small groove near its edge.",
+  "danger_signs": [],
+  "when_to_seek_care": "If the particle cannot be got out easily, use an antibiotic eye ointment, cover the eye with a bandage, and go for medical help.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "black widow bite",
+   "painful spider bite",
+   "muscle cramps after a spider bite"
+  ],
+  "citation": "Chapter 10: Black Widow and Other Spider Bites",
+  "danger_signs": [
+   "painful muscle cramps all over the body",
+   "extreme pain in stomach muscles which become rigid",
+   "signs of shock"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "Most spider bites, including tarantula bites, are painful but not dangerous. A black widow bite, however, can make an adult quite ill and can be dangerous for a small child, often causing painful muscle cramps all over the body and extreme pain in the stomach muscles, which become rigid, sometimes confused with appendicitis. The book advises pain relief, looking for medical help, and tetanus antitoxin, noting that a good antivenom exists but is hard to get.",
+  "symptom": "spider bite",
+  "when_to_seek_care": "Look for medical help."
+ },
+ {
+  "alternate_names": [
+   "twisted joint",
+   "sprained ankle",
+   "bruised joint"
+  ],
+  "citation": "Chapter 10: Strains and Sprains",
+  "danger_signs": [
+   "pain and swelling do not start to go down after 48 hours",
+   "foot seems very loose or floppy",
+   "trouble moving the toes"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "ok",
+  "summary": "It is often impossible to know whether a hand or foot is bruised, sprained or broken without an X-ray, and breaks and sprains are treated more or less the same. The book advises keeping the joint motionless with firm support, resting a sprained foot with crutches, keeping the part raised, using cold cloths or ice in cloth for the first day or two, then hot soaks after swelling stops getting worse, and pain relief. Serious sprains need at least three or four weeks to heal.",
+  "symptom": "sprain or strain",
+  "when_to_seek_care": "Seek medical help if pain and swelling do not start to go down after 48 hours, if the foot seems very loose or floppy, or if the person has trouble moving the toes."
+ },
+ {
+  "alternate_names": [
+   "stiff neck",
+   "arched back",
+   "jaw stiffness",
+   "neck stiffness"
+  ],
+  "citation": "Chapter 3: How to Examine a Sick Person; Chapter 4: How to Take Care of a Sick Person",
+  "danger_signs": [
+   "stiff neck with arched back, with or without a stiff jaw",
+   "a head that will not bend forward in a very sick child"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 3",
+   "Chapter 4"
+  ],
+  "status": "ok",
+  "summary": "Stiffness is presented as an important warning examination finding. If the jaw is stiff or will not open, the book advises suspecting tetanus or a severe infection of the throat or tooth, while a jaw problem after yawning or a blow may be a dislocated jaw. If the neck or back is stiff and bent backwards in a very sick child, meningitis is suspected, and if the head will not bend forward or cannot be put between the knees, meningitis is described as likely. Chapter 4 lists stiff neck with arched back, with or without a stiff jaw, among signs of dangerous illness requiring medical help as soon as possible.",
+  "symptom": "stiff neck, back or jaw",
+  "when_to_seek_care": "Seek medical help as soon as possible for stiff neck with arched back, with or without a stiff jaw."
+ },
+ {
+  "alternate_names": [
+   "stomach-ache",
+   "belly pain",
+   "abdominal pain",
+   "gut cramps"
+  ],
+  "citation": "Chapter 2: Sicknesses that Are Often Confused; Chapter 3: How to Examine a Sick Person",
+  "danger_signs": [
+   "a very hard belly",
+   "strong, continuous stomach pains with vomiting in a person who does not have diarrhea or cannot have a bowel movement",
+   "no bowel sounds heard after listening for about two minutes when there is constant stomach pain with nausea and no bowel movement"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1",
+   "Chapter 2",
+   "Chapter 3"
+  ],
+  "status": "ok",
+  "summary": "Stomach pain is presented as a complaint with many possible causes, and the book stresses finding the exact place, whether pain is steady or comes and goes like cramps, and whether the belly is soft or hard. In Chapter 2, illnesses causing stomach pain or diarrhea may all be called empacho in the folk example, including diarrhea or dysentery with cramps, worms, a swollen stomach from malnutrition, indigestion or stomach ulcer, and rarely true gut obstruction or appendicitis. Chapter 3 maps typical pain areas for ulcer, appendicitis, gallbladder, liver, urinary problems, and ectopic pregnancy, and warns that a very hard belly may mean an acute abdomen.",
+  "symptom": "stomach pain and cramps",
+  "when_to_seek_care": "Seek medical help at once for an acute abdomen pattern such as strong continuous stomach pain with vomiting and no bowel movement."
+ },
+ {
+  "symptom": "stroke in an older person: suddenly falling down unconscious, reddish face, hoarse noisy breathing, strong slow pulse, coma for hours or days, then trouble speaking, seeing or thinking, or paralysis of one side of face and body",
+  "alternate_names": [
+   "stroke",
+   "apoplexy",
+   "cerebro-vascular accident",
+   "CVA"
+  ],
+  "source_chapters": [
+   "Chapter 22"
+  ],
+  "citation": "Chapter 22: Health and Sicknesses of Older People",
+  "summary": "In older people stroke commonly results from a blood clot or bleeding inside the brain and often strikes without warning. The person may suddenly fall down unconscious, with a reddish face, hoarse and noisy breathing, and a strong and slow pulse, and may remain in a coma for hours or days. If the person lives, there may be trouble speaking, seeing or thinking, or one side of the face and body may be paralysed. In minor strokes some of the same problems may result without loss of consciousness, and difficulties caused by stroke sometimes get better with time. The book advises putting the person in bed with the head a little higher than the feet, and if unconscious, rolling the head back and to one side so saliva or vomit runs out of the mouth rather than into the lungs, giving no food, drink or medicines by mouth while unconscious, and seeking medical help if possible.",
+  "danger_signs": [
+   "sudden unconsciousness",
+   "coma",
+   "paralysis of one side"
+  ],
+  "when_to_seek_care": "If possible, seek medical help; after a stroke, if the person remains partly paralysed, help with walking with a cane and self-care, avoiding heavy exercise and anger.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "blocked nose",
+   "stuffy nose"
+  ],
+  "citation": "Chapter 13: Stuffy and Runny Noses",
+  "danger_signs": [
+   "ear infections in children or sinus problems in adults from a lot of mucus in the nose"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 13"
+  ],
+  "status": "ok",
+  "summary": "A stuffy or runny nose can result from a cold or allergy, and a lot of mucus in the nose may cause ear infections in children or sinus problems in adults. To clear it, the book advises sucking mucus from a little child's nose with a suction bulb, sniffing a little salt water for older children and adults, breathing hot water vapor, and wiping rather than blowing the nose, since blowing may lead to earache and sinus infections. Decongestant nose drops may help people who often get earaches or sinus trouble after a cold.",
+  "symptom": "stuffy and runny nose",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "blocked nose",
+   "runny nose",
+   "plugged nose",
+   "nasal congestion"
+  ],
+  "citation": "Chapter 3: How to Examine a Sick Person; Chapter 5: Healing Without Medicines",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 3",
+   "Chapter 5"
+  ],
+  "status": "ok",
+  "summary": "A runny or plugged nose is presented as an examination finding, with advice to notice how a baby breathes through the nose and to look inside with light for mucus, pus, blood, redness, swelling, or bad smell, and to check for signs of sinus trouble or hay fever. Chapter 5 advises sniffing salt water for a stuffed up nose, as one of the water-based measures that may help more than medicines. This entry records only those examination and simple-care points from Chapters 3 and 5 and does not attribute a stuffed nose to a single cause, since colds, sinus trouble, and hay fever are all mentioned as possibilities to check for.",
+  "symptom": "stuffy or runny nose",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "symptom": "sudden headache or severe pain in one eye, red eye, blurred vision, hard eyeball and vomiting, pupil larger than the other eye (acute glaucoma)",
+  "alternate_names": [
+   "acute glaucoma"
+  ],
+  "source_chapters": [
+   "Chapter 16"
+  ],
+  "citation": "Chapter 16: The Eyes",
+  "summary": "Glaucoma is a dangerous disease from too much pressure in the eye, usually beginning after the age of forty and a common cause of blindness. Acute glaucoma starts suddenly with a headache or severe pain in the eye, the eye becomes red, vision blurred, the eyeball feels hard to the touch like a marble, there may be vomiting, and the pupil of the bad eye is bigger than that of the good eye. If not treated very soon, acute glaucoma will cause blindness within a few days, surgery is often needed, and the book advises getting medical help fast. Chapter 22 repeats the warning for everyone over forty to watch for signs of glaucoma.",
+  "danger_signs": [
+   "great pain inside the eye",
+   "a big difference in pupil size with pain in the eye or head",
+   "loss of vision"
+  ],
+  "when_to_seek_care": "Get medical help fast; if not treated very soon it will cause blindness within a few days.",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "symptom": "sudden paralysis of one side of the face only, with no other signs of stroke, in a younger or middle-aged person (Bell's palsy)",
+  "alternate_names": [
+   "Bell's palsy",
+   "facial paralysis"
+  ],
+  "source_chapters": [
+   "Chapter 22"
+  ],
+  "citation": "Chapter 22: Health and Sicknesses of Older People",
+  "summary": "If a younger or middle-aged person suddenly develops paralysis on one side of the face with no other signs of stroke, this is probably a temporary paralysis of the face nerve called Bell's palsy. It will usually go away by itself in a few weeks or months, the cause is usually not known, no treatment is needed but hot soaks may help, and if one eye does not close all the way, the eye should be bandaged shut at night to prevent damage from dryness. This entry is kept separate from stroke because the chapter presents it as a distinct, usually temporary condition that should not be confused with a stroke.",
+  "danger_signs": [],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "sudden upset",
+   "congestion",
+   "la congestion",
+   "sudden illness with great distress"
+  ],
+  "citation": "Chapter 2: Sicknesses that Are Often Confused",
+  "danger_signs": [
+   "severe allergic reaction signs including breathing trouble and severe distress",
+   "seizures, convulsions, or paralysis",
+   "sudden or severe difficulty breathing"
+  ],
+  "review_note": "This is a folk umbrella label covering unrelated emergencies and minor upsets in Chapter 2, so it is not a single symptom or diagnosis and needs review before any use.",
+  "source_chapters": [
+   "Chapter 2"
+  ],
+  "status": "NEEDS-REVIEW",
+  "summary": "Sudden severe distress is presented through the folk name la congestion, used for any sudden upset or illness causing great distress, whether of the head, chest, stomach, or whole body. Different illnesses sometimes called by this name include food poisoning with sudden vomiting followed by diarrhea, cramps, and weakness, a severe allergic reaction with vomiting, diarrhea, cold sweat, breathing trouble, itchy rash, and severe distress, any sudden upset of the stomach or gut, sudden or severe difficulty breathing, illnesses causing seizures, convulsions, or paralysis, and heart attacks, mostly in older persons. The chapter stresses going by signs and history, not by the folk name.",
+  "symptom": "sudden severe distress",
+  "when_to_seek_care": "If unsure what the sickness is, especially if it seems serious, try to get medical help."
+ },
+ {
+  "symptom": "sudden severe sore throat with high fever, often without cold or cough, very red back of mouth and tonsils, and swollen tender lymph nodes under the jaw or in the neck (strep throat)",
+  "alternate_names": [
+   "strep throat"
+  ],
+  "source_chapters": [
+   "Chapter 21"
+  ],
+  "citation": "Chapter 21: Health and Sicknesses of Children",
+  "summary": "For the sore throat that often comes with the common cold or flu, antibiotics should usually not be used and will do no good, with gargles and pain relief advised instead. One kind of sore throat called strep throat should be treated with penicillin, is most common in children and young adults, and usually begins suddenly with severe sore throat and high fever, often without signs of a cold or cough. The back of the mouth and tonsils become very red, and the lymph nodes under the jaw or in the neck may become swollen and tender. If penicillin is given early and continued for ten days, there is less danger of getting rheumatic fever. A child with strep throat should eat and sleep far apart from others to prevent others getting it.",
+  "danger_signs": [
+   "risk of rheumatic fever if not treated early"
+  ],
+  "when_to_seek_care": "not stated in the book",
+  "status": "ok",
+  "review_note": ""
+ },
+ {
+  "alternate_names": [
+   "sunken fontanel",
+   "sunken fontanelle",
+   "soft spot sinking inward"
+  ],
+  "citation": "Chapter 1: Home Cures and Popular Beliefs",
+  "danger_signs": [
+   "a soft spot that is swollen or bulges upward, which the book says may be a sign of meningitis",
+   "a baby who does not get more liquid soon may die, in the chapter's question-and-answer discussion"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1"
+  ],
+  "status": "ok",
+  "summary": "The soft spot on top of a newborn baby's head normally takes about a year to a year and a half to close. When it sinks inward, the book explains that this is really caused by dehydration, meaning the child is losing more liquid than they are drinking, usually because of diarrhea, or diarrhea with vomiting. Folk attempts to correct it by sucking on the soft spot, pushing up on the roof of the mouth, or holding the baby upside down are described as not helping. Treatment in this chapter is to give plenty of liquid, including rehydration drink, breast milk, or boiled water, and if necessary treat the causes of diarrhea and vomiting.",
+  "symptom": "sunken soft spot on a baby's head",
+  "when_to_seek_care": "Begin treatment at once and get medical help if the soft spot is swollen or bulges upward."
+ },
+ {
+  "alternate_names": [
+   "broken neck",
+   "broken back",
+   "suspected spine injury"
+  ],
+  "citation": "Chapter 10: Broken Necks and Backs; How to Move a Badly Injured Person",
+  "danger_signs": [
+   "chance the back or neck is broken"
+  ],
+  "review_note": "The chapter gives moving instructions rather than a symptom list for neck and back breaks, so this entry is framed around suspected injury and careful handling rather than presenting signs.",
+  "source_chapters": [
+   "Chapter 10"
+  ],
+  "status": "NEEDS-REVIEW",
+  "summary": "If there is any chance a person's back or neck has been broken, the book stresses great care when moving them and trying not to change their position. If possible, a health worker should be brought before moving them, and if they must be moved, it should be without bending the back or neck, with the head and neck kept from moving, for example with tightly folded clothing or sandbags on each side of the head.",
+  "symptom": "suspected broken neck or back",
+  "when_to_seek_care": "Bring a health worker before moving the person if possible."
+ },
+ {
+  "alternate_names": [
+   "wet malnutrition",
+   "swollen child",
+   "swollen feet face and hands"
+  ],
+  "citation": "Chapter 11: Severe Malnutrition, Wet Malnutrition or Kwashiorkor",
+  "danger_signs": [
+   "swelling of feet, hands and face"
+  ],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 11"
+  ],
+  "status": "ok",
+  "summary": "Wet malnutrition, or kwashiorkor, is recognized first by swelling of the feet, hands and face, with other signs coming later. It can happen when a child does not eat enough body-building protein foods, and more often when he does not get enough energy foods so his body burns up whatever protein he eats for energy. The book says this child needs more food more often, a lot of energy-rich foods and some protein-rich foods, and advises avoiding old or possibly spoiled or moldy stored foods.",
+  "symptom": "swelling from malnutrition",
+  "when_to_seek_care": "not stated in the book"
+ },
+ {
+  "alternate_names": [
+   "swollen feet",
+   "swelling of feet in pregnancy"
+  ],
+  "citation": "Chapter 1: Home Cures and Popular Beliefs",
+  "danger_signs": [],
+  "review_note": "",
+  "source_chapters": [
+   "Chapter 1"
+  ],
+  "status": "ok",
+  "summary": "Swelling of the feet is discussed through corn silk tea, which is described as making a person pass more urine and as helping to reduce swelling of the feet, especially in pregnant women. The chapter points to later pages on pregnancy-related swelling for fuller discussion. This entry records only that limited home-remedy mention in Chapter 1 and does not present corn silk as a treatment for all causes of swollen feet. Other causes of swelling are not distinguished in this chapter, so a swollen foot complaint should not be assumed to have a single explanation from this passage alone.",
+  "symptom": "swelling of the feet",
+  "when_to_seek_care": "not stated in the book"
+ }
+]
