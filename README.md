@@ -86,7 +86,7 @@ Key API endpoints (examples)
 
 Team
 - Project built by TEAM NIBBLE
-- Members: Toluwani Bakare, Onaade Abdulmuqtadir, Olanrewaju Olamide, Yusuf Masroor Ahmad
+- Members: Toluwani Bakare, Olanrewaju Olamide, Yusuf Masroor Ahmad, Emmanuel Ariyo
 
 License & usage
 This project is a hackathon prototype and may not be used, copied, distributed, or modified without explicit permission from the TEAM NIBBLE contributors. If you wish to use this project in whole or part, please contact the maintainers to request permission.
